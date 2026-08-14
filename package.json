@@ -1,0 +1,21 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/pg": "^8.21.0",
+    "dotenv": "^17.4.2",
+    "prisma": "^7.9.1"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.1",
+    "pg": "^8.23.0"
+  }
+}
