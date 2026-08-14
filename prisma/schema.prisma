@@ -15,6 +15,7 @@ datasource db {
 enum Stock {
   disponible
   ultima_unidad
+  a_consultar
   sin_stock
 }
 
@@ -37,11 +38,11 @@ model Producto {
   precio Decimal
   estado_stock Stock //agarra el enum Stock con las opciones: disponible, ultima_unidad, sin_stock
   descripcion String
-  imagen_url String
-  created_at DateTime
-  updated_at DateTime
-  categoria_id Int
-  categoria Categoria @relation(fields: [categoria_id], references: [id])
-  artista_id Int? //el ? lo hace nullable osea opcional
-  artista Artista? @relation(fields: [artista_id], references: [id])
+  imagenUrl String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  categoriaId Int
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  artistaId Int? //el ? lo hace nullable osea opcional
+  artista Artista? @relation(fields: [artistaId], references: [id])
 }
