@@ -19,9 +19,33 @@ enum Stock {
   sin_stock
 }
 
+enum Condicion {
+  nuevo
+  usado
+  restaurado
+}
+
+enum Estado {
+  pendiente
+  leido
+  respondido
+}
+
+model AdminUser {
+  id Int @id @default(autoincrement())
+  nombre String
+  apellido String
+  mail String
+  telefono Int
+  passwordhash String
+}
+
 model Categoria {
   id Int @id @default(autoincrement())
   nombre String
+  sello String 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   productos Producto[] // relacion opuesta: una categoria tiene una lista de productos (siempre tiene que estar en prisma)
 }
 
@@ -31,18 +55,56 @@ model Artista {
   productos Producto[]
 }
 
+model StoreInfo {
+  id Int @id @default(1) // fila única
+  nombre String
+  direccion String
+  telefono String?
+  email String?
+  instagram String?
+  whatsapp String?
+  description String?
+  horario Json // [{ label: "Miér a Vie", value: "13 a 20 hs" }]
+}
+
 model Producto {
   id Int @id @default(autoincrement())
   nombre String
   anio Int
   precio Decimal
+  stock Int
   estado_stock Stock //agarra el enum Stock con las opciones: disponible, ultima_unidad, sin_stock
+  condicion Condicion
+  destacado Boolean
+  esActivo Boolean
   descripcion String
-  imagenUrl String
+  imagenId Int
+  imagen Imagen @relation(fields: [imagenId],references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   categoriaId Int
   categoria Categoria @relation(fields: [categoriaId], references: [id])
   artistaId Int? //el ? lo hace nullable osea opcional
   artista Artista? @relation(fields: [artistaId], references: [id])
+  consultaId Int
+  consulta Consulta @relation(fields: [consultaId], references: [id])
+}
+
+model Imagen {
+  id Int @id @default(autoincrement())
+  url String
+  alt String //descripcion de la imagen
+  productos Producto[]
+}
+
+model Consulta {
+  id Int @id @default(autoincrement())
+  nombre String
+  email String
+  telefono Int
+  titulo String
+  mensaje String
+  estado Estado
+  fecha DateTime
+  productos Producto[]
 }
