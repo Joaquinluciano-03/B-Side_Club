@@ -15,96 +15,145 @@ datasource db {
 enum Stock {
   disponible
   ultima_unidad
+  reservado
   a_consultar
-  sin_stock
-}
-
-enum Condicion {
-  nuevo
-  usado
-  restaurado
+  vendido
 }
 
 enum Estado {
   pendiente
-  leido
-  respondido
+  leida
+  respondida
+}
+
+enum Canal {
+  whatsapp
+  instagram
+  formulario
+}
+
+enum Rol {
+  admin
+  taller
+  mostrador
+}
+
+enum InvitacionEstado {
+  pendiente
+  aceptada
+  revocada
 }
 
 model AdminUser {
-  id Int @id @default(autoincrement())
-  nombre String
-  apellido String
-  mail String
-  telefono Int
+  id           Int                  @id @default(autoincrement())
+  nombre       String
+  apellido     String
+  mail         String               @unique
+  telefono     String // obligatorio: dato minimo de registro segun la consigna del TP
   passwordhash String
+  rol          Rol                  @default(mostrador)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  invitaciones Invitacion[]
+  resetTokens  PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id          Int       @id @default(autoincrement())
+  token       String    @unique
+  adminUserId Int
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  expiraEn    DateTime
+  usado       Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model Invitacion {
+  id            Int              @id @default(autoincrement())
+  email         String
+  token         String           @unique
+  rol           Rol              @default(mostrador)
+  estado        InvitacionEstado @default(pendiente)
+  createdAt     DateTime         @default(now())
+  expiraEn      DateTime
+  invitadoPorId Int?
+  invitadoPor   AdminUser?       @relation(fields: [invitadoPorId], references: [id])
 }
 
 model Categoria {
-  id Int @id @default(autoincrement())
-  nombre String
-  sello String 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  productos Producto[] // relacion opuesta: una categoria tiene una lista de productos (siempre tiene que estar en prisma)
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  slug        String     @unique
+  descripcion String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  productos   Producto[] // relacion opuesta: una categoria tiene una lista de productos (siempre tiene que estar en prisma)
 }
 
 model Artista {
-  id Int @id @default(autoincrement())
-  nombre String
+  id        Int        @id @default(autoincrement())
+  nombre    String
   productos Producto[]
 }
 
 model StoreInfo {
-  id Int @id @default(1) // fila única
-  nombre String
-  direccion String
-  telefono String?
-  email String?
-  instagram String?
-  whatsapp String?
+  id          Int     @id @default(1) // fila única
+  nombre      String
+  direccion   String
+  telefono    String?
+  email       String?
+  instagram   String?
+  whatsapp    String?
   description String?
-  horario Json // [{ label: "Miér a Vie", value: "13 a 20 hs" }]
+  horario     Json // [{ label: "Miér a Vie", value: "13 a 20 hs" }]
 }
 
 model Producto {
-  id Int @id @default(autoincrement())
-  nombre String
-  anio Int
-  precio Decimal
-  stock Int
-  estado_stock Stock //agarra el enum Stock con las opciones: disponible, ultima_unidad, sin_stock
-  condicion Condicion
-  destacado Boolean
-  esActivo Boolean
-  descripcion String
-  imagenId Int
-  imagen Imagen @relation(fields: [imagenId],references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  categoriaId Int
-  categoria Categoria @relation(fields: [categoriaId], references: [id])
-  artistaId Int? //el ? lo hace nullable osea opcional
-  artista Artista? @relation(fields: [artistaId], references: [id])
-  consultaId Int
-  consulta Consulta @relation(fields: [consultaId], references: [id])
+  id           Int        @id @default(autoincrement())
+  nombre       String
+  anio         Int
+  precio       Decimal? // null = "a consultar"
+  stock        Int
+  estado_stock Stock      @default(disponible)
+  condicion    String? // texto libre: la escala de estado varia mucho segun el tipo de producto (vinilo, cassette, equipo)
+  destacado    Boolean    @default(false)
+  esActivo     Boolean    @default(true)
+  descripcion  String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  categoriaId  Int
+  categoria    Categoria  @relation(fields: [categoriaId], references: [id])
+  artistaId    Int? //el ? lo hace nullable osea opcional
+  artista      Artista?   @relation(fields: [artistaId], references: [id])
+  imagenes     Imagen[]
+  consultas    Consulta[]
+
+  @@index([nombre]) // busqueda de publicaciones por nombre
+  @@index([esActivo, destacado]) // listado publico: activos, y destacados de la home
 }
 
 model Imagen {
-  id Int @id @default(autoincrement())
-  url String
-  alt String //descripcion de la imagen
-  productos Producto[]
+  id         Int      @id @default(autoincrement())
+  url        String
+  alt        String //descripcion de la imagen
+  orden      Int      @default(0)
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
 }
 
 model Consulta {
-  id Int @id @default(autoincrement())
-  nombre String
-  email String
-  telefono Int
-  titulo String
-  mensaje String
-  estado Estado
-  fecha DateTime
-  productos Producto[]
+  id         Int       @id @default(autoincrement())
+  nombre     String
+  email      String
+  telefono   String?
+  asunto     String
+  mensaje    String
+  canal      Canal
+  estado     Estado    @default(pendiente)
+  fecha      DateTime  @default(now())
+  productoId Int? // opcional: la consulta puede no referirse a ningun producto del catalogo
+  producto   Producto? @relation(fields: [productoId], references: [id])
+
+  @@index([estado]) // panel: filtrar consultas por estado (pendiente/leida/respondida)
+  @@index([fecha])
 }
