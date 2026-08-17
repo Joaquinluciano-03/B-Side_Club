@@ -3,7 +3,7 @@
 // Se corre con: npm run seed
 
 const bcrypt = require("bcrypt");
-const { prisma } = require("../src/db");
+const { prisma } = require("../src/config/db");
 
 const superAdminData = {
   nombre: "Admin",
