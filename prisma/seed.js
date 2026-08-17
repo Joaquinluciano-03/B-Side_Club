@@ -2,7 +2,16 @@
 // (demo/demo.html): categorias, productos, info del local y consultas.
 // Se corre con: npm run seed
 
+const bcrypt = require("bcrypt");
 const { prisma } = require("../src/db");
+
+const superAdminData = {
+  nombre: "Admin",
+  apellido: "B-Side Club",
+  mail: "admin.bsideclub@gmail.com",
+  telefono: "11 5555-0142",
+  passwordPlana: "admin123", // se hashea antes de guardarla, nunca se guarda tal cual
+};
 
 // "clave" es solo para relacionar cada producto con su categoria aca abajo,
 // no se guarda en la base (Categoria no tiene slug).
@@ -66,6 +75,20 @@ async function main() {
   await prisma.producto.deleteMany(); // esto borra tambien las Imagen (onDelete: Cascade)
   await prisma.categoria.deleteMany();
   await prisma.storeInfo.deleteMany();
+  await prisma.user.deleteMany();
+
+  console.log("Creando el usuario super_admin...");
+  const passwordhash = await bcrypt.hash(superAdminData.passwordPlana, 10);
+  await prisma.user.create({
+    data: {
+      nombre: superAdminData.nombre,
+      apellido: superAdminData.apellido,
+      mail: superAdminData.mail,
+      telefono: superAdminData.telefono,
+      passwordhash,
+      rol: "super_admin",
+    },
+  });
 
   console.log("Creando categorias...");
   const categoriasPorClave = {};
@@ -125,7 +148,8 @@ async function main() {
     });
   }
 
-  console.log("Listo: 4 categorias, 16 productos, info del local y 6 consultas.");
+  console.log("Listo: 1 super_admin, 4 categorias, 16 productos, info del local y 6 consultas.");
+  console.log(`Login del super_admin -> mail: ${superAdminData.mail} / password: ${superAdminData.passwordPlana}`);
 }
 
 main()
