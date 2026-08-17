@@ -33,9 +33,9 @@ enum Canal {
 }
 
 enum Rol {
-  admin
-  taller
-  mostrador
+  super_admin
+  administrador
+  vendedor
 }
 
 enum InvitacionEstado {
@@ -44,14 +44,14 @@ enum InvitacionEstado {
   revocada
 }
 
-model AdminUser {
+model User {
   id           Int                  @id @default(autoincrement())
   nombre       String
   apellido     String
   mail         String               @unique
   telefono     String // obligatorio: dato minimo de registro segun la consigna del TP
   passwordhash String
-  rol          Rol                  @default(mostrador)
+  rol          Rol // super_admin (dueño, unico, no se elimina), administrador o vendedor
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   invitaciones Invitacion[]
@@ -59,25 +59,25 @@ model AdminUser {
 }
 
 model PasswordResetToken {
-  id          Int       @id @default(autoincrement())
-  token       String    @unique
-  adminUserId Int
-  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
-  expiraEn    DateTime
-  usado       Boolean   @default(false)
-  createdAt   DateTime  @default(now())
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiraEn  DateTime
+  usado     Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Invitacion {
   id            Int              @id @default(autoincrement())
   email         String
   token         String           @unique
-  rol           Rol              @default(mostrador)
+  rol           Rol              @default(vendedor)
   estado        InvitacionEstado @default(pendiente)
   createdAt     DateTime         @default(now())
   expiraEn      DateTime
   invitadoPorId Int?
-  invitadoPor   AdminUser?       @relation(fields: [invitadoPorId], references: [id])
+  invitadoPor   User?            @relation(fields: [invitadoPorId], references: [id])
 }
 
 model Categoria {
@@ -87,17 +87,11 @@ model Categoria {
   descripcion String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  productos   Producto[] // relacion opuesta: una categoria tiene una lista de productos (siempre tiene que estar en prisma)
-}
-
-model Artista {
-  id        Int        @id @default(autoincrement())
-  nombre    String
-  productos Producto[]
+  productos   Producto[] 
 }
 
 model StoreInfo {
-  id          Int     @id @default(1) // fila única
+  id          Int     @id @default(1) 
   nombre      String
   direccion   String
   telefono    String?
@@ -105,7 +99,7 @@ model StoreInfo {
   instagram   String?
   whatsapp    String?
   description String?
-  horario     Json // [{ label: "Miér a Vie", value: "13 a 20 hs" }]
+  horario     Json
 }
 
 model Producto {
@@ -115,7 +109,7 @@ model Producto {
   precio       Decimal? // null = "a consultar"
   stock        Int
   estado_stock Stock      @default(disponible)
-  condicion    String? // texto libre: la escala de estado varia mucho segun el tipo de producto (vinilo, cassette, equipo)
+  condicion    String? // el estado varia mucho segun el tipo de producto (vinilo, cassette, equipo)
   destacado    Boolean    @default(false)
   esActivo     Boolean    @default(true)
   descripcion  String
@@ -123,8 +117,6 @@ model Producto {
   updatedAt    DateTime   @updatedAt
   categoriaId  Int
   categoria    Categoria  @relation(fields: [categoriaId], references: [id])
-  artistaId    Int? //el ? lo hace nullable osea opcional
-  artista      Artista?   @relation(fields: [artistaId], references: [id])
   imagenes     Imagen[]
   consultas    Consulta[]
 
