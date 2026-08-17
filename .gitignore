@@ -1,6 +1,10 @@
 node_modules
 # Keep environment variables out of version control
+.env
 
+<<<<<<< HEAD
 .env
 /generated/prisma
+=======
+>>>>>>> 4cc0883edd4028a11d62d0e3f33d6eefac2b61f8
 /prisma/migrations
