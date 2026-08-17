@@ -80,13 +80,12 @@ model Invitacion {
 }
 
 model Categoria {
-  id  Int @id @default(autoincrement())
-  nombre String
-  marca String @unique //sellos / marcas ej sony
-  descripcion String
-  createdAt DateTime @default(now())
-  updatedAt DateTime   @updatedAt
-  productos Producto[] 
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  productos   Producto[]
 }
 
 model StoreInfo {
