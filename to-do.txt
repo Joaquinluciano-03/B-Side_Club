@@ -1,3 +1,38 @@
-- armar controller service y routes de las tablas que faltan (haciendo agus)
-- implementar lo de mandar mail con nodemailer, por ahora esta provisorio
-- instalar morgan y cors
+[hecho] Servidor base (Express, /api/health, errorHandler, cors, morgan)
+[hecho] Autenticacion (register, login, logout, /me GET y PUT)
+[hecho] Roles y permisos (requireRol)
+[hecho] Recuperar contraseña (forgot-password, reset-password)
+[hecho] Invitaciones y gestion de usuarios (crear/listar/revocar invitacion, aceptar, GET/PUT/DELETE usuarios)
+[hecho] Envio de mails con nodemailer (cae a consola si no hay credenciales SMTP en .env)
+
+Falta (haciendo agus):
+
+- Categorias (categorias.routes.js + controller + service)
+  - GET /categorias -- publica, listar
+  - POST /categorias -- protegida
+  - PUT /categorias/:id -- protegida
+  - DELETE /categorias/:id -- protegida
+
+- Productos (productos.routes.js + controller + service) -- depende de Categorias
+  - GET /productos -- publica, con filtros por query string (categoriaId, q, page) y paginado (skip/take)
+  - GET /productos/:id -- publica, incluir imagenes
+  - POST /productos -- protegida, crear imagenes anidadas
+  - PUT /productos/:id -- protegida
+  - DELETE /productos/:id -- protegida
+  - PATCH /productos/:id/activo -- protegida, togglea esActivo sin borrar
+
+- Info del local (storeInfo.routes.js + controller + service) -- independiente, se puede hacer ya
+  - GET /store-info -- publica
+  - PUT /store-info -- protegida, usar upsert (id siempre 1)
+
+- Consultas (consultas.routes.js + controller + service) -- depende de Productos (puede referenciar uno)
+  - POST /consultas -- publica, valida nombre/email/asunto/mensaje, estado: pendiente, canal: formulario
+  - GET /consultas -- protegida, filtro opcional por estado
+  - PATCH /consultas/:id/estado -- protegida, cambia entre pendiente/leida/respondida
+  - DELETE /consultas/:id -- protegida
+
+Extras (opcional, solo si sobra tiempo, puntaje adicional del TP):
+
+- Dashboard con metricas (count() de consultas nuevas, productos activos, etc)
+- Subida real de imagenes con multer (hoy los productos guardan una URL escrita a mano)
+- Promociones / novedades (requeriria tabla nueva, evaluar si vale la pena)

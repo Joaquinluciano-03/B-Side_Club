@@ -1,8 +1,12 @@
 //logica de negocio (bcrypt + jwt)
 
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
+const { enviarRecuperoPassword } = require('../config/mailer');
+
+const MINUTOS_EXPIRACION_RESET = 30;
 
 // datos del usuario que es seguro devolver (sin el passwordhash)
 function datosPublicos(user) {
@@ -99,4 +103,51 @@ async function login({ mail, password }) {
   return { token: firmarToken(user), user: datosPublicos(user) };
 }
 
-module.exports = { register, login, me, actualizarMe };
+async function forgotPassword(mail) {
+  const user = await prisma.user.findUnique({ where: { mail } });
+
+  // si el mail no existe no avisamos nada distinto: evita que alguien
+  // pueda usar este endpoint para averiguar que mails estan registrados.
+  if (!user) return;
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiraEn = new Date(Date.now() + MINUTOS_EXPIRACION_RESET * 60 * 1000);
+
+  await prisma.passwordResetToken.create({
+    data: { token, userId: user.id, expiraEn },
+  });
+
+  const link = `${process.env.FRONTEND_URL}/resetear-password?token=${token}`;
+  await enviarRecuperoPassword({ mail: user.mail, link });
+}
+
+async function resetPassword({ token, password }) {
+  const resetToken = await prisma.passwordResetToken.findUnique({ where: { token } });
+
+  if (!resetToken) {
+    const error = new Error('Token invalido');
+    error.status = 400;
+    throw error;
+  }
+
+  if (resetToken.usado) {
+    const error = new Error('Este token ya fue utilizado');
+    error.status = 409;
+    throw error;
+  }
+
+  if (resetToken.expiraEn < new Date()) {
+    const error = new Error('Este token expiro');
+    error.status = 410;
+    throw error;
+  }
+
+  const passwordhash = await bcrypt.hash(password, 10);
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: resetToken.userId }, data: { passwordhash } }),
+    prisma.passwordResetToken.update({ where: { id: resetToken.id }, data: { usado: true } }),
+  ]);
+}
+
+module.exports = { register, login, me, actualizarMe, forgotPassword, resetPassword };

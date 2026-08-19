@@ -83,4 +83,29 @@ async function aceptar({ token, nombre, apellido, telefono, password }) {
   };
 }
 
-module.exports = { crear, aceptar };
+async function listar() {
+  return prisma.invitacion.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, email: true, rol: true, estado: true, expiraEn: true, createdAt: true },
+  });
+}
+
+async function revocar(id) {
+  const invitacion = await prisma.invitacion.findUnique({ where: { id: Number(id) } });
+
+  if (!invitacion) {
+    const error = new Error('Invitación no encontrada');
+    error.status = 404;
+    throw error;
+  }
+
+  if (invitacion.estado !== 'pendiente') {
+    const error = new Error('Solo se pueden revocar invitaciones pendientes');
+    error.status = 409;
+    throw error;
+  }
+
+  await prisma.invitacion.update({ where: { id: invitacion.id }, data: { estado: 'revocada' } });
+}
+
+module.exports = { crear, aceptar, listar, revocar };

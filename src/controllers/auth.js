@@ -58,4 +58,35 @@ async function actualizarMe(req, res, next) {
   }
 }
 
-module.exports = { register, login, logout, me, actualizarMe };
+async function forgotPassword(req, res, next) {
+  try {
+    const { mail } = req.body;
+
+    if (!mail) {
+      return res.status(400).json({ error: 'Falta el mail' });
+    }
+
+    await authService.forgotPassword(mail);
+    // respuesta identica exista o no el mail, para no filtrar que usuarios estan registrados
+    res.json({ mensaje: 'Si el mail esta registrado, te enviamos un link para recuperar la contraseña' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
+    await authService.resetPassword({ token, password });
+    res.json({ mensaje: 'Contraseña actualizada' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { register, login, logout, me, actualizarMe, forgotPassword, resetPassword };

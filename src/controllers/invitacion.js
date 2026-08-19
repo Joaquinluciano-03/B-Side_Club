@@ -37,4 +37,22 @@ async function aceptar(req, res, next) {
   }
 }
 
-module.exports = { crear, aceptar };
+async function listar(req, res, next) {
+  try {
+    const invitaciones = await invitacionService.listar();
+    res.json(invitaciones);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function revocar(req, res, next) {
+  try {
+    await invitacionService.revocar(req.params.id);
+    res.json({ mensaje: 'Invitación revocada' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { crear, aceptar, listar, revocar };

@@ -8,6 +8,8 @@ const { requireRol } = require('../middlewares/requireRol');
 const router = Router();
 
 router.post('/', requireAuth, requireRol('super_admin', 'administrador'), invitacionController.crear);
+router.get('/', requireAuth, requireRol('super_admin', 'administrador'), invitacionController.listar);
+router.delete('/:id', requireAuth, requireRol('super_admin', 'administrador'), invitacionController.revocar);
 router.post('/aceptar', invitacionController.aceptar);
 
 module.exports = router;
