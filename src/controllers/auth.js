@@ -3,6 +3,21 @@
 
 const authService = require('../services/auth.service');
 
+async function register(req, res, next) {
+  try {
+    const { nombre, apellido, mail, telefono, password } = req.body;
+
+    if (!nombre || !apellido || !mail || !telefono || !password) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
+    const resultado = await authService.register({ nombre, apellido, mail, telefono, password });
+    res.status(201).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function login(req, res, next) {
   try {
     const { mail, password } = req.body;
@@ -18,4 +33,29 @@ async function login(req, res, next) {
   }
 }
 
-module.exports = { login };
+// el token es stateless: no hay nada que invalidar del lado del servidor.
+// el frontend es el que descarta el token guardado; esto solo confirma la accion.
+async function logout(req, res) {
+  res.json({ mensaje: 'Sesion cerrada' });
+}
+
+async function me(req, res, next) {
+  try {
+    const usuario = await authService.me(req.user.id);
+    res.json(usuario);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function actualizarMe(req, res, next) {
+  try {
+    const { nombre, apellido, mail, telefono, password } = req.body;
+    const usuario = await authService.actualizarMe(req.user.id, { nombre, apellido, mail, telefono, password });
+    res.json(usuario);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { register, login, logout, me, actualizarMe };
