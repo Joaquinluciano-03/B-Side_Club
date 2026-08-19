@@ -1,1 +1,3 @@
+- armar controller service y routes de las tablas que faltan (haciendo agus)
 - implementar lo de mandar mail con nodemailer, por ahora esta provisorio
+- instalar morgan y cors
