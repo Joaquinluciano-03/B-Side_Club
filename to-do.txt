@@ -1,0 +1,1 @@
+- implementar lo de mandar mail con nodemailer, por ahora esta provisorio
