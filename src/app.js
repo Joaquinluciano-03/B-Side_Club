@@ -4,6 +4,10 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/auth.routes');
 const invitacionRoutes = require('./routes/invitacion.routes');
 const usuariosRoutes = require('./routes/usuarios.routes');
+const categoriaRoutes = require('./routes/categoria.routes');
+const productoRoutes = require('./routes/producto.routes');
+const storeInfoRoutes = require('./routes/storeInfo.routes');
+const consultaRoutes = require('./routes/consulta.routes');
 const { errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
@@ -19,6 +23,10 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/invitacion', invitacionRoutes);
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/categorias', categoriaRoutes); 
+app.use('/api/productos', productoRoutes);
+app.use('/api/store-info', storeInfoRoutes);
+app.use('/api/consultas', consultaRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Recurso no encontrado' });
