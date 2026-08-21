@@ -9,6 +9,7 @@ const productoRoutes = require('./routes/producto.routes');
 const storeInfoRoutes = require('./routes/storeInfo.routes');
 const consultaRoutes = require('./routes/consulta.routes');
 const imagenRoutes = require('./routes/imagen.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 const path = require('path');
 const { errorHandler } = require('./middlewares/errorHandler');
 
@@ -31,6 +32,7 @@ app.use('/api/store-info', storeInfoRoutes);
 app.use('/api/consultas', consultaRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // sirve las imagenes como archivos estaticos
 app.use('/api', imagenRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Recurso no encontrado' });
