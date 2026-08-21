@@ -23,7 +23,7 @@ async function actualizar(req, res, next) {
 
 async function eliminar(req, res, next) {
   try {
-    await usuariosService.eliminar(req.params.id);
+    await usuariosService.eliminar(req.params.id, req.user.rol);
     res.json({ mensaje: 'Usuario eliminado' });
   } catch (err) {
     next(err);

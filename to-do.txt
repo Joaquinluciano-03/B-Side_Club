@@ -9,11 +9,11 @@
 [hecho]Info del local (storeInfo.routes.js + controller + service) -- independiente, se puede hacer ya
 [hecho]Consultas (consultas.routes.js + controller + service) -- depende de Productos (puede referenciar uno)
 [hecho]Subida real de imagenes con multer (hoy los productos guardan una URL escrita a mano)
+[hecho]Dashboard con metricas (count() de consultas nuevas, productos activos, etc)
+[hecho]Promociones / novedades (requeriria tabla nueva, evaluar si vale la pena)
 
 
 Falta (haciendo agus):
 
 Extras (opcional, solo si sobra tiempo, puntaje adicional del TP):
 
-- Dashboard con metricas (count() de consultas nuevas, productos activos, etc)
-- Promociones / novedades (requeriria tabla nueva, evaluar si vale la pena)

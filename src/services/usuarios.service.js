@@ -63,11 +63,18 @@ async function actualizar(id, { nombre, apellido, mail, telefono, rol }) {
   return datosPublicos(usuario);
 }
 
-async function eliminar(id) {
+async function eliminar(id, rolSolicitante) {
   const target = await buscarOFallar(id);
 
   if (target.rol === 'super_admin') {
     const error = new Error('No se puede eliminar al super_admin');
+    error.status = 403;
+    throw error;
+  }
+
+  // solo el super_admin puede eliminar administradores
+  if (target.rol === 'administrador' && rolSolicitante !== 'super_admin') {
+    const error = new Error('Solo el super_admin puede eliminar administradores');
     error.status = 403;
     throw error;
   }
