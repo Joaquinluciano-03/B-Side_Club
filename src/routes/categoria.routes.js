@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/', categoriaController.listar);
 router.get('/:id', categoriaController.obtener);
-router.post('/', requireAuth, requireRol('super_admin', 'administrador'), categoriaController.crear);
-router.put('/:id', requireAuth, requireRol('super_admin', 'administrador'), categoriaController.actualizar);
-router.delete('/:id', requireAuth, requireRol('super_admin', 'administrador'), categoriaController.eliminar);
+router.post('/', requireAuth, requireRol('super_admin', 'administrador','vendedor;'), categoriaController.crear);
+router.put('/:id', requireAuth, requireRol('super_admin', 'administrador','vendedor'), categoriaController.actualizar);
+router.delete('/:id', requireAuth, requireRol('super_admin', 'administrador','vendedor'), categoriaController.eliminar);
 
 module.exports = router;

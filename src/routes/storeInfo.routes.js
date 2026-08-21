@@ -8,6 +8,6 @@ const { requireRol } = require('../middlewares/requireRol');
 const router = Router();
 
 router.get('/', storeInfoController.obtener);
-router.put('/', requireAuth, requireRol('super_admin', 'administrador'), storeInfoController.actualizar);
+router.put('/', requireAuth, requireRol('super_admin', 'administrador','vendedor'), storeInfoController.actualizar);
 
 module.exports = router;

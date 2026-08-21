@@ -10,6 +10,7 @@ const storeInfoRoutes = require('./routes/storeInfo.routes');
 const consultaRoutes = require('./routes/consulta.routes');
 const imagenRoutes = require('./routes/imagen.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const promocionRoutes = require('./routes/promocion.routes');
 const path = require('path');
 const { errorHandler } = require('./middlewares/errorHandler');
 
@@ -33,6 +34,7 @@ app.use('/api/consultas', consultaRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // sirve las imagenes como archivos estaticos
 app.use('/api', imagenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/promociones', promocionRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Recurso no encontrado' });

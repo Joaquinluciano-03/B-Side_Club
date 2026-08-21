@@ -147,3 +147,15 @@ model Consulta {
   @@index([estado]) // panel: filtrar consultas por estado (pendiente/leida/respondida)
   @@index([fecha])
 }
+
+model Promocion {
+  id          Int       @id @default(autoincrement())
+  titulo      String
+  descripcion String?
+  imagenUrl   String?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  activa      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
