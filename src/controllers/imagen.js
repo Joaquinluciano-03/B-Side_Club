@@ -24,4 +24,18 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { agregar, eliminar };
+async function actualizarOrden(req, res, next) {
+  try {
+    const { orden } = req.body;
+    if (orden === undefined) {
+      return res.status(400).json({ error: 'Falta el campo orden' });
+    }
+
+    const imagen = await imagenService.actualizarOrden(req.params.id, orden);
+    res.json(imagen);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { agregar, eliminar, actualizarOrden };

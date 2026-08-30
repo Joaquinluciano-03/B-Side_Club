@@ -19,6 +19,7 @@ router.post(
   imagenController.agregar
 );
 
+router.patch('/imagenes/:id', requireAuth, requireRol(...rolesGestion), imagenController.actualizarOrden);
 router.delete('/imagenes/:id', requireAuth, requireRol(...rolesGestion), imagenController.eliminar);
 
 module.exports = router;

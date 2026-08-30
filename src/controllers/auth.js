@@ -3,12 +3,20 @@
 
 const authService = require('../services/auth.service');
 
+const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function register(req, res, next) {
   try {
     const { nombre, apellido, mail, telefono, password } = req.body;
 
     if (!nombre || !apellido || !mail || !telefono || !password) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+    if (!MAIL_REGEX.test(mail)) {
+      return res.status(400).json({ error: 'El mail no tiene un formato válido' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
     const resultado = await authService.register({ nombre, apellido, mail, telefono, password });
@@ -80,6 +88,9 @@ async function resetPassword(req, res, next) {
 
     if (!token || !password) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
     await authService.resetPassword({ token, password });

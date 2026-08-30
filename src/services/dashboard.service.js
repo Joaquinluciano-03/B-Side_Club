@@ -6,12 +6,14 @@ async function obtenerMetricas() {
   const [
     consultasPendientes,
     productosActivos,
+    productosInactivos,
     productosSinStock,
     invitacionesPendientes,
     totalUsuarios,
   ] = await Promise.all([
     prisma.consulta.count({ where: { estado: 'pendiente' } }),
     prisma.producto.count({ where: { esActivo: true } }),
+    prisma.producto.count({ where: { esActivo: false } }),
     prisma.producto.count({ where: { esActivo: true, stock: 0 } }),
     prisma.invitacion.count({ where: { estado: 'pendiente' } }),
     prisma.user.count(),
@@ -20,6 +22,7 @@ async function obtenerMetricas() {
   return {
     consultasPendientes,
     productosActivos,
+    productosInactivos,
     productosSinStock,
     invitacionesPendientes,
     totalUsuarios,

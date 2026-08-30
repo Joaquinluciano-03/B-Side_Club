@@ -2,22 +2,55 @@
 
 const { prisma } = require('../config/db');
 
-async function listar({ categoriaId, destacado } = {}) {
+const PAGE_SIZE_DEFAULT = 12;
+const PAGE_SIZE_MAX = 60;
+
+async function listar({ categoriaId, destacado, q, esActivo, page, pageSize } = {}, { esAdmin = false } = {}) {
   const where = {};
   if (categoriaId) where.categoriaId = Number(categoriaId);
   if (destacado !== undefined) where.destacado = destacado === 'true';
+  if (q) {
+    where.OR = [
+      { nombre: { contains: q, mode: 'insensitive' } },
+      { descripcion: { contains: q, mode: 'insensitive' } },
+    ];
+  }
 
-  return prisma.producto.findMany({
-    where,
-    include: { categoria: true, imagenes: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  // el publico solo ve productos activos, sin excepcion; el panel admin puede
+  // pedir activos, inactivos, o todos segun el filtro que elija
+  if (esAdmin) {
+    if (esActivo !== undefined) where.esActivo = esActivo === 'true';
+  } else {
+    where.esActivo = true;
+  }
+
+  const pageNum = Math.max(1, Number(page) || 1);
+  const pageSizeNum = Math.min(PAGE_SIZE_MAX, Math.max(1, Number(pageSize) || PAGE_SIZE_DEFAULT));
+
+  const [productos, total] = await Promise.all([
+    prisma.producto.findMany({
+      where,
+      include: { categoria: true, imagenes: { orderBy: { orden: 'asc' } } },
+      orderBy: { createdAt: 'desc' },
+      skip: (pageNum - 1) * pageSizeNum,
+      take: pageSizeNum,
+    }),
+    prisma.producto.count({ where }),
+  ]);
+
+  return {
+    productos,
+    page: pageNum,
+    pageSize: pageSizeNum,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSizeNum)),
+  };
 }
 
 async function obtenerPorId(id) {
   const producto = await prisma.producto.findUnique({
     where: { id: Number(id) },
-    include: { categoria: true, imagenes: true },
+    include: { categoria: true, imagenes: { orderBy: { orden: 'asc' } } },
   });
   if (!producto) {
     const error = new Error('Producto no encontrado');

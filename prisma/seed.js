@@ -41,6 +41,12 @@ const productosData = [
   { titulo: "Walkman WM-2", artista: "Reproductor portátil", categoria: "equipos", anio: 1981, sello: "Sony", precio: 95000, condicion: "Funcional", estado_stock: "ultima_unidad", destacado: false, stock: 1, color: "0E8FA6", descripcion: "Chasis plateado con marcas de uso honestas. Motor recién lubricado, velocidad estable. Se entrega con auriculares de época." },
   { titulo: "Receiver 2270", artista: "Amplificador estéreo", categoria: "equipos", anio: 1972, sello: "Marantz", precio: 180000, condicion: "Revisado en taller", estado_stock: "disponible", destacado: false, stock: 1, color: "9A6100", descripcion: "Capacitores reemplazados, iluminación del dial restaurada con lámparas originales. 70 watts por canal que mueven cualquier par de parlantes." },
   { titulo: "Speed of Life", artista: "Varios · compilado del local", categoria: "cassettes", anio: 1988, sello: "B-Side Club", precio: 12000, condicion: "Casero", estado_stock: "disponible", destacado: false, stock: 8, color: "C41E75", descripcion: "Compilado que armamos nosotros con lados B de los 80. Grabado en TDK SA-90, carátula fotocopiada. No es original de nada, es original de acá." },
+  { titulo: "Rumours", artista: "Fleetwood Mac", categoria: "vinilos", anio: 1977, sello: "Warner Bros.", precio: 128000, condicion: "Muy bueno (VG+)", estado_stock: "disponible", destacado: false, stock: 2, color: "1F7A4E", descripcion: "Prensado americano de los 70. Funda con desgaste típico de la época, vinilo brillante y sin rayas profundas." },
+  { titulo: "Vida", artista: "Vox Dei", categoria: "vinilos", anio: 1971, sello: "Disc Jockey", precio: 155000, condicion: "Bueno (VG)", estado_stock: "ultima_unidad", destacado: true, stock: 1, color: "9A6100", descripcion: "Edición original argentina, uno de los discos fundacionales del rock nacional. Tapa con marcas de manoseo, disco escuchado pero prolijo." },
+  { titulo: "Léon Gieco", artista: "León Gieco", categoria: "vinilos", anio: 1973, sello: "Music Hall", precio: 89000, condicion: "Bueno (VG)", estado_stock: "disponible", destacado: false, stock: 1, color: "C41E75", descripcion: "Primer disco solista, edición original. Contratapa con firma de un dueño anterior, nada que afecte el sonido." },
+  { titulo: "Continuous", artista: "Buddy Holly", categoria: "cds", anio: 1988, sello: "MCA", precio: 18000, condicion: "Muy bueno (VG+)", estado_stock: "disponible", destacado: false, stock: 3, color: "5B45B8", descripcion: "Compilado importado, caja sin roturas. Ideal para arrancar una colección de rock and roll clásico." },
+  { titulo: "Ok Corazón", artista: "Massacre", categoria: "cds", anio: 2001, sello: "PopArt", precio: 16000, condicion: "Casi nuevo (NM)", estado_stock: "disponible", destacado: false, stock: 4, color: "0E8FA6", descripcion: "Edición nacional con librito completo. Un clásico under del rock argentino de los 2000." },
+  { titulo: "Parlantes 3 vías", artista: "Torre acústica", categoria: "equipos", anio: 1985, sello: "JBL", precio: 210000, condicion: "Revisado en taller", estado_stock: "disponible", destacado: false, stock: 1, color: "7C6CE0", descripcion: "Par de parlantes de piso, gabinete restaurado y parlantes originales recableados por nuestro técnico." },
 ];
 
 const storeInfoData = {
@@ -148,7 +154,7 @@ async function main() {
     });
   }
 
-  console.log("Listo: 1 super_admin, 4 categorias, 16 productos, info del local y 6 consultas.");
+  console.log(`Listo: 1 super_admin, 4 categorias, ${productosData.length} productos, info del local y 6 consultas.`);
   console.log(`Login del super_admin -> mail: ${superAdminData.mail} / password: ${superAdminData.passwordPlana}`);
 }
 

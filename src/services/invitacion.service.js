@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { prisma } = require('../config/db');
 const { enviarInvitacion } = require('../config/mailer');
 
-const DIAS_EXPIRACION = 2;
+const DIAS_EXPIRACION = 7;
 
 async function crear({ email, rol, invitadoPorId }) {
   const mailEnUso = await prisma.user.findUnique({ where: { mail: email } });

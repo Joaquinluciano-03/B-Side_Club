@@ -2,12 +2,17 @@
 
 const consultaService = require('../services/consulta.service');
 
+const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function crear(req, res, next) {
   try {
     const { nombre, email, telefono, asunto, mensaje, productoId } = req.body;
 
     if (!nombre || !email || !asunto || !mensaje) {
       return res.status(400).json({ error: 'Faltan campos requeridos (nombre, email, asunto, mensaje)' });
+    }
+    if (!MAIL_REGEX.test(email)) {
+      return res.status(400).json({ error: 'El mail no tiene un formato válido' });
     }
 
     const consulta = await consultaService.crear({ nombre, email, telefono, asunto, mensaje, productoId });
@@ -27,12 +32,17 @@ async function listar(req, res, next) {
   }
 }
 
+const ESTADOS_VALIDOS = ['pendiente', 'leida', 'respondida'];
+
 async function cambiarEstado(req, res, next) {
   try {
     const { estado } = req.body;
 
     if (!estado) {
       return res.status(400).json({ error: 'Falta el campo estado' });
+    }
+    if (!ESTADOS_VALIDOS.includes(estado)) {
+      return res.status(400).json({ error: `Estado inválido, debe ser uno de: ${ESTADOS_VALIDOS.join(', ')}` });
     }
 
     const consulta = await consultaService.cambiarEstado(req.params.id, estado);

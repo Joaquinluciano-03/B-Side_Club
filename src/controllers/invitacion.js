@@ -2,12 +2,17 @@
 
 const invitacionService = require('../services/invitacion.service');
 
+const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function crear(req, res, next) {
   try {
     const { email, rol } = req.body;
 
     if (!email || !rol) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+    if (!MAIL_REGEX.test(email)) {
+      return res.status(400).json({ error: 'El mail no tiene un formato válido' });
     }
 
     const resultado = await invitacionService.crear({
@@ -28,6 +33,9 @@ async function aceptar(req, res, next) {
 
     if (!token || !nombre || !apellido || !telefono || !password) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
     const resultado = await invitacionService.aceptar({ token, nombre, apellido, telefono, password });
