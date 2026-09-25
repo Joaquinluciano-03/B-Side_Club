@@ -4,6 +4,15 @@ Base URL local: http://localhost:3000/api
 
 Numeración según las funciones principales que pide el enunciado del TPO.
 
+IMPORTANTE — API key en todos los pedidos:
+Todos los pedidos a /api/* requieren el header "x-api-key" con la clave
+configurada en la variable de entorno API_KEY. La unica excepcion es
+GET /api/health, que queda publico. Los archivos estaticos de /uploads
+tampoco la piden (no estan bajo /api). Sin ese header la respuesta es
+401 { "error": "API key inválida o faltante" }, antes de llegar a
+cualquier ruta. El detalle de esta capa y de las otras dos esta en la
+seccion 9.
+
 ============================================================
 1. SITIO PUBLICO (visitante, sin login)
 ============================================================
@@ -188,12 +197,70 @@ DELETE /api/usuarios/:id          Elimina un usuario (con las reglas
   campos requeridos, estados validos, categoria existente, categoria
   con productos asociados no se puede borrar.
 - Autenticacion y autorizacion: JWT + roles (requireRol) + reglas por
-  usuario destino donde corresponde.
+  usuario destino donde corresponde. Ver el detalle de las tres capas
+  de seguridad mas abajo.
 - Separacion frontend/backend: este repo es solo la API; el frontend va
   aparte (React + Vite, todavia no empezado).
 
 Servidor base: Express, cors, morgan (logs), express.json(),
 GET /api/health, archivos subidos servidos como estaticos en /uploads.
+
+------------------------------------------------------------
+9.1 CAPAS DE SEGURIDAD (en el orden en que actuan)
+------------------------------------------------------------
+Los pedidos pasan por tres filtros, del mas general al mas especifico.
+
+CAPA 1 — CORS (que sitios web pueden consumir la API)
+  Configurado en src/app.js con la variable de entorno CORS_ORIGINS:
+  una lista de dominios separados por coma (ej.
+  "http://localhost:5173,https://bsideclub.com"). Solo esos dominios
+  reciben el header Access-Control-Allow-Origin.
+  Metodos habilitados: GET, POST, PUT, PATCH, DELETE.
+  Headers habilitados: Content-Type, Authorization, x-api-key.
+  Si CORS_ORIGINS esta vacia o no existe, no se permite ningun dominio
+  (nunca vuelve a "permitir todos") y el backend avisa por consola al
+  arrancar.
+  Ojo: CORS lo aplica el NAVEGADOR. Limita que paginas web pueden usar
+  la API desde el browser, pero no frena pedidos hechos por fuera de un
+  navegador (curl, Postman, scripts): esos siguen funcionando y no
+  mandan header Origin.
+
+CAPA 2 — API key interna (src/middlewares/apiKey.js)
+  Montada con app.use('/api', requireApiKey). Lee el header x-api-key y
+  lo compara contra la variable de entorno API_KEY usando
+  crypto.timingSafeEqual (comparacion en tiempo constante, para no
+  filtrar informacion por cuanto tarda la comparacion).
+  - Falta el header o no coincide -> 401 "API key inválida o faltante".
+  - API_KEY no configurada en el server -> 500 "API key no configurada
+    en el servidor". Nunca deja pasar pedidos por falta de
+    configuracion: si el .env esta mal armado, la API se cierra en vez
+    de quedar abierta.
+  Rutas que NO piden la clave, y por que:
+  - GET /api/health: es el chequeo de que el servidor esta arriba,
+    tiene que poder consultarse sin credenciales.
+  - /uploads/*: son archivos estaticos (las imagenes de los productos).
+    Una etiqueta <img> del navegador no puede mandar headers, asi que
+    exigir la clave ahi romperia las imagenes del sitio. Ademas no
+    cuelga de /api, asi que el middleware ni las toca.
+  - El preflight OPTIONS del navegador: lo responde cors() antes de
+    llegar a este middleware, porque cors() se monta primero.
+  Importante: imagenRoutes esta montado directamente en /api
+  (POST /api/productos/:id/imagenes, PATCH y DELETE /api/imagenes/:id),
+  asi que tambien queda detras de la API key.
+
+CAPA 3 — JWT + roles (lo que ya existia, sin cambios)
+  requireAuth valida el token, requireRol chequea el rol, y algunos
+  services agregan reglas segun el usuario destino (por ejemplo, no se
+  puede tocar al super_admin). Ver seccion 8.
+
+Que protege cada cosa (importante para no confiarse de mas):
+  CORS y la API key filtran el uso desde otros sitios web y el uso
+  casual de la API, pero la clave viaja en el frontend, asi que
+  cualquiera que abra las herramientas del navegador puede leerla y
+  reusarla con curl. No son un mecanismo de autenticacion.
+  La proteccion real de las operaciones sensibles (crear/editar/borrar
+  productos, categorias, usuarios, consultas) es el JWT con roles, que
+  se sigue exigiendo igual que antes en todas esas rutas.
 
 ============================================================
 10. FUNCIONALIDADES ADICIONALES (puntaje extra)
@@ -217,6 +284,49 @@ GET /api/health, archivos subidos servidos como estaticos en /uploads.
 - Buscador avanzado: parcial — hoy es busqueda por texto + filtro de
   categoria + paginacion (seccion 1.3/1.4). No tiene ordenamiento por
   precio/fecha ni filtros combinados mas finos.
+
+============================================================
+COMO CONSUMIR LA API DESDE EL FRONTEND (React + Vite)
+============================================================
+1. En el .env del proyecto de Vite (no en el del backend), definir:
+       VITE_API_URL="http://localhost:3000/api"
+       VITE_API_KEY="la misma clave que API_KEY del backend"
+   Vite solo expone al frontend las variables que empiezan con VITE_.
+
+2. Armar una unica funcion central de fetch y usarla siempre desde ahi,
+   en vez de llamar a fetch() suelto en cada componente. Asi la clave y
+   el token se mandan siempre y se configuran en un solo lugar:
+
+       const API_URL = import.meta.env.VITE_API_URL;
+       const API_KEY = import.meta.env.VITE_API_KEY;
+
+       export async function api(ruta, opciones = {}) {
+         const token = localStorage.getItem('token');
+
+         const res = await fetch(API_URL + ruta, {
+           ...opciones,
+           headers: {
+             'Content-Type': 'application/json',
+             'x-api-key': API_KEY,
+             ...(token ? { Authorization: `Bearer ${token}` } : {}),
+             ...opciones.headers,
+           },
+         });
+
+         if (!res.ok) throw new Error((await res.json()).error);
+         return res.status === 204 ? null : res.json();
+       }
+
+   Nota: si se manda un FormData (subida de imagenes), NO poner
+   Content-Type a mano — el navegador lo arma solo con el boundary.
+
+3. El dominio desde el que corre el frontend tiene que estar si o si en
+   CORS_ORIGINS del .env del backend, o el navegador bloquea todos los
+   pedidos. En desarrollo Vite levanta en http://localhost:5173, que ya
+   viene configurado; cuando se publique hay que agregar el dominio real.
+
+4. Las imagenes de /uploads se pueden usar directo en un <img src="...">:
+   no pasan por la API key.
 
 ============================================================
 PENDIENTE / OPCIONAL (no bloquea el TPO)
