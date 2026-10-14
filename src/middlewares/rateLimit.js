@@ -3,8 +3,29 @@
 // desde las herramientas del navegador y reusarla con curl.
 
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = require('express-rate-limit');
 
 const MINUTO = 60 * 1000;
+
+// De donde sacamos "quien es el que pide".
+//
+// Por defecto la libreria usa req.ip, que Express arma a partir del socket de
+// la conexion. Corriendo como funcion de Netlify NO hay socket: req.ip queda
+// undefined y la libreria explota al intentar hashearlo, tirando 500 en TODOS
+// los pedidos. Por eso lo resolvemos a mano, leyendo el header con la IP real
+// del cliente que pone Netlify.
+function identificarCliente(req) {
+  const ip =
+    req.headers['x-nf-client-connection-ip'] || // la que pone Netlify
+    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || // otros proxies
+    req.ip ||
+    '';
+
+  // ipKeyGenerator normaliza IPv6 a su subred: sin esto, alguien con un /64
+  // tiene millones de direcciones y cada intento contaria como un cliente
+  // distinto, dejando el limite en nada.
+  return ip ? ipKeyGenerator(ip) : 'sin-ip';
+}
 
 // respuesta en el mismo formato { error } que usa el resto de la API,
 // para que el frontend la pueda mostrar sin un caso especial
@@ -17,7 +38,11 @@ function crearLimite({ windowMs, limit, mensaje, skipSuccessfulRequests = false 
     windowMs,
     limit,
     skipSuccessfulRequests,
-    standardHeaders: 'draft-8', // headers RateLimit-* para que el frontend sepa cuanto le queda
+    keyGenerator: identificarCliente,
+    // draft-7 y no draft-8: el borrador 8 agrega una "partition key" que la
+    // libreria arma hasheando datos de la conexion, y eso no existe cuando
+    // corremos sin socket. draft-7 manda los mismos RateLimit-* utiles.
+    standardHeaders: 'draft-7',
     legacyHeaders: false,
     handler: respuesta(mensaje),
   });

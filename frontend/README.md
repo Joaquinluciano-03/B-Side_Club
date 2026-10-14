@@ -20,8 +20,18 @@ Hacen falta **dos** cosas del backend:
 2. Que `VITE_API_KEY` sea **exactamente** la misma que `API_KEY` en el `.env`
    del backend. Si no coinciden, todos los pedidos vuelven 401.
 
-Y que `CORS_ORIGINS` del backend incluya `http://localhost:5173`, o el
-navegador bloquea todo antes de salir.
+No hace falta configurar la URL de la API ni pelearse con CORS: el frontend
+pide a `/api`, y en desarrollo el proxy de `vite.config.js` reenvía eso al
+Express de al lado. En producción lo resuelve el redirect de `netlify.toml`.
+
+## Cómo se publica
+
+Todo va en **un solo deploy de Netlify**: el frontend compilado como sitio
+estático, y el backend como una función en `/api/*`
+(`netlify/functions/api.js` envuelve el mismo Express con `serverless-http`).
+
+Por eso las imágenes de los productos van a Supabase Storage y no a una
+carpeta del servidor: una función no tiene disco propio.
 
 ## Cómo está organizado
 

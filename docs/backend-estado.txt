@@ -121,6 +121,12 @@ y horarios de atencion.
     POST /api/productos/:id/imagenes (protegida) — sube hasta 5
     imagenes reales con multer. El orden sigue la secuencia existente
     del producto (no pisa la portada al agregar una tanda nueva).
+    Los archivos NO se guardan en el servidor: van a Supabase Storage
+    (bucket "productos", publico) y en la base queda su URL completa.
+    Antes se escribian en una carpeta uploads/, pero eso dejo de servir
+    cuando el backend paso a correr como funcion de Netlify: una funcion
+    se levanta y se muere por cada pedido, no tiene disco propio.
+    Hacen falta SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en el .env.
     PATCH /api/imagenes/:id (protegida) — cambia el campo "orden" de
     una imagen ya subida, para reordenar cual queda como portada.
     DELETE /api/imagenes/:id (protegida) — borra el registro y el
@@ -278,11 +284,18 @@ CAPA 2 — LIMITE DE PEDIDOS POR IP (src/middlewares/rateLimit.js)
   afuera: esta registrado antes del limite, porque es el chequeo de que el
   servidor esta arriba y no tiene que poder agotarse.
 
-  Ojo con el deploy: los limites cuentan por IP y la IP sale de req.ip. Si el
-  server queda detras de un proxy (Render, Railway, nginx) todos los pedidos
-  llegan con la IP del proxy y el limite se aplicaria a todos los usuarios
-  juntos. Para eso esta la variable TRUST_PROXY (normalmente =1 en
-  produccion, vacia en local).
+  De donde sale la IP: NO de req.ip. Corriendo como funcion de Netlify no hay
+  socket, asi que req.ip queda undefined y la libreria tiraba 500 en todos los
+  pedidos al intentar usarlo. El identificador se arma a mano en
+  src/middlewares/rateLimit.js leyendo el header x-nf-client-connection-ip
+  (el que pone Netlify con la IP real del cliente), con x-forwarded-for de
+  respaldo. Por eso ya no hace falta la variable TRUST_PROXY.
+
+  LIMITACION IMPORTANTE en serverless: los contadores viven en memoria, y cada
+  invocacion de la funcion puede arrancar en un contenedor nuevo. Netlify
+  reutiliza contenedores un rato, asi que el limite funciona a medias, pero no
+  es tan firme como en un servidor que queda prendido. Para que sea exacto
+  habria que guardar los contadores afuera (en la base o en Redis).
 
 CAPA 3 — API key interna (src/middlewares/apiKey.js)
   Montada con app.use('/api', requireApiKey). Lee el header x-api-key y

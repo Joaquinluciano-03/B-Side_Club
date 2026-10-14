@@ -12,10 +12,10 @@ const consultaRoutes = require('./routes/consulta.routes');
 const imagenRoutes = require('./routes/imagen.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const promocionRoutes = require('./routes/promocion.routes');
-const path = require('path');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { requireApiKey } = require('./middlewares/apiKey');
 const { limiteGeneral } = require('./middlewares/rateLimit');
+const { estaConfigurado } = require('./config/storage');
 
 const app = express();
 
@@ -69,8 +69,15 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// los archivos estaticos no piden API key: las etiquetas <img> del navegador no mandan headers
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Las imagenes de los productos ya no se sirven desde acá: viven en Supabase
+// Storage y la base guarda su URL publica completa. Antes habia un
+// express.static('/uploads'), que dejo de tener sentido cuando el backend
+// paso a correr como funcion (no tiene disco propio).
+if (!estaConfigurado()) {
+  console.warn(
+    'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY no estan configuradas: la subida de imagenes va a fallar.'
+  );
+}
 
 // el limite general va ANTES de la API key a proposito: si fuera despues,
 // los pedidos sin clave se irian en 401 sin contar para el limite y se podria

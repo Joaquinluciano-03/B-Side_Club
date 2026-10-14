@@ -2,12 +2,12 @@
 // la API key y el token se manden siempre y se configuren en un solo lugar
 // (es el patron que documenta docs/backend-estado.txt).
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Por defecto "/api", o sea el mismo dominio desde el que se sirve el sitio.
+// En Netlify eso lo atiende la funcion del backend; en desarrollo lo reenvia
+// el proxy de vite.config.js. Solo hace falta definir VITE_API_URL si alguna
+// vez el backend se muda a otro dominio.
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 const API_KEY = import.meta.env.VITE_API_KEY || '';
-
-// El backend sirve las imagenes en /uploads, que cuelga de la raiz y no de
-// /api. Derivamos esa base sacandole el /api al final.
-export const BASE_ARCHIVOS = API_URL.replace(/\/api\/?$/, '');
 
 const CLAVE_TOKEN = 'bsc_token';
 
@@ -105,10 +105,11 @@ export function query(params) {
   return s ? `?${s}` : '';
 }
 
-// Las imagenes vienen como "/uploads/archivo.jpg": hay que anteponerles el
-// host del backend porque el frontend corre en otro puerto.
+// Las imagenes se guardan en Supabase Storage, asi que la base ya tiene la
+// URL completa y no hay nada que armar. Se deja la funcion igual porque
+// todavia puede haber filas viejas con rutas relativas (las del seed, por
+// ejemplo) y asi no revientan.
 export function urlImagen(url) {
   if (!url) return null;
-  if (/^https?:\/\//.test(url)) return url;
-  return BASE_ARCHIVOS + url;
+  return url;
 }
