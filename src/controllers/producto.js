@@ -17,7 +17,10 @@ async function listar(req, res, next) {
 
 async function obtener(req, res, next) {
   try {
-    const producto = await productoService.obtenerPorId(req.params.id);
+    // mismo criterio que listar: sin token sos visitante y solo ves activos
+    const producto = await productoService.obtenerPorId(req.params.id, {
+      soloActivos: !req.user,
+    });
     res.json(producto);
   } catch (err) {
     next(err);

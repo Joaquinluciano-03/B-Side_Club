@@ -1,0 +1,37 @@
+# Netlify publica SOLO el frontend de este repo.
+# El backend (Express + multer escribiendo en /uploads) necesita un servidor
+# que quede prendido: no corre acá. Ver frontend/README.md.
+
+[build]
+  # el frontend no está en la raíz del repo, sino en /frontend
+  base = "frontend"
+  command = "npm run build"
+  # relativo a base, o sea frontend/dist
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# React Router maneja las rutas del lado del cliente: el server tiene que
+# devolver index.html para CUALQUIER path. Sin esto, entrar directo a
+# /catalogo o apretar F5 ahí da 404, porque ese archivo no existe en disco.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# helmet protege la API, pero no estos archivos estáticos: los headers del
+# sitio se configuran acá.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    # Vite le pone un hash al nombre de cada archivo, así que si el contenido
+    # cambia cambia la URL: se pueden cachear para siempre sin riesgo.
+    Cache-Control = "public, max-age=31536000, immutable"

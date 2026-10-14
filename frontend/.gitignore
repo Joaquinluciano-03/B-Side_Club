@@ -1,0 +1,8 @@
+node_modules
+dist
+.vite
+
+# Los .env reales no se commitean, pero .env.example si (es la plantilla)
+.env
+.env.*
+!.env.example

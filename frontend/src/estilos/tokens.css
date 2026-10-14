@@ -1,0 +1,191 @@
+/* Sistema de diseño de B-Side Club.
+   Los valores salen de la seccion "01 — SISTEMA DE DISEÑO" de demo/demo.html:
+   no son elegidos de nuevo aca, estan copiados de ahi para que el sitio real
+   y la demo sean la misma cosa. */
+
+:root {
+  /* ---- Grises frios: recogen el celeste del logo ---- */
+  --humo: #d5dadd; /* fondo general */
+  --superficie: #e9edee; /* cards y paneles */
+  --gris-medio: #c9d0d3; /* bandas y tablas */
+  --borde: #bac2c6; /* divisiones */
+  --borde-fuerte: #a1abaf; /* bordes de input */
+  --borde-boton: #94a0a4; /* boton secundario */
+  --panel-fondo: #dde1e3; /* fondo del panel admin */
+
+  /* ---- Tinta ---- */
+  --tinta: #191c1d; /* texto principal */
+  --tinta-cuerpo: #333a3c;
+  --tinta-suave: #454d50;
+  --tinta-dim: #4e5558;
+  --tinta-tenue: #5e676a;
+  --meta: #6e645c; /* labels, gris calido */
+  --apagado: #6f797c; /* placeholder y disabled */
+
+  /* ---- Oscuros: hero, portadas, panel ---- */
+  --carbon: #100f0e;
+  --carbon-2: #0e0d0c;
+  --negro: #0c0b0a;
+  --tinta-sobre-naranja: #141210;
+  --madera: #17150f;
+  --cinta: #26221f;
+  --borde-oscuro: #2a2624;
+  --borde-oscuro-2: #3a3431;
+  --borde-oscuro-3: #332e2b;
+  --crema: #f2ece4; /* texto sobre oscuro */
+  --crema-dim: #a79e97;
+  --crema-tenue: #8a817b;
+
+  /* ---- Color ---- */
+  --naranja: #f26a1b; /* primario */
+  --naranja-hover: #ff7d2f;
+  --teja: #b8402c; /* secundario */
+  --teal: #0e8fa6; /* enlaces y foco */
+  --teal-hover: #7ce4f4;
+  --magenta: #c41e75; /* acento puntual */
+  --error: #b33a2b;
+
+  /* ---- Neon: aparece de a poco, nunca de fondo ---- */
+  --neon-rosa: #ff4fa3;
+  --neon-rosa-claro: #ffc9e4;
+  --neon-cian: #35d0e8;
+  --neon-cian-claro: #cff6fc;
+
+  /* ---- Estados de stock (coinciden con el enum Stock de Prisma) ---- */
+  --ok-fondo: #e4f2e9;
+  --ok-texto: #1f7a4e;
+  --aviso-fondo: #f7ebd5;
+  --aviso-texto: #9a6100;
+  --violeta-fondo: #ede7fa;
+  --violeta-texto: #5b45b8;
+  --info-fondo: #dff1f5;
+  --info-texto: #0e8fa6;
+  --mal-fondo: #fae5e1;
+  --mal-texto: #b33a2b;
+
+  /* ---- Tipografia ---- */
+  --display: 'Bungee', Impact, sans-serif; /* logo, hero, encabezados. Nunca parrafos */
+  --cuerpo: 'Archivo', system-ui, -apple-system, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace; /* etiquetas, años, categorias */
+
+  /* ---- Formas ---- */
+  --r-badge: 5px;
+  --r-control: 8px;
+  --r-card: 14px;
+  --ancho: 1240px;
+
+  --sombra-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* Fondo con trama de puntos tipo halftone, igual que la demo */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--humo);
+}
+
+body {
+  font-family: var(--cuerpo);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--tinta);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--teal);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--teal-hover);
+}
+
+::selection {
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: var(--cuerpo);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--apagado);
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--borde-oscuro-2);
+  border-radius: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gris-medio);
+}
+
+/* ---- Animaciones de la demo ---- */
+@keyframes bspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bmarq {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes bneon {
+  to {
+    background-position: 200% 0;
+  }
+}
+@keyframes bflick {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.55;
+  }
+  96% {
+    opacity: 1;
+  }
+}
+@keyframes bskel {
+  to {
+    background-position: -220% 0;
+  }
+}
+@keyframes toast-entra {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

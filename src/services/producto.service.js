@@ -5,6 +5,27 @@ const { prisma } = require('../config/db');
 const PAGE_SIZE_DEFAULT = 12;
 const PAGE_SIZE_MAX = 60;
 
+// convierte a numero validando: sin esto un "abc" se vuelve NaN, llega a
+// Prisma y revienta como 500 en vez de avisar que el dato vino mal.
+function aNumero(valor, campo) {
+  const numero = Number(valor);
+  if (!Number.isFinite(numero)) {
+    const error = new Error(`El campo "${campo}" tiene que ser un numero`);
+    error.status = 400;
+    throw error;
+  }
+  return numero;
+}
+
+async function validarCategoria(categoriaId) {
+  const categoria = await prisma.categoria.findUnique({ where: { id: categoriaId } });
+  if (!categoria) {
+    const error = new Error('La categoría indicada no existe');
+    error.status = 400;
+    throw error;
+  }
+}
+
 async function listar({ categoriaId, destacado, q, esActivo, page, pageSize } = {}, { esAdmin = false } = {}) {
   const where = {};
   if (categoriaId) where.categoriaId = Number(categoriaId);
@@ -47,12 +68,16 @@ async function listar({ categoriaId, destacado, q, esActivo, page, pageSize } = 
   };
 }
 
-async function obtenerPorId(id) {
+// soloActivos=true es la vista publica: un producto dado de baja tiene que
+// responder 404 igual que uno inexistente, para no delatar que existe.
+// Los llamados internos (actualizar/eliminar) lo dejan en false: el panel
+// necesita poder tocar productos inactivos.
+async function obtenerPorId(id, { soloActivos = false } = {}) {
   const producto = await prisma.producto.findUnique({
     where: { id: Number(id) },
     include: { categoria: true, imagenes: { orderBy: { orden: 'asc' } } },
   });
-  if (!producto) {
+  if (!producto || (soloActivos && !producto.esActivo)) {
     const error = new Error('Producto no encontrado');
     error.status = 404;
     throw error;
@@ -61,35 +86,57 @@ async function obtenerPorId(id) {
 }
 
 async function crear(data) {
-  const categoria = await prisma.categoria.findUnique({ where: { id: Number(data.categoriaId) } });
-  if (!categoria) {
-    const error = new Error('La categoría indicada no existe');
-    error.status = 400;
-    throw error;
-  }
+  const categoriaId = aNumero(data.categoriaId, 'categoriaId');
+  await validarCategoria(categoriaId);
 
   return prisma.producto.create({
     data: {
       nombre: data.nombre,
-      anio: Number(data.anio),
+      anio: aNumero(data.anio, 'anio'),
       precio: data.precio !== undefined ? data.precio : null,
-      stock: Number(data.stock),
+      stock: aNumero(data.stock, 'stock'),
       estado_stock: data.estado_stock || 'disponible',
       condicion: data.condicion,
       destacado: data.destacado || false,
       descripcion: data.descripcion,
-      categoriaId: Number(data.categoriaId),
+      categoriaId,
     },
   });
 }
 
+// Campos que el cliente puede editar. Es una lista blanca a proposito: antes
+// se hacia { ...req.body } y se podia mandar cualquier columna de la tabla
+// (por ejemplo "id", que reasignaba la clave primaria del producto).
+const CAMPOS_EDITABLES = [
+  'nombre',
+  'precio',
+  'estado_stock',
+  'condicion',
+  'destacado',
+  'esActivo',
+  'descripcion',
+];
+
+const CAMPOS_EDITABLES_NUMERICOS = ['anio', 'stock', 'categoriaId'];
+
 async function actualizar(id, data) {
   await obtenerPorId(id);
 
-  const dataActualizada = { ...data };
-  if (data.anio !== undefined) dataActualizada.anio = Number(data.anio);
-  if (data.stock !== undefined) dataActualizada.stock = Number(data.stock);
-  if (data.categoriaId !== undefined) dataActualizada.categoriaId = Number(data.categoriaId);
+  const dataActualizada = {};
+
+  for (const campo of CAMPOS_EDITABLES) {
+    if (data[campo] !== undefined) dataActualizada[campo] = data[campo];
+  }
+
+  for (const campo of CAMPOS_EDITABLES_NUMERICOS) {
+    if (data[campo] !== undefined) dataActualizada[campo] = aNumero(data[campo], campo);
+  }
+
+  // si cambia de categoria avisamos con un 400 claro, en vez de dejar que
+  // la foreign key falle contra la base y salga como error interno
+  if (dataActualizada.categoriaId !== undefined) {
+    await validarCategoria(dataActualizada.categoriaId);
+  }
 
   return prisma.producto.update({
     where: { id: Number(id) },

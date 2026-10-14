@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const morgan = require('morgan');
 const authRoutes = require('./routes/auth.routes');
 const invitacionRoutes = require('./routes/invitacion.routes');
@@ -14,8 +15,30 @@ const promocionRoutes = require('./routes/promocion.routes');
 const path = require('path');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { requireApiKey } = require('./middlewares/apiKey');
+const { limiteGeneral } = require('./middlewares/rateLimit');
 
 const app = express();
+
+// Los limites de pedidos cuentan por IP, y la IP la saca de req.ip. Si el
+// server queda detras de un proxy (Render, Railway, nginx) todos los pedidos
+// llegan con la IP del proxy y el limite se aplicaria a todos juntos: hay que
+// decirle a express que confie en el header X-Forwarded-For.
+// Se activa con TRUST_PROXY=1 en produccion; en local no hace falta.
+if (process.env.TRUST_PROXY) {
+  app.set('trust proxy', Number(process.env.TRUST_PROXY));
+}
+
+// headers de seguridad (saca X-Powered-By, agrega nosniff, HSTS, etc).
+// Va primero para que aplique a todas las respuestas, incluso las de error.
+app.use(
+  helmet({
+    // por defecto helmet pone Cross-Origin-Resource-Policy: same-origin, que
+    // haria que el navegador bloquee las imagenes de /uploads cuando el
+    // frontend corre en otro puerto (localhost:5173). Son archivos publicos,
+    // asi que las dejamos cargar desde cualquier origen.
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
 // dominios del frontend habilitados, se configuran en CORS_ORIGINS separados por coma
 const origenesPermitidos = (process.env.CORS_ORIGINS || '')
@@ -48,6 +71,11 @@ app.get('/api/health', (req, res) => {
 
 // los archivos estaticos no piden API key: las etiquetas <img> del navegador no mandan headers
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// el limite general va ANTES de la API key a proposito: si fuera despues,
+// los pedidos sin clave se irian en 401 sin contar para el limite y se podria
+// inundar el servidor igual.
+app.use('/api', limiteGeneral);
 
 // de aca en adelante, todo /api/* exige el header x-api-key.
 // va despues de cors() para que el preflight OPTIONS se responda sin la clave.

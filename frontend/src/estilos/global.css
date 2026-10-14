@@ -1,0 +1,463 @@
+/* Componentes del sistema de diseño. Cada clase corresponde a un bloque de la
+   seccion "BOTONES Y BADGES" / "CAMPOS" / "CARD DE PRODUCTO" de la demo. */
+
+/* ============ LAYOUT ============ */
+.pagina {
+  min-height: 100vh;
+  /* trama halftone sobre el gris humo, igual que la demo */
+  background:
+    radial-gradient(rgba(25, 28, 29, 0.075) 1.1px, transparent 1.5px) 0 0 / 9px 9px,
+    var(--humo);
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.contenido {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  width: 100%;
+  padding: 48px 18px 90px;
+  flex: 1;
+}
+
+/* ============ TIPOGRAFIA ============ */
+.kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--naranja);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.titulo {
+  font-family: var(--display);
+  font-size: clamp(30px, 6vw, 52px);
+  margin: 0 0 28px;
+  line-height: 1.03;
+  font-weight: 400;
+}
+
+.titulo-seccion {
+  font-family: var(--display);
+  font-size: clamp(26px, 5vw, 40px);
+  margin: 0;
+  line-height: 1.05;
+  font-weight: 400;
+}
+
+/* etiqueta que divide secciones, con linea abajo */
+.divisor {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--tinta-tenue);
+  border-bottom: 1px solid var(--borde);
+  padding-bottom: 10px;
+  margin-bottom: 22px;
+  text-transform: uppercase;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--tinta-tenue);
+}
+
+/* ============ BOTONES ============ */
+.btn {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: var(--cuerpo);
+}
+
+.btn-primario {
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+}
+.btn-primario:hover:not(:disabled) {
+  background: var(--naranja-hover);
+}
+
+.btn-secundario {
+  background: transparent;
+  color: var(--tinta);
+  font-weight: 700;
+  padding: 13px 23px;
+  border: 1px solid var(--borde-boton);
+}
+.btn-secundario:hover:not(:disabled) {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* version del secundario sobre fondo oscuro (hero, panel) */
+.btn-secundario-oscuro {
+  background: transparent;
+  color: var(--crema);
+  font-weight: 700;
+  padding: 13px 23px;
+  border: 1px solid #4a433f;
+}
+.btn-secundario-oscuro:hover:not(:disabled) {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.btn-enlace {
+  background: transparent;
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 4px;
+  border: none;
+  border-bottom: 1px solid #0e8fa655;
+  border-radius: 0;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--cuerpo);
+}
+.btn-enlace:hover {
+  border-bottom-color: var(--teal);
+}
+
+.btn:disabled {
+  background: var(--borde);
+  color: var(--apagado);
+  border-color: var(--borde);
+  cursor: not-allowed;
+}
+
+.btn-peligro {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid #b33a2b55;
+  font-weight: 700;
+}
+.btn-peligro:hover:not(:disabled) {
+  border-color: var(--error);
+  background: var(--mal-fondo);
+}
+
+.btn-chico {
+  font-size: 13px;
+  padding: 10px 16px;
+}
+
+/* ============ BADGES DE ESTADO ============ */
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 6px 11px;
+  border-radius: var(--r-badge);
+  text-transform: uppercase;
+  display: inline-block;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.badge-disponible {
+  background: var(--ok-fondo);
+  color: var(--ok-texto);
+  border: 1px solid #1f7a4e33;
+}
+.badge-ultima_unidad {
+  background: var(--aviso-fondo);
+  color: var(--aviso-texto);
+  border: 1px solid #9a610033;
+}
+.badge-reservado {
+  background: var(--violeta-fondo);
+  color: var(--violeta-texto);
+  border: 1px solid #5b45b833;
+}
+.badge-a_consultar {
+  background: var(--info-fondo);
+  color: var(--info-texto);
+  border: 1px solid #0e8fa633;
+}
+.badge-vendido {
+  background: var(--mal-fondo);
+  color: var(--mal-texto);
+  border: 1px solid #b33a2b33;
+}
+
+/* estados de consulta, reusan la misma forma */
+.badge-pendiente {
+  background: var(--aviso-fondo);
+  color: var(--aviso-texto);
+  border: 1px solid #9a610033;
+}
+.badge-leida {
+  background: var(--info-fondo);
+  color: var(--info-texto);
+  border: 1px solid #0e8fa633;
+}
+.badge-respondida {
+  background: var(--ok-fondo);
+  color: var(--ok-texto);
+  border: 1px solid #1f7a4e33;
+}
+.badge-neutro {
+  background: var(--gris-medio);
+  color: var(--tinta-dim);
+  border: 1px solid var(--borde);
+}
+.badge-revocada {
+  background: var(--mal-fondo);
+  color: var(--mal-texto);
+  border: 1px solid #b33a2b33;
+}
+.badge-aceptada {
+  background: var(--ok-fondo);
+  color: var(--ok-texto);
+  border: 1px solid #1f7a4e33;
+}
+
+/* ============ CAMPOS ============ */
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo label,
+.etiqueta {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--meta);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-control);
+  padding: 13px 14px;
+  color: var(--tinta);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.campo input:focus,
+.campo textarea:focus,
+.campo select:focus {
+  border-color: var(--naranja);
+}
+
+.campo textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+.campo.con-error label {
+  color: var(--error);
+}
+.campo.con-error input,
+.campo.con-error textarea,
+.campo.con-error select {
+  border-color: var(--error);
+}
+
+.campo-error {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.campo-ayuda {
+  color: var(--tinta-tenue);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--r-card);
+  padding: 24px;
+}
+
+.grilla-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+/* el hover de la card de producto, igual que en la demo */
+.card-producto:hover,
+.tarjeta-categoria:hover {
+  border-color: #f26a1b66 !important;
+  transform: translateY(-4px);
+}
+
+.card-producto:focus-visible,
+.tarjeta-categoria:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* el foco por teclado tiene que verse en todo lo interactivo */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* ============ ESTADOS VACIOS ============ */
+.vacio {
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: var(--r-card);
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.vacio-titulo {
+  font-family: var(--display);
+  font-size: 22px;
+  color: var(--naranja);
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+
+.vacio-texto {
+  color: var(--meta);
+  margin-bottom: 22px;
+}
+
+/* ============ AVISOS ============ */
+.aviso {
+  border-radius: var(--r-control);
+  padding: 13px 16px;
+  font-size: 14px;
+  margin-bottom: 18px;
+  border: 1px solid transparent;
+}
+.aviso-error {
+  background: var(--mal-fondo);
+  color: var(--mal-texto);
+  border-color: #b33a2b33;
+}
+.aviso-ok {
+  background: var(--ok-fondo);
+  color: var(--ok-texto);
+  border-color: #1f7a4e33;
+}
+
+/* ============ TABLAS DEL PANEL ============ */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.tabla th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--tinta-dim);
+  text-transform: uppercase;
+  text-align: left;
+  padding: 14px 16px;
+  background: var(--gris-medio);
+  border-bottom: 1px solid var(--borde);
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #c2cacd;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+  border-radius: var(--r-card);
+}
+
+/* ============ SKELETON DE CARGA ============ */
+.skel {
+  background: linear-gradient(100deg, #d2d8da 30%, #e3e8ea 50%, #d2d8da 70%);
+  background-size: 220% 100%;
+  animation: bskel 1.1s linear infinite;
+}
+
+.skel-linea {
+  height: 11px;
+  border-radius: 4px;
+  background: #d2d8da;
+}
+
+/* ============ MODALES ============ */
+dialog::backdrop {
+  background: rgba(12, 11, 10, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.modal-cerrar:hover {
+  border-color: var(--error) !important;
+  color: var(--error) !important;
+}
+
+/* ============ RESPONSIVE DEL PANEL ============ */
+@media (max-width: 880px) {
+  .adm-shell {
+    flex-direction: column;
+  }
+  .adm-side {
+    position: static !important;
+    height: auto !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    align-items: center;
+    overflow-x: auto;
+    padding: 12px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--borde-oscuro);
+  }
+  .adm-side > button,
+  .adm-side > a {
+    width: auto !important;
+    white-space: nowrap;
+  }
+  .adm-side-foot {
+    margin-top: 0 !important;
+    flex-direction: row !important;
+    border-top: none !important;
+    padding-top: 0 !important;
+  }
+  .adm-side-marca {
+    display: none !important;
+  }
+}
