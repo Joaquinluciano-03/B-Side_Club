@@ -2,9 +2,15 @@
 
 const { prisma } = require('../config/db');
 
-async function listar({ soloActivas } = {}) {
+// Mismo criterio que productos: el visitante solo ve las promociones activas.
+// El panel (con token) puede pedir todas, o filtrar con soloActivas.
+async function listar({ soloActivas } = {}, { esAdmin = false } = {}) {
   const where = {};
-  if (soloActivas === 'true') where.activa = true;
+  if (esAdmin) {
+    if (soloActivas === 'true') where.activa = true;
+  } else {
+    where.activa = true;
+  }
 
   return prisma.promocion.findMany({
     where,
@@ -12,9 +18,9 @@ async function listar({ soloActivas } = {}) {
   });
 }
 
-async function obtenerPorId(id) {
+async function obtenerPorId(id, { soloActivas = false } = {}) {
   const promocion = await prisma.promocion.findUnique({ where: { id: Number(id) } });
-  if (!promocion) {
+  if (!promocion || (soloActivas && !promocion.activa)) {
     const error = new Error('Promoción no encontrada');
     error.status = 404;
     throw error;
@@ -35,12 +41,24 @@ async function crear(data) {
   });
 }
 
+// Lista blanca, igual que en productos: antes se pasaba el body completo a
+// Prisma y se podia mandar cualquier columna, incluido "id".
+const CAMPOS_EDITABLES = ['titulo', 'descripcion', 'imagenUrl', 'activa'];
+
 async function actualizar(id, data) {
   await obtenerPorId(id);
 
-  const dataActualizada = { ...data };
-  if (data.fechaInicio !== undefined) dataActualizada.fechaInicio = data.fechaInicio ? new Date(data.fechaInicio) : null;
-  if (data.fechaFin !== undefined) dataActualizada.fechaFin = data.fechaFin ? new Date(data.fechaFin) : null;
+  const dataActualizada = {};
+  for (const campo of CAMPOS_EDITABLES) {
+    if (data[campo] !== undefined) dataActualizada[campo] = data[campo];
+  }
+
+  // las fechas llegan como texto y van a la base como Date; vacio = sin fecha
+  for (const campo of ['fechaInicio', 'fechaFin']) {
+    if (data[campo] !== undefined) {
+      dataActualizada[campo] = data[campo] ? new Date(data[campo]) : null;
+    }
+  }
 
   return prisma.promocion.update({
     where: { id: Number(id) },

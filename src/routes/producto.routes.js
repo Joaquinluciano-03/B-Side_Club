@@ -10,7 +10,7 @@ const router = Router();
 const rolesGestion = ['super_admin', 'administrador', 'vendedor'];
 
 router.get('/', authOpcional, productoController.listar);
-router.get('/:id', productoController.obtener);
+router.get('/:id', authOpcional, productoController.obtener);
 router.post('/', requireAuth, requireRol(...rolesGestion), productoController.crear);
 router.put('/:id', requireAuth, requireRol(...rolesGestion), productoController.actualizar);
 router.delete('/:id', requireAuth, requireRol(...rolesGestion), productoController.eliminar);

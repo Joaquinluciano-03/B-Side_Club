@@ -24,7 +24,11 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Solo se permiten archivos de imagen'), false);
+    // con .status el errorHandler lo devuelve como 400 con este mismo mensaje,
+    // en vez de tratarlo como un error interno inesperado
+    const error = new Error('Solo se permiten archivos de imagen');
+    error.status = 400;
+    cb(error, false);
   }
 };
 

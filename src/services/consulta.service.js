@@ -30,7 +30,17 @@ async function crear({ nombre, email, telefono, asunto, mensaje, productoId }) {
 
 async function listar({ estado } = {}) {
   const where = {};
-  if (estado) where.estado = estado;
+
+  // el estado es un enum en la base: un valor cualquiera metido en el where
+  // falla como error interno, asi que lo validamos antes y devolvemos 400
+  if (estado) {
+    if (!ESTADOS_VALIDOS.includes(estado)) {
+      const error = new Error(`Estado inválido. Debe ser uno de: ${ESTADOS_VALIDOS.join(', ')}`);
+      error.status = 400;
+      throw error;
+    }
+    where.estado = estado;
+  }
 
   return prisma.consulta.findMany({
     where,

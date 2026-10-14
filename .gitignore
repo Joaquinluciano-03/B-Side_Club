@@ -3,3 +3,5 @@ node_modules
 .env
 /generated/prisma
 /prisma/migrations
+# imagenes subidas en desarrollo: son datos, no codigo
+/uploads

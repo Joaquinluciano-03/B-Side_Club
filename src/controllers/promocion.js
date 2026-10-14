@@ -5,7 +5,10 @@ const promocionService = require('../services/promocion.service');
 async function listar(req, res, next) {
   try {
     const { soloActivas } = req.query;
-    const promociones = await promocionService.listar({ soloActivas });
+    const promociones = await promocionService.listar(
+      { soloActivas },
+      { esAdmin: Boolean(req.user) }
+    );
     res.json(promociones);
   } catch (err) {
     next(err);
@@ -14,7 +17,9 @@ async function listar(req, res, next) {
 
 async function obtener(req, res, next) {
   try {
-    const promocion = await promocionService.obtenerPorId(req.params.id);
+    const promocion = await promocionService.obtenerPorId(req.params.id, {
+      soloActivas: !req.user,
+    });
     res.json(promocion);
   } catch (err) {
     next(err);

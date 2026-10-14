@@ -15,6 +15,18 @@ async function crear({ email, rol, invitadoPorId }) {
     throw error;
   }
 
+  // sin este chequeo se podian emitir N tokens validos para el mismo mail,
+  // y revocar uno no servia de nada porque los otros seguian funcionando.
+  // Las vencidas no cuentan: ya no sirven, se puede volver a invitar.
+  const invitacionVigente = await prisma.invitacion.findFirst({
+    where: { email, estado: 'pendiente', expiraEn: { gt: new Date() } },
+  });
+  if (invitacionVigente) {
+    const error = new Error('Ya hay una invitación pendiente para ese email. Revocala antes de generar una nueva.');
+    error.status = 409;
+    throw error;
+  }
+
   const token = crypto.randomBytes(32).toString('hex');
   const expiraEn = new Date(Date.now() + DIAS_EXPIRACION * 24 * 60 * 60 * 1000);
 
@@ -23,7 +35,29 @@ async function crear({ email, rol, invitadoPorId }) {
   });
 
   const link = `${process.env.FRONTEND_URL}/aceptar-invitacion?token=${token}`;
-  await enviarInvitacion({ mail: email, link });
+
+  // si el mail no sale, la invitacion no sirve para nada: nadie va a recibir
+  // el link. La borramos para que el admin pueda reintentar, porque si no el
+  // chequeo de "ya hay una invitacion pendiente" de arriba le bloquearia el
+  // segundo intento con un 409.
+  // el mail dice quien invito, para que no llegue como si fuera automatico
+  const quienInvita = invitadoPorId
+    ? await prisma.user.findUnique({ where: { id: invitadoPorId }, select: { nombre: true, apellido: true } })
+    : null;
+
+  try {
+    await enviarInvitacion({
+      mail: email,
+      link,
+      invitadoPor: quienInvita ? `${quienInvita.nombre} ${quienInvita.apellido}` : null,
+    });
+  } catch (err) {
+    await prisma.invitacion.delete({ where: { id: invitacion.id } });
+    console.error('No se pudo enviar la invitacion, se dio de baja:', err.message);
+    const error = new Error('No se pudo enviar el mail de invitación. Probá de nuevo en un rato.');
+    error.status = 502;
+    throw error;
+  }
 
   return {
     id: invitacion.id,
