@@ -1,27 +1,50 @@
-# Netlify publica SOLO el frontend de este repo.
-# El backend (Express + multer escribiendo en /uploads) necesita un servidor
-# que quede prendido: no corre acá. Ver frontend/README.md.
+# Todo el proyecto en un solo deploy de Netlify:
+#   - el frontend compilado (Vite) se publica como sitio estatico
+#   - el backend (Express) corre como una funcion, en /api/*
+#
+# Las imagenes NO se guardan acá: una funcion no tiene disco propio, asi que
+# van a Supabase Storage (ver src/config/storage.js).
 
 [build]
-  # el frontend no está en la raíz del repo, sino en /frontend
-  base = "frontend"
-  command = "npm run build"
-  # relativo a base, o sea frontend/dist
-  publish = "dist"
+  # el repo tiene el backend en la raiz y el frontend en /frontend, asi que
+  # hay que instalar las dependencias de los dos
+  command = "npm install && npx prisma generate && npm --prefix frontend install && npm --prefix frontend run build"
+  publish = "frontend/dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
 
+[functions]
+  # esbuild sigue los require() y arma el bundle de la funcion
+  node_bundler = "esbuild"
+  # Prisma 7 con driver adapters no usa un binario nativo, pero si necesita el
+  # .wasm del compilador de queries y el schema: esbuild no los detecta solo
+  # porque no se cargan con un require()
+  included_files = [
+    "node_modules/.prisma/client/*.wasm",
+    "node_modules/.prisma/client/schema.prisma",
+    "prisma/schema.prisma"
+  ]
+
+# /api/* lo atiende el backend. Va ANTES del catch-all del SPA, porque las
+# reglas se evaluan en orden y si no el index.html se comeria la API.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
 # React Router maneja las rutas del lado del cliente: el server tiene que
-# devolver index.html para CUALQUIER path. Sin esto, entrar directo a
-# /catalogo o apretar F5 ahí da 404, porque ese archivo no existe en disco.
+# devolver index.html para cualquier otro path. Sin esto, entrar directo a
+# /catalogo o apretar F5 ahi da 404, porque ese archivo no existe en disco.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# helmet protege la API, pero no estos archivos estáticos: los headers del
-# sitio se configuran acá.
+# helmet pone los headers de las respuestas de la API; estos son para los
+# archivos estaticos del sitio, que no pasan por Express.
 [[headers]]
   for = "/*"
   [headers.values]
@@ -32,6 +55,6 @@
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    # Vite le pone un hash al nombre de cada archivo, así que si el contenido
-    # cambia cambia la URL: se pueden cachear para siempre sin riesgo.
+    # Vite le pone un hash al nombre de cada archivo: si el contenido cambia,
+    # cambia la URL, asi que se pueden cachear para siempre sin riesgo
     Cache-Control = "public, max-age=31536000, immutable"

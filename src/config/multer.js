@@ -1,24 +1,12 @@
-// configuracion de multer: como y donde se guardan las imagenes subidas
+// configuracion de multer: recibe las imagenes que sube el panel
 
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
-const uploadsDir = path.join(__dirname, '../../uploads');
-
-// si la carpeta uploads/ no existe todavia, la creamos
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // .jpg, .png, etc
-    const nombreUnico = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, nombreUnico);
-  },
-});
+// memoryStorage y no diskStorage: el backend corre como funcion de Netlify y
+// no tiene disco propio donde escribir. El archivo queda en memoria y de ahi
+// lo sube storage.js a Supabase Storage.
+// El limite de 5 MB de abajo es lo que mantiene acotado el uso de memoria.
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
