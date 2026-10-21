@@ -101,7 +101,8 @@ y horarios de atencion.
 4.2 Modificar publicaciones
     PUT /api/productos/:id (protegida) — edita los campos del producto.
     Acepta solo una lista blanca de campos (nombre, anio, precio, stock,
-    estado_stock, condicion, destacado, esActivo, descripcion, categoriaId).
+    estado_stock, condicion, destacado, esActivo, descripcion, categoriaId,
+    descuento_tipo, descuento_valor).
     Cualquier otra cosa que venga en el body se ignora: antes se pasaba el
     body completo a Prisma y se podia mandar "id", que reasignaba la clave
     primaria del producto.
@@ -110,12 +111,30 @@ y horarios de atencion.
 
 4.3 Eliminar publicaciones
     DELETE /api/productos/:id (protegida) — borra el producto y sus
-    imagenes en cascada.
+    imagenes en cascada, y tambien los archivos de esas imagenes en
+    Supabase Storage.
 
 4.4 Activar o desactivar publicaciones
     Se logra con PUT /api/productos/:id mandando { esActivo: false }.
     No hay un endpoint PATCH separado para esto — es la misma via que
     editar cualquier otro campo.
+
+4.5 Descuentos
+    Cada producto puede tener un descuento: descuento_tipo ("porcentaje" o
+    "monto") y descuento_valor (15 = 15%, o un monto en pesos). Se cargan
+    en POST /api/productos o PUT /api/productos/:id; mandar los dos en null
+    lo quita. El backend valida (400 si no se cumple):
+    - el producto tiene que tener precio (no se descuenta a "a consultar")
+    - porcentaje: mas de 0 y menos de 100
+    - monto: mas de 0 y menos que el precio
+    Si se cambia el precio, el descuento se vuelve a validar contra el
+    precio nuevo; si el precio pasa a null ("a consultar"), el descuento
+    se quita solo. El precio final no se guarda: lo calcula el frontend
+    (lib/formato.js, calcularDescuento) redondeando a pesos enteros.
+    En el panel se aplica desde el formulario del producto o desde el
+    boton de descuento de cada fila del listado. En el sitio se muestra el
+    precio original tachado, el precio nuevo y una etiqueta con el
+    descuento ("-15%" o "-$ 10.000").
 
 4.5 Imagenes de cada publicacion (multiples, con portada)
     POST /api/productos/:id/imagenes (protegida) — sube hasta 5
@@ -137,7 +156,7 @@ y horarios de atencion.
     repartidos en las 4 categorias.
 
 Cada producto guarda: nombre, categoria, imagenes, descripcion, precio
-(nullable = "a consultar"), y estado de disponibilidad (enum: disponible,
+(nullable = "a consultar"), descuento opcional (ver 4.5), y estado de disponibilidad (enum: disponible,
 ultima_unidad, reservado, a_consultar, vendido) ademas de esActivo y
 destacado.
 
@@ -204,6 +223,9 @@ POST   /api/invitacion            Invita por mail con un rol. Token
                                    revocar uno no servia porque los otros
                                    seguian funcionando. Las vencidas no
                                    cuentan: ahi se puede volver a invitar.
+                                   El rol tiene que ser "administrador" o
+                                   "vendedor" (400 si no): super_admin no
+                                   se puede dar por invitacion.
 GET    /api/invitacion            Lista invitaciones y su estado.
 DELETE /api/invitacion/:id        Revoca una invitacion pendiente.
 POST   /api/invitacion/aceptar    (publica) Crea la cuenta con el rol
@@ -354,6 +376,10 @@ detalle real queda solo en el log del servidor.
 - Sistema de promociones/novedades: tabla Promocion migrada y
   sincronizada en la base real. CRUD completo:
   GET/POST /api/promociones, GET/PUT/DELETE /api/promociones/:id.
+  POST /api/promociones/:id/imagen sube UNA imagen (multipart, campo
+  "imagen", 5 MB max) a Supabase Storage y la guarda en imagenUrl. Si la
+  promo ya tenia una imagen nuestra, la borra del storage; al eliminar la
+  promo tambien se borra su imagen.
   El panel las administra en /panel/promociones y las vigentes salen en
   la banda "NOVEDADES" de la home.
   Mismo criterio que productos: el visitante solo ve las encendidas

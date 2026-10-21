@@ -1,0 +1,244 @@
+.pagina {
+  flex: 1;
+  width: 100%;
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: var(--e-8) var(--gutter) var(--seccion);
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(var(--e-7), 6vw, var(--e-10));
+  align-items: start;
+}
+
+/* ============ LADO IZQUIERDO ============ */
+.titulo {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-2xl);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.bajada {
+  margin: var(--e-4) 0 0;
+  max-width: 40ch;
+  font-size: var(--t-md);
+  line-height: 1.55;
+  color: var(--tinta-dim);
+}
+
+.canales {
+  list-style: none;
+  margin: var(--e-7) 0 0;
+  padding: 0;
+  border-top: 2px solid var(--tinta);
+}
+.canales li {
+  border-bottom: 2px solid var(--tinta);
+}
+.canales a {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--e-4);
+  padding: var(--e-4) var(--e-2);
+  color: var(--tinta);
+  transition: background-color var(--d-rapida) ease;
+}
+.canales a:hover {
+  color: var(--tinta);
+  background: rgba(242, 106, 27, 0.12);
+}
+.canales a > svg:first-child {
+  color: var(--naranja);
+}
+.canales span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.canales strong {
+  font-size: var(--t-md);
+  font-weight: 800;
+}
+.canales small {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  color: var(--tinta-tenue);
+  overflow-wrap: anywhere;
+}
+.flecha {
+  transition: transform var(--d-rapida) var(--ease-out);
+}
+.canales a:hover .flecha {
+  transform: translate(2px, -2px);
+}
+
+.local {
+  margin-top: var(--e-7);
+}
+.direccion {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  font-weight: 700;
+  color: var(--tinta);
+  text-decoration: underline;
+  text-decoration-color: var(--borde-fuerte);
+  text-underline-offset: 4px;
+}
+.direccion:hover {
+  color: var(--tinta);
+  text-decoration-color: var(--naranja);
+}
+.horario {
+  margin: var(--e-4) 0 0;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  color: var(--tinta-dim);
+}
+.horario div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e-4);
+}
+.horario dt,
+.horario dd {
+  margin: 0;
+}
+.hoy {
+  color: var(--tinta);
+  font-weight: 700;
+}
+.hoy dt::after {
+  content: ' · hoy';
+  color: var(--naranja);
+}
+
+/* ============ FORMULARIO ============ */
+.formulario {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--r-card);
+  padding: clamp(var(--e-5), 4vw, var(--e-7));
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+  box-shadow: var(--sombra-suave);
+}
+.formTitulo {
+  margin: 0 0 var(--e-2);
+  font-size: var(--t-lg);
+  font-weight: 800;
+}
+.opcional {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--tinta-tenue);
+}
+.dosColumnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e-4);
+}
+
+.producto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  padding: var(--e-3) var(--e-3) var(--e-3) var(--e-4);
+  border-radius: var(--r-control);
+  background: var(--carbon);
+  color: var(--crema);
+  font-size: var(--t-sm);
+}
+.producto a {
+  color: var(--naranja);
+  font-weight: 800;
+}
+.producto button {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--borde-oscuro-2);
+  background: transparent;
+  color: var(--crema);
+  cursor: pointer;
+}
+
+.enviar {
+  margin-top: var(--e-2);
+  width: 100%;
+}
+.nota {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--tinta-tenue);
+}
+
+/* ============ ENVIADO ============ */
+.enviado {
+  max-width: 560px;
+  margin: var(--e-6) auto 0;
+  text-align: center;
+}
+.enviadoIcono {
+  color: var(--ok-texto);
+}
+.enviadoTitulo {
+  margin: var(--e-4) 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+}
+.enviado p {
+  color: var(--tinta-dim);
+  line-height: 1.6;
+}
+.enviadoAcciones {
+  margin-top: var(--e-6);
+  display: flex;
+  gap: var(--e-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .grilla {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .dosColumnas {
+    grid-template-columns: 1fr;
+  }
+  .pagina {
+    padding-top: var(--e-7);
+  }
+}
+
+/* entrada: el formulario sube despues de los canales */
+@keyframes formulario-entra {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+.formulario {
+  animation: formulario-entra 800ms var(--ease-out) 220ms backwards;
+}

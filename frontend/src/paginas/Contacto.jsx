@@ -1,27 +1,55 @@
-// Formulario de contacto -> POST /api/consultas (publico).
+// Contacto: canales rapidos (WhatsApp, Instagram, mail) y el formulario que
+// guarda la consulta -> POST /api/consultas (publico, 5 envios por hora).
 // Si llega con ?productoId=N la consulta queda asociada a ese disco.
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import {
+  WhatsappLogo,
+  InstagramLogo,
+  EnvelopeSimple,
+  ArrowUpRight,
+  MapPin,
+  CheckCircle,
+  X,
+} from '@phosphor-icons/react';
 import { get, post } from '../lib/api';
 import { useStoreInfo } from '../lib/useStoreInfo';
-import { mensajeDeError } from '../lib/formato';
+import { normalizarHorario, horarioDeHoy } from '../lib/horario';
+import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
+import { mensajeDeError, separarNombre } from '../lib/formato';
+import estilos from './Contacto.module.css';
 
 const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const VACIO = { nombre: '', email: '', telefono: '', asunto: '', mensaje: '' };
+
+function Campo({ id, label, error, opcional, children }) {
+  return (
+    <div className={`campo ${error ? 'con-error' : ''}`}>
+      <label htmlFor={id}>
+        {label}
+        {opcional && <span className={estilos.opcional}> (opcional)</span>}
+      </label>
+      {children}
+      {error && (
+        <div className="campo-error" id={`${id}-error`}>
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Contacto() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const productoId = params.get('productoId');
   const { info } = useStoreInfo();
+  const horario = normalizarHorario(info?.horario);
+  const hoy = horarioDeHoy(info?.horario);
 
   const [producto, setProducto] = useState(null);
-  const [form, setForm] = useState({
-    nombre: '',
-    email: '',
-    telefono: '',
-    asunto: '',
-    mensaje: '',
-  });
+  const [form, setForm] = useState(VACIO);
   const [errores, setErrores] = useState({});
   const [errorGeneral, setErrorGeneral] = useState(null);
   const [enviando, setEnviando] = useState(false);
@@ -29,14 +57,14 @@ export default function Contacto() {
 
   // si viene por un producto, lo mostramos y precargamos el asunto
   useEffect(() => {
-    if (!productoId) return;
+    if (!productoId) {
+      setProducto(null);
+      return;
+    }
     get(`/productos/${productoId}`)
       .then((p) => {
         setProducto(p);
-        setForm((f) => ({
-          ...f,
-          asunto: f.asunto || `Consulta por ${p.nombre}`,
-        }));
+        setForm((f) => ({ ...f, asunto: f.asunto || `Consulta por ${p.nombre}` }));
       })
       .catch(() => setProducto(null));
   }, [productoId]);
@@ -47,17 +75,28 @@ export default function Contacto() {
     if (errores[nombre]) setErrores((e) => ({ ...e, [nombre]: null }));
   }
 
+  function quitarProducto() {
+    setProducto(null);
+    setForm((f) => ({ ...f, asunto: '' }));
+    const nuevos = new URLSearchParams(params);
+    nuevos.delete('productoId');
+    setParams(nuevos, { replace: true });
+  }
+
   // Validamos igual que el backend para avisar antes de gastar un pedido:
   // el formulario publico tiene un limite de 5 envios por hora.
   function validar() {
     const e = {};
     if (!form.nombre.trim()) e.nombre = 'Decinos cómo te llamás.';
     if (!form.email.trim()) e.email = 'Necesitamos un mail para contestarte.';
-    else if (!MAIL_REGEX.test(form.email)) e.email = 'Falta el dominio del email.';
-    if (!form.asunto.trim()) e.asunto = 'Poné un asunto.';
+    else if (!MAIL_REGEX.test(form.email.trim())) e.email = 'Revisá el mail: le falta algo (por ejemplo, el @ o el dominio).';
+    if (!form.asunto.trim()) e.asunto = 'Poné un asunto corto.';
     if (!form.mensaje.trim()) e.mensaje = 'Contanos qué buscás.';
     setErrores(e);
-    return Object.keys(e).length === 0;
+    // el foco va al primer campo con error, para no tener que buscarlo
+    const primero = ['nombre', 'email', 'asunto', 'mensaje'].find((k) => e[k]);
+    if (primero) document.getElementById(`c-${primero}`)?.focus();
+    return !primero;
   }
 
   async function enviar(ev) {
@@ -73,9 +112,10 @@ export default function Contacto() {
         telefono: form.telefono.trim() || undefined,
         asunto: form.asunto.trim(),
         mensaje: form.mensaje.trim(),
-        productoId: productoId || undefined,
+        productoId: producto ? producto.id : undefined,
       });
       setEnviado(true);
+      window.scrollTo(0, 0);
     } catch (err) {
       setErrorGeneral(
         err.status === 429
@@ -87,29 +127,28 @@ export default function Contacto() {
     }
   }
 
+  const whatsapp = linkWhatsApp(
+    info?.whatsapp,
+    producto ? `Hola B-Side Club! Les consulto por "${producto.nombre}".` : 'Hola B-Side Club!'
+  );
+  const instagram = linkInstagram(info?.instagram);
+
   if (enviado) {
     return (
-      <main className="contenido">
-        <div className="kicker">04 — Contacto</div>
-        <div className="vacio" style={{ borderStyle: 'solid', borderColor: 'var(--ok-texto)' }}>
-          <div className="vacio-titulo" style={{ color: 'var(--ok-texto)' }}>
-            CONSULTA ENVIADA
-          </div>
-          <div className="vacio-texto">
-            La recibimos y te contestamos al mail que nos dejaste. Si es urgente, escribinos por
-            WhatsApp.
-          </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <main className={estilos.pagina}>
+        <div className={estilos.enviado} role="status">
+          <CheckCircle size={48} weight="duotone" className={estilos.enviadoIcono} aria-hidden="true" />
+          <h1 className={estilos.enviadoTitulo}>Consulta enviada</h1>
+          <p>
+            La recibimos y te contestamos a <strong>{form.email.trim()}</strong>. Si es urgente,
+            escribinos por WhatsApp.
+          </p>
+          <div className={estilos.enviadoAcciones}>
             <Link to="/catalogo" className="btn btn-primario">
               Seguir mirando el catálogo
             </Link>
-            {info?.whatsapp && (
-              <a
-                href={`https://wa.me/${String(info.whatsapp).replace(/\D/g, '')}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secundario"
-              >
+            {whatsapp && (
+              <a href={whatsapp} target="_blank" rel="noreferrer" className="btn btn-secundario">
                 WhatsApp
               </a>
             )}
@@ -120,172 +159,164 @@ export default function Contacto() {
   }
 
   return (
-    <main className="contenido">
-      <div className="kicker">04 — Contacto</div>
-      <h1 className="titulo">ESCRIBINOS</h1>
+    <main className={estilos.pagina}>
+      <div className={estilos.grilla}>
+        <div className={`${estilos.lado} cascada`}>
+          <h1 className={estilos.titulo}>Escribinos</h1>
+          <p className={estilos.bajada}>
+            Para reservar un disco, pedir uno que no está o vendernos tu colección. Por WhatsApp te
+            contestamos más rápido.
+          </p>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
-          gap: 28,
-          alignItems: 'start',
-        }}
-        className="grilla-contacto"
-      >
-        <form onSubmit={enviar} className="card" noValidate>
+          <ul className={estilos.canales}>
+            {whatsapp && (
+              <li>
+                <a href={whatsapp} target="_blank" rel="noreferrer">
+                  <WhatsappLogo size={26} weight="duotone" aria-hidden="true" />
+                  <span>
+                    <strong>WhatsApp</strong>
+                    <small>{info.whatsapp}</small>
+                  </span>
+                  <ArrowUpRight size={18} weight="bold" aria-hidden="true" className={estilos.flecha} />
+                </a>
+              </li>
+            )}
+            {instagram && (
+              <li>
+                <a href={instagram} target="_blank" rel="noreferrer">
+                  <InstagramLogo size={26} weight="duotone" aria-hidden="true" />
+                  <span>
+                    <strong>Instagram</strong>
+                    <small>{arrobaInstagram(info.instagram)}</small>
+                  </span>
+                  <ArrowUpRight size={18} weight="bold" aria-hidden="true" className={estilos.flecha} />
+                </a>
+              </li>
+            )}
+            {info?.email && (
+              <li>
+                <a href={`mailto:${info.email}`}>
+                  <EnvelopeSimple size={26} weight="duotone" aria-hidden="true" />
+                  <span>
+                    <strong>Mail</strong>
+                    <small>{info.email}</small>
+                  </span>
+                  <ArrowUpRight size={18} weight="bold" aria-hidden="true" className={estilos.flecha} />
+                </a>
+              </li>
+            )}
+          </ul>
+
+          {info?.direccion && (
+            <div className={estilos.local}>
+              <a href={linkMapa(info.direccion)} target="_blank" rel="noreferrer" className={estilos.direccion}>
+                <MapPin size={20} weight="duotone" aria-hidden="true" />
+                {info.direccion}
+              </a>
+              {horario.length > 0 && (
+                <dl className={estilos.horario}>
+                  {horario.map((fila) => (
+                    <div key={fila.label} className={fila.label === hoy?.label ? estilos.hoy : undefined}>
+                      <dt>{fila.label}</dt>
+                      <dd>{fila.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={enviar} className={estilos.formulario} noValidate aria-labelledby="form-titulo">
+          <h2 id="form-titulo" className={estilos.formTitulo}>
+            Dejanos un mensaje
+          </h2>
+
           {producto && (
-            <div
-              style={{
-                display: 'flex',
-                gap: 12,
-                alignItems: 'center',
-                padding: 12,
-                borderRadius: 'var(--r-control)',
-                background: 'var(--gris-medio)',
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'var(--mono)',
-                  fontSize: 10,
-                  letterSpacing: '.16em',
-                  color: 'var(--meta)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Consulta por
-              </div>
-              <Link to={`/producto/${producto.id}`} style={{ fontWeight: 800, fontSize: 14 }}>
-                {producto.nombre}
-              </Link>
+            <div className={estilos.producto}>
+              <span>
+                Consulta por{' '}
+                <Link to={`/producto/${producto.id}`}>{separarNombre(producto.nombre).titulo}</Link>
+              </span>
+              <button type="button" onClick={quitarProducto} aria-label="Quitar el disco de la consulta">
+                <X size={14} weight="bold" />
+              </button>
             </div>
           )}
 
-          {errorGeneral && <div className="aviso aviso-error">{errorGeneral}</div>}
+          {errorGeneral && (
+            <div className="aviso aviso-error" role="alert">
+              {errorGeneral}
+            </div>
+          )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className={`campo ${errores.nombre ? 'con-error' : ''}`}>
-              <label htmlFor="c-nombre">Nombre</label>
+          <div className={estilos.dosColumnas}>
+            <Campo id="c-nombre" label="Nombre" error={errores.nombre}>
               <input
                 id="c-nombre"
                 value={form.nombre}
                 onChange={(e) => campo('nombre', e.target.value)}
-                placeholder="Tu nombre"
+                autoComplete="name"
+                aria-invalid={Boolean(errores.nombre)}
+                aria-describedby={errores.nombre ? 'c-nombre-error' : undefined}
               />
-              {errores.nombre && <div className="campo-error">{errores.nombre}</div>}
-            </div>
-
-            <div className={`campo ${errores.email ? 'con-error' : ''}`}>
-              <label htmlFor="c-email">Email</label>
+            </Campo>
+            <Campo id="c-telefono" label="Teléfono" opcional>
               <input
-                id="c-email"
-                type="email"
-                value={form.email}
-                onChange={(e) => campo('email', e.target.value)}
-                placeholder="vos@ejemplo.com"
-              />
-              {errores.email && <div className="campo-error">{errores.email}</div>}
-            </div>
-
-            <div className="campo">
-              <label htmlFor="c-tel">Teléfono (opcional)</label>
-              <input
-                id="c-tel"
+                id="c-telefono"
+                type="tel"
                 value={form.telefono}
                 onChange={(e) => campo('telefono', e.target.value)}
-                placeholder="11 5555-0000"
+                autoComplete="tel"
+                inputMode="tel"
               />
-            </div>
-
-            <div className={`campo ${errores.asunto ? 'con-error' : ''}`}>
-              <label htmlFor="c-asunto">Asunto</label>
-              <input
-                id="c-asunto"
-                value={form.asunto}
-                onChange={(e) => campo('asunto', e.target.value)}
-                placeholder="Busco un disco / Consulta por un precio"
-              />
-              {errores.asunto && <div className="campo-error">{errores.asunto}</div>}
-            </div>
-
-            <div className={`campo ${errores.mensaje ? 'con-error' : ''}`}>
-              <label htmlFor="c-mensaje">Mensaje</label>
-              <textarea
-                id="c-mensaje"
-                value={form.mensaje}
-                onChange={(e) => campo('mensaje', e.target.value)}
-                placeholder="Contanos qué estás buscando…"
-              />
-              {errores.mensaje && <div className="campo-error">{errores.mensaje}</div>}
-            </div>
-
-            <button type="submit" className="btn btn-primario" disabled={enviando}>
-              {enviando ? 'Enviando…' : 'Enviar consulta'}
-            </button>
+            </Campo>
           </div>
+
+          <Campo id="c-email" label="Email" error={errores.email}>
+            <input
+              id="c-email"
+              type="email"
+              value={form.email}
+              onChange={(e) => campo('email', e.target.value)}
+              autoComplete="email"
+              inputMode="email"
+              aria-invalid={Boolean(errores.email)}
+              aria-describedby={errores.email ? 'c-email-error' : undefined}
+            />
+          </Campo>
+
+          <Campo id="c-asunto" label="Asunto" error={errores.asunto}>
+            <input
+              id="c-asunto"
+              value={form.asunto}
+              onChange={(e) => campo('asunto', e.target.value)}
+              placeholder="Busco un disco, reservar, vender mi colección…"
+              aria-invalid={Boolean(errores.asunto)}
+              aria-describedby={errores.asunto ? 'c-asunto-error' : undefined}
+            />
+          </Campo>
+
+          <Campo id="c-mensaje" label="Mensaje" error={errores.mensaje}>
+            <textarea
+              id="c-mensaje"
+              value={form.mensaje}
+              onChange={(e) => campo('mensaje', e.target.value)}
+              placeholder="Contanos qué estás buscando…"
+              aria-invalid={Boolean(errores.mensaje)}
+              aria-describedby={errores.mensaje ? 'c-mensaje-error' : undefined}
+            />
+          </Campo>
+
+          <button type="submit" className={`btn btn-primario ${estilos.enviar}`} disabled={enviando}>
+            {enviando ? 'Enviando…' : 'Enviar consulta'}
+          </button>
+          {/* sale del horario cargado en el panel, no de un texto fijo */}
+          <p className={estilos.nota}>
+            {hoy ? `Hoy el local está: ${hoy.value}. ` : ''}Te contestamos al mail que nos dejes.
+          </p>
         </form>
-
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div className="card">
-            <div className="etiqueta">Dónde estamos</div>
-            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>
-              {info?.direccion || 'Chacarita, Buenos Aires'}
-            </div>
-            {info?.horario && typeof info.horario === 'object' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {Object.entries(info.horario).map(([dia, hs]) => (
-                  <div
-                    key={dia}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: 10,
-                      fontSize: 13,
-                    }}
-                  >
-                    <span style={{ color: 'var(--meta)', textTransform: 'capitalize' }}>{dia}</span>
-                    <span style={{ fontWeight: 700 }}>{String(hs)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="card">
-            <div className="etiqueta">Más rápido</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14 }}>
-              {info?.whatsapp && (
-                <a
-                  href={`https://wa.me/${String(info.whatsapp).replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  WhatsApp
-                </a>
-              )}
-              {info?.instagram && (
-                <a
-                  href={`https://instagram.com/${String(info.instagram).replace(/^@/, '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Instagram
-                </a>
-              )}
-              {info?.email && <a href={`mailto:${info.email}`}>{info.email}</a>}
-              {info?.telefono && <span style={{ color: 'var(--meta)' }}>{info.telefono}</span>}
-            </div>
-          </div>
-        </aside>
       </div>
-
-      <style>{`
-        @media (max-width: 820px) {
-          .grilla-contacto { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </main>
   );
 }

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>D · La pila del mostrador</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bungee&family=Bungee+Shade&family=Space+Mono:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root{--humo:#d5dadd;--tinta:#191c1d;--carbon:#100f0e;--crema:#f2ece4;--naranja:#f26a1b;--rosa:#ff4fa3;--cian:#35d0e8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;height:900px;overflow:hidden;font-family:Archivo,sans-serif;position:relative;background:var(--carbon);color:var(--crema)}
+  header{position:absolute;top:0;left:0;right:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:9}
+  .marca{font-family:Bungee;font-size:26px}.marca .b{color:#ffc9e4;text-shadow:0 0 10px var(--rosa)}.marca .c{color:#cff6fc;text-shadow:0 0 10px var(--cian)}
+  nav{display:flex;gap:26px;font-weight:700;font-size:14px}
+  /* titular con el contorno multiplicado de Bungee Shade */
+  h1{position:absolute;left:48px;top:104px;font-family:"Bungee Shade";font-size:84px;line-height:.9;color:var(--naranja);z-index:8}
+  .bajada{position:absolute;left:52px;top:300px;width:380px;font-size:18px;line-height:1.45;color:#a79e97;z-index:8}
+  .buscar{position:absolute;left:52px;top:390px;width:380px;height:56px;background:var(--crema);color:#6f797c;border-radius:999px;display:flex;align-items:center;padding:0 22px;font-size:16px;z-index:8}
+  /* la pila: tapas superpuestas en teja, cada una con su precio escrito a mano */
+  .pila{position:absolute;left:520px;top:170px;width:900px;height:700px}
+  .tapa{position:absolute;width:300px;height:300px;background:#1b1816;border:1px solid #2a2624;box-shadow:0 20px 44px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center}
+  .tapa .d{width:78%;height:78%;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 2px,rgba(255,255,255,.07) 2px 3px),radial-gradient(circle,var(--c) 0 20%,#0c0b0a 21%)}
+  .precio{position:absolute;font-family:'Permanent Marker',cursive;font-size:26px;color:#141210;background:#f7e14a;padding:6px 12px;transform:rotate(-6deg);box-shadow:0 4px 10px rgba(0,0,0,.35);white-space:nowrap}
+  .nota{position:absolute;font-family:'Permanent Marker',cursive;font-size:20px;color:var(--crema);white-space:nowrap}
+  svg{position:absolute;inset:0;pointer-events:none;overflow:visible}
+  .frente{transform:translateY(-14px) rotate(-2deg);outline:2px solid var(--naranja);z-index:5}
+</style></head><body>
+<header><div class="marca"><span class="b">B-SIDE</span> <span class="c">CLUB</span></div><nav><span>Catálogo</span><span>El local</span><span>Contacto</span></nav></header>
+<h1>RECIÉN<br>LLEGADOS</h1>
+<p class="bajada">Esta semana entraron 22 discos. Los escuchamos enteros y les pusimos precio.</p>
+<div class="buscar">Buscar artista, disco o sello…</div>
+<div class="pila">
+  <div class="tapa" style="left:0;top:40px;transform:rotate(-7deg)"><div class="d" style="--c:#9a6100"></div></div>
+  <div class="tapa" style="left:200px;top:0;transform:rotate(3deg)"><div class="d" style="--c:#0e8fa6"></div></div>
+  <div class="tapa frente" style="left:330px;top:210px"><div class="d" style="--c:#c41e75"></div></div>
+  <div class="tapa" style="left:600px;top:60px;transform:rotate(6deg)"><div class="d" style="--c:#5b45b8"></div></div>
+  <div class="tapa" style="left:120px;top:380px;transform:rotate(-3deg)"><div class="d" style="--c:#1f7a4e"></div></div>
+  <div class="tapa" style="left:620px;top:390px;transform:rotate(-8deg)"><div class="d" style="--c:#f26a1b"></div></div>
+  <div class="precio" style="left:90px;top:330px">$155.000</div>
+  <div class="precio" style="left:420px;top:180px;background:var(--naranja);z-index:6;font-size:30px">$120.000 · NM</div>
+  <div class="precio" style="left:760px;top:40px">$135.000</div>
+  <div class="precio" style="left:180px;top:620px">$128.000</div>
+  <div class="nota" style="left:420px;top:540px;z-index:7">Signos · 1ra edición nacional ↑</div>
+  <div class="nota" style="left:740px;top:690px">¡última unidad!</div>
+</div>
+</body></html>

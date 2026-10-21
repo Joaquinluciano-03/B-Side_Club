@@ -1,0 +1,191 @@
+.pantalla {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: var(--humo);
+}
+
+/* ============ EL DISCO (izquierda) ============ */
+.disco {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, #2b2521 0%, #1a1715 45%, var(--carbon) 80%);
+  display: grid;
+  place-items: center;
+}
+/* Mismo esquema que el hero: el label es su propio contexto de apilamiento y
+   el papel naranja va en ::after (z -1, despues del vinilo en el arbol). Si el
+   naranja fuera el fondo del label, el vinilo (z -1) lo taparia apenas el
+   label tuviera opacity < 1, o sea durante toda su animacion de entrada. */
+.label {
+  position: relative;
+  isolation: isolate;
+  width: min(46vh, 32vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4%;
+}
+.label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--naranja);
+  box-shadow: 0 0 0 2px var(--negro);
+}
+/* el vinilo, detras del label */
+.vinilo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 230%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    url('/imperfecciones.svg') center / 100% 100% no-repeat,
+    radial-gradient(circle closest-side, transparent 43.3%, #121110 43.5% 49.4%, rgba(255, 255, 255, 0.14) 49.6%, transparent 50.2%),
+    url('/surcos.svg') center / 100% 100% no-repeat,
+    radial-gradient(circle closest-side, #161412 0 93%, #23201d 96.5%, #3a3531 98.6%, #0a0909 99.6%, transparent 100%);
+  /* sombra centrada: el disco gira y una sombra corrida daria vueltas con el */
+  box-shadow: 0 0 120px rgba(0, 0, 0, 0.75);
+  will-change: rotate;
+}
+.logo {
+  width: 58%;
+  height: auto;
+}
+.labelTexto {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: clamp(9px, 0.9vw, 12px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tinta-sobre-naranja);
+}
+
+/* ============ FORMULARIO (derecha) ============ */
+.lado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e-8) var(--gutter);
+  background:
+    radial-gradient(rgba(25, 28, 29, 0.075) 1.1px, transparent 1.5px) 0 0 / 9px 9px,
+    var(--humo);
+}
+.contenido {
+  width: 100%;
+  max-width: 420px;
+}
+
+.marca {
+  display: inline-block;
+  margin-bottom: var(--e-7);
+  font-family: var(--display);
+  font-size: var(--t-md);
+  color: var(--tinta);
+}
+.marca span {
+  color: var(--naranja);
+}
+.marca:hover {
+  color: var(--tinta);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-xl);
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.bajada {
+  margin: var(--e-3) 0 0;
+  color: var(--tinta-dim);
+  line-height: 1.55;
+}
+.formulario {
+  margin-top: var(--e-6);
+}
+/* los botones de los formularios de sesion ocupan todo el ancho */
+.formulario :global(.btn-primario) {
+  width: 100%;
+}
+
+.pie {
+  margin-top: var(--e-6);
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--borde);
+  font-size: var(--t-sm);
+  color: var(--tinta-dim);
+}
+.volver {
+  margin-top: var(--e-6);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  font-size: var(--t-sm);
+  color: var(--tinta-tenue);
+}
+.volver:hover {
+  color: var(--tinta);
+}
+
+@media (max-width: 860px) {
+  .pantalla {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .disco {
+    height: 180px;
+  }
+  .label {
+    width: 220px;
+    margin-top: 60px; /* asoma la mitad de arriba del label */
+  }
+  .lado {
+    align-items: flex-start;
+    padding-top: var(--e-7);
+  }
+  .marca {
+    margin-bottom: var(--e-5);
+  }
+}
+
+/* ============ ENTRADA Y GIRO ============
+   El disco baja sobre el plato y gira despacio, el label aparece encima */
+@keyframes auth-gira {
+  to {
+    rotate: 1turn;
+  }
+}
+@keyframes auth-disco-baja {
+  from {
+    opacity: 0;
+    scale: 1.08;
+  }
+}
+@keyframes auth-label-entra {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+.vinilo {
+  animation:
+    auth-gira 30s linear infinite,
+    auth-disco-baja 1s var(--ease-out) backwards;
+}
+.label {
+  animation: auth-label-entra 900ms var(--ease-out) 200ms backwards;
+}

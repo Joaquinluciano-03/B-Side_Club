@@ -1,69 +1,41 @@
-/* Componentes del sistema de diseño. Cada clase corresponde a un bloque de la
-   seccion "BOTONES Y BADGES" / "CAMPOS" / "CARD DE PRODUCTO" de la demo. */
+/* Piezas globales del sistema de diseño: las que usan muchas pantallas
+   (botones, badges, campos, tablas del panel, avisos, skeleton). Lo que es
+   de un solo componente vive en su propio .module.css. Ver DESIGN.md. */
 
 /* ============ LAYOUT ============ */
 .pagina {
-  min-height: 100vh;
+  min-height: 100dvh;
   /* trama halftone sobre el gris humo, igual que la demo */
   background:
     radial-gradient(rgba(25, 28, 29, 0.075) 1.1px, transparent 1.5px) 0 0 / 9px 9px,
     var(--humo);
   position: relative;
-  overflow-x: hidden;
+  /* clip y no hidden: hidden convierte a .pagina en contenedor de scroll y
+     rompe el position: sticky del header y de la barra del catalogo */
+  overflow-x: clip;
   display: flex;
   flex-direction: column;
 }
 
-.contenido {
-  max-width: var(--ancho);
-  margin: 0 auto;
-  width: 100%;
-  padding: 48px 18px 90px;
-  flex: 1;
-}
-
 /* ============ TIPOGRAFIA ============ */
-.kicker {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.24em;
-  color: var(--naranja);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-
-.titulo {
-  font-family: var(--display);
-  font-size: clamp(30px, 6vw, 52px);
-  margin: 0 0 28px;
-  line-height: 1.03;
-  font-weight: 400;
-}
-
-.titulo-seccion {
-  font-family: var(--display);
-  font-size: clamp(26px, 5vw, 40px);
-  margin: 0;
-  line-height: 1.05;
-  font-weight: 400;
-}
-
-/* etiqueta que divide secciones, con linea abajo */
-.divisor {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  color: var(--tinta-tenue);
-  border-bottom: 1px solid var(--borde);
-  padding-bottom: 10px;
-  margin-bottom: 22px;
-  text-transform: uppercase;
+/* visible solo para lectores de pantalla (labels de campos con icono, etc) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .mono {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.02em;
   color: var(--tinta-tenue);
 }
 
@@ -77,8 +49,16 @@
   border-radius: var(--r-control);
   cursor: pointer;
   border: none;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background-color var(--d-rapida) ease,
+    border-color var(--d-rapida) ease,
+    color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
   font-family: var(--cuerpo);
+}
+/* al presionar el boton se hunde un poco: la interfaz confirma que escucho */
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .btn-primario {
@@ -150,6 +130,16 @@
   background: var(--mal-fondo);
 }
 
+/* accion destructiva confirmada (el boton final de "Eliminar") */
+.btn-peligro-lleno {
+  background: var(--error);
+  color: #fff;
+}
+.btn-peligro-lleno:hover:not(:disabled) {
+  background: #9c2f22;
+  color: #fff;
+}
+
 .btn-chico {
   font-size: 13px;
   padding: 10px 16px;
@@ -158,8 +148,9 @@
 /* ============ BADGES DE ESTADO ============ */
 .badge {
   font-family: var(--mono);
+  font-stretch: 87.5%;
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   padding: 6px 11px;
   border-radius: var(--r-badge);
   text-transform: uppercase;
@@ -236,8 +227,9 @@
 .etiqueta {
   display: block;
   font-family: var(--mono);
+  font-stretch: 87.5%;
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   color: var(--meta);
   margin-bottom: 7px;
   text-transform: uppercase;
@@ -261,6 +253,14 @@
 .campo textarea:focus,
 .campo select:focus {
   border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+.campo input,
+.campo textarea,
+.campo select {
+  transition:
+    border-color var(--d-rapida) ease,
+    box-shadow var(--d-rapida) ease;
 }
 
 .campo textarea {
@@ -298,23 +298,22 @@
   padding: 24px;
 }
 
+/* las cards no tienen caja: separa el aire, mas entre filas que entre columnas */
 .grilla-productos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 42vw), 1fr));
+  gap: var(--e-7) var(--e-5);
+}
+@media (max-width: 480px) {
+  .grilla-productos {
+    gap: var(--e-6) var(--e-4);
+  }
 }
 
-/* el hover de la card de producto, igual que en la demo */
-.card-producto:hover,
-.tarjeta-categoria:hover {
-  border-color: #f26a1b66 !important;
-  transform: translateY(-4px);
-}
-
-.card-producto:focus-visible,
-.tarjeta-categoria:focus-visible {
-  outline: 2px solid var(--teal);
-  outline-offset: 2px;
+/* sobre fondo carbon el teal oscuro no se ve: ahi el foco va en cian.
+   data-oscuro lo llevan header, footer, lateral del panel y el Lado B */
+[data-oscuro] :focus-visible {
+  outline-color: var(--foco-oscuro) !important;
 }
 
 /* el foco por teclado tiene que verse en todo lo interactivo */
@@ -325,27 +324,6 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
-}
-
-/* ============ ESTADOS VACIOS ============ */
-.vacio {
-  border: 1px dashed var(--borde-fuerte);
-  border-radius: var(--r-card);
-  padding: 60px 24px;
-  text-align: center;
-}
-
-.vacio-titulo {
-  font-family: var(--display);
-  font-size: 22px;
-  color: var(--naranja);
-  margin-bottom: 10px;
-  font-weight: 400;
-}
-
-.vacio-texto {
-  color: var(--meta);
-  margin-bottom: 22px;
 }
 
 /* ============ AVISOS ============ */
@@ -378,11 +356,10 @@ textarea:focus-visible {
 }
 
 .tabla th {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  font-family: var(--cuerpo);
+  font-size: 12px;
+  font-weight: 700;
   color: var(--tinta-dim);
-  text-transform: uppercase;
   text-align: left;
   padding: 14px 16px;
   background: var(--gris-medio);
@@ -420,44 +397,97 @@ textarea:focus-visible {
 }
 
 /* ============ MODALES ============ */
+/* Entrada y salida de todos los <dialog> (Modal y Confirmar).
+   Entra desde un poco mas chico con fade (240ms, ease-out fuerte); sale mas
+   rapido (160ms). Nunca desde scale(0): nada aparece de la nada.
+   @starting-style da el estado inicial al abrir; overlay/display con
+   allow-discrete permiten animar tambien el cierre. */
+dialog {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity 160ms ease,
+    scale 160ms var(--ease-out),
+    overlay 160ms allow-discrete,
+    display 160ms allow-discrete;
+}
+dialog[open] {
+  transition-duration: 240ms;
+}
+dialog:not([open]) {
+  opacity: 0;
+  scale: 0.97;
+}
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
 dialog::backdrop {
   background: rgba(12, 11, 10, 0.62);
   backdrop-filter: blur(3px);
+  opacity: 1;
+  transition:
+    opacity 240ms ease,
+    overlay 240ms allow-discrete,
+    display 240ms allow-discrete;
+}
+dialog:not([open])::backdrop {
+  opacity: 0;
+}
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
 }
 
-.modal-cerrar:hover {
-  border-color: var(--error) !important;
-  color: var(--error) !important;
+
+
+/* ============ LADO A -> LADO B ============
+   Los links a Nosotros navegan con View Transition: la pagina nueva (el Lado
+   B, en carbon) se abre en circulo desde el centro, como cuando das vuelta el
+   disco. Solo esos links la disparan; sin soporte la navegacion es normal. */
+::view-transition-old(root) {
+  animation: none;
+}
+::view-transition-new(root) {
+  animation: dar-vuelta 620ms var(--ease-in-out) both;
+}
+@keyframes dar-vuelta {
+  from {
+    clip-path: circle(0% at 50% 55%);
+  }
+  to {
+    clip-path: circle(140% at 50% 55%);
+  }
 }
 
-/* ============ RESPONSIVE DEL PANEL ============ */
-@media (max-width: 880px) {
-  .adm-shell {
-    flex-direction: column;
-  }
-  .adm-side {
-    position: static !important;
-    height: auto !important;
-    width: 100% !important;
-    flex-direction: row !important;
-    align-items: center;
-    overflow-x: auto;
-    padding: 12px !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--borde-oscuro);
-  }
-  .adm-side > button,
-  .adm-side > a {
-    width: auto !important;
-    white-space: nowrap;
-  }
-  .adm-side-foot {
-    margin-top: 0 !important;
-    flex-direction: row !important;
-    border-top: none !important;
-    padding-top: 0 !important;
-  }
-  .adm-side-marca {
-    display: none !important;
+
+/* ============ ENTRADAS AL CARGAR ============
+   Piezas compartidas para que cada pagina entre con movimiento.
+   - .cascada: los hijos directos entran subiendo, uno detras de otro (70ms).
+     --cascada-inicio corre todo el grupo si hace falta esperar a otra cosa.
+   fill-mode backwards: el estado inicial se aplica durante el delay y al
+   terminar la animacion no queda nada pegado al elemento. */
+@keyframes entrada-subir {
+  from {
+    opacity: 0;
+    translate: 0 18px;
   }
 }
+
+.cascada > * {
+  animation: entrada-subir 700ms var(--ease-out) backwards;
+  animation-delay: var(--cascada-inicio, 0ms);
+}
+.cascada > :nth-child(2) { animation-delay: calc(var(--cascada-inicio, 0ms) + 70ms); }
+.cascada > :nth-child(3) { animation-delay: calc(var(--cascada-inicio, 0ms) + 140ms); }
+.cascada > :nth-child(4) { animation-delay: calc(var(--cascada-inicio, 0ms) + 210ms); }
+.cascada > :nth-child(5) { animation-delay: calc(var(--cascada-inicio, 0ms) + 280ms); }
+.cascada > :nth-child(6) { animation-delay: calc(var(--cascada-inicio, 0ms) + 350ms); }
+.cascada > :nth-child(7) { animation-delay: calc(var(--cascada-inicio, 0ms) + 420ms); }
+.cascada > :nth-child(8) { animation-delay: calc(var(--cascada-inicio, 0ms) + 490ms); }
+.cascada > :nth-child(9) { animation-delay: calc(var(--cascada-inicio, 0ms) + 560ms); }
+.cascada > :nth-child(n + 10) { animation-delay: calc(var(--cascada-inicio, 0ms) + 630ms); }

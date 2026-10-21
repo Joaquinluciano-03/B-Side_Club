@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T18:30:00-03:00",
+  "title": "Design System: B-Side Club",
+  "extensions": {
+    "colorMeta": {
+      "naranja-label": { "role": "primary", "displayName": "Naranja label", "tonalRamp": ["#3d1806", "#6b2a0b", "#a03f10", "#d45615", "#f26a1b", "#f78a4c", "#fbb48a", "#fde3d2"] },
+      "carbon-surco": { "role": "neutral", "displayName": "Carbón surco", "tonalRamp": ["#0a0909", "#100f0e", "#1a1715", "#26221f", "#3a3431", "#5c554f", "#8a817b", "#c8c0b9"] },
+      "humo": { "role": "neutral", "displayName": "Gris humo", "tonalRamp": ["#2f3436", "#4e5558", "#7a8386", "#a1abaf", "#bac2c6", "#c9d0d3", "#d5dadd", "#e9edee"] },
+      "teal-enlace": { "role": "tertiary", "displayName": "Teal enlace", "tonalRamp": ["#05343d", "#0a6677", "#0e8fa6", "#3fb0c4", "#7ccfdc", "#aee2ea", "#d5f1f5", "#eef9fb"] },
+      "neon-rosa": { "role": "accent", "displayName": "Neón rosa (solo logotipo)" },
+      "neon-cian": { "role": "accent", "displayName": "Neón cian (logotipo y foco sobre carbón)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Bungee", "purpose": "Títulos de página y sección, el label del hero. Nunca párrafos." },
+      "body": { "displayName": "Archivo Variable", "purpose": "Todo lo que se lee; eje de ancho condensado para los títulos de las tapas." },
+      "meta": { "displayName": "Martian Mono Variable", "purpose": "Datos: año, formato, cantidades, estados, horarios." }
+    },
+    "shadows": [
+      { "name": "sombra-suave", "value": "0 1px 2px rgba(16,15,14,.08), 0 4px 16px rgba(16,15,14,.08)", "purpose": "Formularios y paneles sobre el humo." },
+      { "name": "sombra-alta", "value": "0 2px 4px rgba(16,15,14,.1), 0 18px 40px rgba(16,15,14,.18)", "purpose": "Diálogos y funda levantada." },
+      { "name": "sombra-vinilo", "value": "0 40px 120px rgba(0,0,0,.75)", "purpose": "El disco del hero sobre la mesa." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Todo lo que entra o responde a un toque (púa, funda, botones)." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Movimiento en pantalla: el disco que se da vuelta al ir a Nosotros." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Menú mobile y cajón del panel." },
+      { "name": "d-presion", "value": "140ms", "purpose": "Feedback al presionar (scale 0.97)." },
+      { "name": "d-rapida", "value": "180ms", "purpose": "Hover y color." },
+      { "name": "d-media", "value": "240ms", "purpose": "Menús y cambios de estado." },
+      { "name": "d-lenta", "value": "360ms", "purpose": "Diálogos y cajones." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "640px" },
+      { "name": "label-mobile", "value": "720px" },
+      { "name": "header-mobile", "value": "760px" },
+      { "name": "panel-cajon", "value": "880px" },
+      { "name": "tablet", "value": "960px" },
+      { "name": "label-sin-costados", "value": "1180px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de cada pantalla. Tinta sobre naranja.",
+      "html": "<button class=\"ds-btn-primario\">Ver el catálogo</button>",
+      "css": ".ds-btn-primario { background: #f26a1b; color: #141210; font: 800 14px/1 'Archivo Variable', Archivo, sans-serif; letter-spacing: .05em; text-transform: uppercase; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 180ms ease, transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-primario:hover { background: #ff7d2f; } .ds-btn-primario:active { transform: scale(.97); } .ds-btn-primario:focus-visible { outline: 2px solid #0a6677; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción alternativa junto al primario.",
+      "html": "<button class=\"ds-btn-secundario\">Escribir un mensaje</button>",
+      "css": ".ds-btn-secundario { background: transparent; color: #191c1d; font: 700 14px/1 'Archivo Variable', Archivo, sans-serif; letter-spacing: .05em; text-transform: uppercase; padding: 13px 23px; border: 1px solid #94a0a4; border-radius: 8px; cursor: pointer; transition: border-color 180ms ease, color 180ms ease, transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-secundario:hover { border-color: #0a6677; color: #0a6677; } .ds-btn-secundario:active { transform: scale(.97); }"
+    },
+    {
+      "name": "Buscador en pastilla",
+      "kind": "input",
+      "refersTo": "search-pill",
+      "description": "Buscador del catálogo y del panel.",
+      "html": "<label class=\"ds-buscador\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 256 256\" fill=\"currentColor\"><path d=\"M232.49 215.51 185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68 68.07 68.07 0 0 1-68-68Z\"/></svg><input placeholder=\"Buscar artista, disco o sello\"></label>",
+      "css": ".ds-buscador { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; background: #fff; border: 1px solid #a1abaf; border-radius: 999px; color: #555d60; transition: border-color 180ms ease, box-shadow 180ms ease; } .ds-buscador:focus-within { border-color: #f26a1b; box-shadow: 0 0 0 3px rgba(242,106,27,.18); } .ds-buscador input { flex: 1; border: none; outline: none; background: transparent; font: 16px 'Archivo Variable', Archivo, sans-serif; color: #191c1d; }"
+    },
+    {
+      "name": "Separador de batea",
+      "kind": "chip",
+      "refersTo": "tab-separador",
+      "description": "Filtro por formato del catálogo, con su cantidad.",
+      "html": "<div class=\"ds-separadores\"><button class=\"ds-sep ds-sep-activo\">Todo <span>22</span></button><button class=\"ds-sep\">Vinilos <span>9</span></button><button class=\"ds-sep\">CDs <span>5</span></button></div>",
+      "css": ".ds-separadores { display: flex; gap: 4px; border-bottom: 2px solid #191c1d; } .ds-sep { margin-bottom: -2px; padding: 12px 18px 11px; border: 2px solid #191c1d; border-bottom: none; border-radius: 10px 10px 0 0; background: #e9edee; color: #191c1d; font: 800 14px 'Archivo Variable', Archivo, sans-serif; cursor: pointer; transition: transform 180ms cubic-bezier(0.23,1,0.32,1); } .ds-sep span { font: 11px 'Martian Mono Variable', monospace; color: #555d60; } .ds-sep:hover { transform: translateY(-3px); } .ds-sep-activo { background: #f26a1b; color: #141210; } .ds-sep-activo span { color: #141210; }"
+    },
+    {
+      "name": "Badge de stock",
+      "kind": "chip",
+      "description": "Estado del ejemplar (solo cuando no es disponible).",
+      "html": "<span class=\"ds-badge\">Última unidad</span>",
+      "css": ".ds-badge { display: inline-block; font: 10px 'Martian Mono Variable', monospace; letter-spacing: .12em; text-transform: uppercase; padding: 6px 11px; border-radius: 5px; background: #f7ebd5; color: #925c00; border: 1px solid #9a610033; }"
+    },
+    {
+      "name": "Navegación",
+      "kind": "nav",
+      "description": "Header carbón con logotipo neón y links en una línea.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-marca\"><b>B-SIDE</b> <i>CLUB</i></span><a class=\"ds-activo\">Home</a><a>Catálogo</a><a>Nosotros</a><a>Contacto</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 28px; padding: 0 24px; height: 68px; background: #100f0e; } .ds-marca { margin-right: auto; font: 26px Bungee, Impact, sans-serif; } .ds-marca b { font-weight: 400; color: #ffc9e4; text-shadow: 0 0 4px #ff4fa3, 0 0 14px rgba(255,79,163,.7); } .ds-marca i { font-style: normal; color: #cff6fc; text-shadow: 0 0 4px #35d0e8, 0 0 14px rgba(53,208,232,.7); } .ds-nav a { color: #f2ece4; font: 700 14px 'Archivo Variable', Archivo, sans-serif; cursor: pointer; padding: 8px 0; border-bottom: 2px solid transparent; } .ds-nav a.ds-activo { color: #f26a1b; border-color: #f26a1b; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El label del disco",
+    "overview": "El sitio está armado como un vinilo visto de cerca. La Home abre con el label naranja de un disco gigante sobre su surco: el título \"El cajón\" va impreso en el label y la tracklist del Lado A (recién llegados y formatos) y del Lado B (el local, escribinos) es la navegación. Esa idea se repite en todo el sitio: las cards del catálogo son fundas con el disco adentro que asoma, la ficha de producto es la hoja de inspección del ejemplar, Nosotros es el Lado B en carbón, y el login lleva un label de \"solo staff\".\n\nEl tono es el de una disquería de barrio con oficio: cálida en la voz (rioplatense, con voseo) y precisa en los datos (estado Goldmine, año, formato, precio). El neón rosa y cian del logo existe, pero aparece una sola vez por pantalla, en el logotipo del header; nunca es fondo. El panel interno usa el mismo mundo con mucha más sobriedad: es una herramienta.",
+    "keyCharacteristics": [
+      "Label naranja + surco carbón como figura y fondo del Lado A; carbón con trama clara en el Lado B.",
+      "Tapas propias por formato cuando no hay foto: funda de papel con troquel (vinilo, CD), estuche de cassette, ficha de equipo.",
+      "Navegación que se lee como tracklist o como separadores de batea, nunca como menú genérico.",
+      "Una sola animación protagonista por superficie: la púa que baja al tema, el disco que sale de la funda, el disco que se da vuelta al entrar a Nosotros."
+    ],
+    "rules": [
+      { "name": "The One Neon Rule", "body": "El neón aparece una sola vez por pantalla (el logotipo). Nunca de fondo, nunca en botones ni en texto corrido.", "section": "colors" },
+      { "name": "The Ink-on-Orange Rule", "body": "Sobre naranja va tinta casi negra. El blanco sobre naranja no pasa contraste y además rompe la lectura de \"label impreso\".", "section": "colors" },
+      { "name": "The AA Floor Rule", "body": "Todo texto pasa 4.5:1 sobre su fondo. El teal y el gris tenue de la demo original (2.7:1 y 4.1:1) se oscurecieron por esto.", "section": "colors" },
+      { "name": "The Display-Is-A-Sign Rule", "body": "Bungee nunca en párrafos ni en botones. Es cartel, no texto.", "section": "typography" },
+      { "name": "The Real-Mono Rule", "body": "El mono solo lleva datos (años, cantidades, códigos, precios a consultar, horarios). No se usa como disfraz \"técnico\" en títulos.", "section": "typography" },
+      { "name": "The Object-Not-Card Rule", "body": "Un producto se presenta como un objeto (funda + disco), no dentro de una caja con borde.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar el formato \"Título — Artista\" en el nombre del producto: el sitio lo separa en dos líneas.",
+      "Do mostrar la escala Goldmine cuando la condición trae el código entre paréntesis.",
+      "Do dar una sola animación protagonista por pantalla. Las animaciones se ven siempre igual: el proyecto decidió no reducirlas con prefers-reduced-motion.",
+      "Do usar data-oscuro en las zonas carbón para que el foco pase a cian.",
+      "Do mantener el texto en 4.5:1 como mínimo."
+    ],
+    "donts": [
+      "Don't poner eyebrows o etiquetas numeradas (\"01 — Catálogo\") encima de los títulos.",
+      "Don't usar el neón fuera del logotipo.",
+      "Don't meter productos en cajas con borde; son objetos.",
+      "Don't usar rayas largas como separador en el copy: se reservan para el dato \"Título — Artista\".",
+      "Don't mostrar métricas que el backend no tiene (por ejemplo, visitas)."
+    ]
+  }
+}

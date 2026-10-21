@@ -46,6 +46,13 @@ async function actualizar(id, { nombre, apellido, mail, telefono, rol }) {
     throw error;
   }
 
+  // un rol inventado llegaria a Prisma y saldria como error 500
+  if (rol !== undefined && !['administrador', 'vendedor'].includes(rol)) {
+    const error = new Error('Rol inválido, debe ser administrador o vendedor');
+    error.status = 400;
+    throw error;
+  }
+
   if (mail) {
     const mailEnUso = await prisma.user.findFirst({ where: { mail, NOT: { id: target.id } } });
     if (mailEnUso) {

@@ -1,0 +1,102 @@
+/* El cartel de neon (ver Neon.jsx). El tamaño lo pone quien lo usa: todas las
+   medidas de aca van en em, asi el resplandor escala con la letra. */
+.neon {
+  /* Bungee Outline: cada trazo es un tubo */
+  font-family: 'Bungee Outline', var(--display);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.palabra {
+  display: inline-block;
+}
+.palabra + .palabra {
+  margin-left: 0.3em;
+}
+/* los tubos: nucleo casi blanco, halo del color y resplandor amplio */
+.rosa {
+  color: #ffd0e6;
+  text-shadow:
+    0 0 0.03em #fff,
+    0 0 0.06em #ff4fa3,
+    0 0 0.14em #ff4fa3,
+    0 0 0.3em #ff4fa3,
+    0 0 0.6em rgba(255, 79, 163, 0.85),
+    0 0 1.1em rgba(255, 79, 163, 0.45);
+}
+.cian {
+  color: #d2f8ff;
+  text-shadow:
+    0 0 0.03em #fff,
+    0 0 0.06em #35d0e8,
+    0 0 0.14em #35d0e8,
+    0 0 0.3em #35d0e8,
+    0 0 0.6em rgba(53, 208, 232, 0.85),
+    0 0 1.1em rgba(53, 208, 232, 0.45);
+}
+.rosa,
+.cian {
+  /* grosor del tubo: el contorno de Bungee Outline es finito y el trazo lo
+     engorda. En tamaños chicos conviene engordarlo mas con --trazo */
+  -webkit-text-stroke: var(--trazo, 0.018em) currentColor;
+}
+
+/* encendido: cada letra arranca apagada (se ve el tubo de vidrio, tenue),
+   chispea un par de veces y queda prendida, una despues de la otra */
+.letra {
+  display: inline-block;
+  animation: tubo-enciende 1.3s linear backwards;
+  animation-delay: calc(var(--inicio) + var(--l) * var(--paso));
+}
+/* el tubo flojo: despues de encenderse, cada tanto titila */
+.floja {
+  animation:
+    tubo-enciende 1.3s linear backwards,
+    tubo-flojo 6.5s linear infinite;
+  animation-delay:
+    calc(var(--inicio) + var(--l) * var(--paso)),
+    calc(var(--inicio) + 3.6s);
+}
+@keyframes tubo-enciende {
+  0%,
+  28% {
+    opacity: 0.14;
+  }
+  30% {
+    opacity: 1;
+  }
+  34% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.55;
+  }
+  56%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes tubo-flojo {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  87% {
+    opacity: 0.2;
+  }
+  88% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.35;
+  }
+  91.5%,
+  100% {
+    opacity: 1;
+  }
+}

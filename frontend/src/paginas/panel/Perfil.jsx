@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
+import InputPassword from '../../componentes/InputPassword';
 import { useAuth } from '../../lib/auth';
 import { useToast } from '../../lib/toast';
 import { etiquetaRol, mensajeDeError } from '../../lib/formato';
@@ -110,9 +111,8 @@ export default function Perfil() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div className={`campo ${errores.password ? 'con-error' : ''}`}>
                 <label htmlFor="pf-pass">Contraseña nueva</label>
-                <input
+                <InputPassword
                   id="pf-pass"
-                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
@@ -122,9 +122,8 @@ export default function Perfil() {
 
               <div className={`campo ${errores.repetir ? 'con-error' : ''}`}>
                 <label htmlFor="pf-rep">Repetir</label>
-                <input
+                <InputPassword
                   id="pf-rep"
-                  type="password"
                   value={repetir}
                   onChange={(e) => setRepetir(e.target.value)}
                   autoComplete="new-password"

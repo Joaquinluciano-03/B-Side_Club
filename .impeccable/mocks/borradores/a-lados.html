@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>A · Lado A / Lado B</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bungee&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--humo:#d5dadd;--sup:#e9edee;--tinta:#191c1d;--carbon:#100f0e;--crema:#f2ece4;--crema-dim:#a79e97;--naranja:#f26a1b;--teal:#0e8fa6;--rosa:#ff4fa3;--cian:#35d0e8;--borde:#bac2c6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;height:900px;overflow:hidden;font-family:Archivo,sans-serif;color:var(--tinta);position:relative;background:var(--carbon)}
+  .lado-a{position:absolute;inset:0 50% 0 0;background:radial-gradient(rgba(25,28,29,.08) 1.1px,transparent 1.5px) 0 0/9px 9px,var(--humo)}
+  .lado-b{position:absolute;inset:0 0 0 50%;background:radial-gradient(60% 50% at 30% 50%,rgba(242,106,27,.16),transparent 70%),var(--carbon);color:var(--crema)}
+  header{position:absolute;top:0;left:0;right:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:5}
+  .marca{font-family:Bungee;font-size:26px}
+  .marca .b{color:var(--tinta)} .marca .c{color:var(--naranja)}
+  nav{display:flex;gap:28px;font-weight:700;font-size:14px;font-stretch:110%;color:var(--crema)}
+  nav a.on{color:var(--naranja)}
+  .tag{font-family:'Space Mono';font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+  .a-cont{position:absolute;left:48px;top:140px;width:470px}
+  h1{font-family:Bungee;font-size:54px;line-height:.98;margin:18px 0 22px;letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--naranja)}
+  .sub{font-size:18px;line-height:1.45;color:#333a3c;max-width:420px;margin-bottom:28px}
+  .buscar{display:flex;height:60px;background:#fff;border:1.5px solid var(--tinta);border-radius:999px;align-items:center;padding:0 8px 0 24px;gap:12px;width:440px}
+  .buscar span{flex:1;color:#6f797c;font-size:17px}
+  .buscar b{background:var(--naranja);color:#141210;border-radius:999px;padding:13px 22px;font-size:14px;letter-spacing:.06em}
+  .chips{display:flex;gap:8px;margin-top:16px}
+  .chips i{font-style:normal;font-weight:700;font-size:13px;border:1px solid #94a0a4;border-radius:999px;padding:7px 14px}
+  .llegados{position:absolute;left:48px;bottom:44px;display:flex;gap:14px;align-items:flex-end}
+  .tapa{width:118px;height:118px;border-radius:6px;background:var(--carbon);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(16,15,14,.25)}
+  .tapa .d{width:80%;height:80%;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 2px,rgba(255,255,255,.07) 2px 3px),radial-gradient(circle,var(--c) 0 20%,#0c0b0a 21%)}
+  .llegados .t{font-size:13px;font-weight:800;margin-top:8px;width:118px}
+  .llegados .p{font-size:13px;color:#4e5558}
+  /* el disco: bisagra entre los dos lados */
+  .disco{position:absolute;left:50%;top:50%;width:560px;height:560px;transform:translate(-36%,-48%);border-radius:50%;
+    background:repeating-radial-gradient(circle,transparent 0 3px,rgba(255,255,255,.06) 3px 4px),radial-gradient(circle,#2a231c,#141210 70%);
+    box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 60px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:2}
+  .label{width:250px;height:250px;border-radius:50%;background:var(--naranja);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#141210}
+  .label img{width:150px}
+  .hole{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--carbon)}
+  .b-cont{position:absolute;right:48px;top:150px;width:330px;text-align:left;z-index:3}
+  .b-cont h2{font-family:Bungee;font-size:40px;line-height:1;margin:16px 0 18px;color:var(--crema)}
+  .abierto{color:var(--crema);display:inline-flex;gap:10px;align-items:center;border:1px solid #3a3431;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px}
+  .abierto::before{content:'';width:8px;height:8px;border-radius:50%;background:#3ddc84}
+  .b-cont p{color:var(--crema-dim);font-size:16px;line-height:1.5;margin:18px 0 26px}
+  .wa{display:inline-block;background:transparent;border:1.5px solid var(--crema);color:var(--crema);font-weight:800;font-size:14px;letter-spacing:.06em;padding:15px 24px;border-radius:999px}
+  .costura{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(var(--rosa),var(--naranja),var(--cian));opacity:.7;z-index:1}
+</style></head><body>
+<div class="lado-a"></div><div class="lado-b"></div><div class="costura"></div>
+<header><div class="marca"><span class="b">B-SIDE</span> <span class="c">CLUB</span></div>
+<nav><a class="on">Catálogo</a><a>El local</a><a>Contacto</a><a style="opacity:.6">Ingresar</a></nav></header>
+
+<div class="a-cont">
+  <div class="tag" style="color:var(--naranja)">Lado A · El cajón</div>
+  <h1>Un disco no se compra, se <em>encuentra.</em></h1>
+  <p class="sub">Vinilos, cassettes, CDs y equipos usados. Cada uno escuchado entero antes de llegar acá.</p>
+  <div class="buscar"><span>Buscar por artista, disco o sello…</span><b>BUSCAR</b></div>
+  <div class="chips"><i>Vinilos</i><i>Cassettes</i><i>CDs</i><i>Equipos</i></div>
+</div>
+<div class="llegados">
+  <div><div class="tapa"><div class="d" style="--c:#9a6100"></div></div><div class="t">Vida</div><div class="p">Vox Dei · $ 155.000</div></div>
+  <div><div class="tapa"><div class="d" style="--c:#c41e75"></div></div><div class="t">Signos</div><div class="p">Soda Stereo · $ 120.000</div></div>
+  <div><div class="tapa"><div class="d" style="--c:#5b45b8"></div></div><div class="t">Purple Rain</div><div class="p">Prince · $ 135.000</div></div>
+</div>
+
+<div class="disco"><div class="label"><img src="http://localhost:5173/logo.png" alt=""><div class="tag" style="font-size:10px">33⅓ RPM · Chacarita</div></div><div class="hole"></div></div>
+
+<div class="b-cont">
+  <div class="tag" style="color:var(--cian)">Lado B · El local</div>
+  <h2>Pasá a escucharlo.</h2>
+  <span class="abierto">Hoy abierto · 13 a 23 hs</span>
+  <p>Jorge Newbery 3120, Chacarita. Te guardamos el disco 48 hs.</p>
+  <span class="wa">ESCRIBINOS POR WHATSAPP</span>
+</div>
+</body></html>

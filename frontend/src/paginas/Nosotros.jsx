@@ -1,27 +1,29 @@
-// Nosotros. El texto fijo es el relato del local; los datos de contacto y el
-// horario salen de GET /api/store-info, que el panel puede editar.
+// Nosotros: el Lado B. Toda la pagina va en carbon; la historia del local
+// son los temas del lado B (B1, B2, B3). Los datos de contacto y el horario
+// salen de GET /api/store-info, que el panel puede editar.
 
 import { Link } from 'react-router-dom';
+import { MapPin, ArrowRight } from '@phosphor-icons/react';
 import { useStoreInfo } from '../lib/useStoreInfo';
+import { normalizarHorario, horarioDeHoy } from '../lib/horario';
+import { linkMapa } from '../lib/contacto';
+import estilos from './Nosotros.module.css';
 
-const CAPITULOS = [
+const TEMAS = [
   {
-    n: '01',
-    color: 'var(--naranja)',
+    lado: 'B1',
     titulo: 'Empezó como un cajón',
     texto:
       'Arrancamos vendiendo los duplicados de nuestra propia colección en una feria de Chacarita. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente escuchara antes de comprar. Esa bandeja todavía está en el mostrador.',
   },
   {
-    n: '02',
-    color: 'var(--neon-cian)',
+    lado: 'B2',
     titulo: 'Escuchamos todo',
     texto:
       'Cada disco que entra pasa entero por la bandeja antes de llegar al catálogo. Si salta, si tiene ruido de fondo, si la tapa está gastada: lo escribimos en la ficha. Preferimos vender menos y que nadie se lleve una sorpresa.',
   },
   {
-    n: '03',
-    color: 'var(--neon-rosa)',
+    lado: 'B3',
     titulo: 'El lado B',
     texto:
       'Nos interesa lo que no entró en el corte difusión: los prensados nacionales raros, los compilados caseros, el cassette que alguien grabó para otra persona. Si buscás algo puntual, escribinos y lo salimos a buscar.',
@@ -30,138 +32,62 @@ const CAPITULOS = [
 
 export default function Nosotros() {
   const { info } = useStoreInfo();
+  const horario = normalizarHorario(info?.horario);
+  const hoy = horarioDeHoy(info?.horario);
 
   return (
-    <main className="contenido">
-      <div className="kicker">03 — Nosotros</div>
-      <h1 className="titulo">
-        LADO B:
-        <br />
-        <span style={{ color: 'var(--naranja)' }}>LA HISTORIA</span>
-      </h1>
-
-      <p
-        style={{
-          maxWidth: 620,
-          margin: '0 0 54px',
-          color: 'var(--tinta-suave)',
-          fontSize: 17,
-          textWrap: 'pretty',
-        }}
-      >
-        {info?.description ||
-          'Una disquería chica en Chacarita, especializada en usados que pasaron por la bandeja antes de entrar al catálogo.'}
-      </p>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-          gap: 18,
-          marginBottom: 60,
-        }}
-      >
-        {CAPITULOS.map((c) => (
-          <article key={c.n} className="card">
-            <div
-              style={{
-                fontFamily: 'var(--display)',
-                fontSize: 28,
-                color: c.color,
-                marginBottom: 12,
-              }}
-            >
-              {c.n}
-            </div>
-            <h2 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 8px' }}>{c.titulo}</h2>
-            <p style={{ color: 'var(--tinta-suave)', fontSize: 15, margin: 0, textWrap: 'pretty' }}>
-              {c.texto}
-            </p>
-          </article>
-        ))}
-      </div>
-
-      {/* ---------- Visitanos ---------- */}
-      <div className="divisor">Visitanos</div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 18,
-          marginBottom: 50,
-        }}
-      >
-        <div className="card">
-          <div className="etiqueta">Dirección</div>
-          <div style={{ fontSize: 17, fontWeight: 700 }}>
-            {info?.direccion || 'Chacarita, Buenos Aires'}
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="etiqueta">Horarios</div>
-          {info?.horario && typeof info.horario === 'object' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {Object.entries(info.horario).map(([dia, hs]) => (
-                <div
-                  key={dia}
-                  style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 14 }}
-                >
-                  <span style={{ color: 'var(--meta)', textTransform: 'capitalize' }}>{dia}</span>
-                  <span style={{ fontWeight: 700 }}>{String(hs)}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ color: 'var(--meta)', fontSize: 14 }}>Escribinos y coordinamos.</div>
-          )}
-        </div>
-
-        <div className="card">
-          <div className="etiqueta">Escribinos</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-            {info?.telefono && <span>{info.telefono}</span>}
-            {info?.email && <a href={`mailto:${info.email}`}>{info.email}</a>}
-            {info?.instagram && (
-              <a
-                href={`https://instagram.com/${String(info.instagram).replace(/^@/, '')}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {info.instagram.startsWith('@') ? info.instagram : `@${info.instagram}`}
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          background: 'var(--madera)',
-          color: 'var(--crema)',
-          borderRadius: 'var(--r-card)',
-          padding: 'clamp(28px, 5vw, 48px)',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ fontFamily: 'var(--display)', fontSize: 'clamp(22px,4vw,32px)', marginBottom: 12 }}>
-          ¿BUSCÁS ALGO PUNTUAL?
-        </div>
-        <p
-          style={{
-            color: 'var(--crema-dim)',
-            maxWidth: 520,
-            margin: '0 auto 26px',
-            textWrap: 'pretty',
-          }}
-        >
-          Decinos qué disco estás buscando y lo anotamos en la lista. Cuando entra, te avisamos antes
-          de publicarlo.
+    <main className={estilos.pagina} data-oscuro>
+      <header className={`${estilos.cabecera} cascada`}>
+        <p className={estilos.lado}>Lado B</p>
+        <h1 className={estilos.titulo}>La historia</h1>
+        <p className={estilos.bajada}>
+          {info?.description ||
+            'Una disquería chica en Chacarita, especializada en usados que pasaron por la bandeja antes de entrar al catálogo.'}
         </p>
-        <Link to="/contacto" className="btn btn-primario" style={{ display: 'inline-block' }}>
-          Escribinos
-        </Link>
-      </div>
+      </header>
+
+      <ol className={`${estilos.temas} cascada`} style={{ '--cascada-inicio': '260ms' }}>
+        {TEMAS.map((t) => (
+          <li key={t.lado} className={estilos.tema}>
+            <span className={estilos.temaLado}>{t.lado}</span>
+            <h2 className={estilos.temaTitulo}>{t.titulo}</h2>
+            <p className={estilos.temaTexto}>{t.texto}</p>
+          </li>
+        ))}
+      </ol>
+
+      <section className={estilos.visita} aria-labelledby="visita-titulo">
+        <div>
+          <h2 id="visita-titulo" className={estilos.visitaTitulo}>
+            Pasá a escucharlo
+          </h2>
+          {info?.direccion && (
+            <a href={linkMapa(info.direccion)} target="_blank" rel="noreferrer" className={estilos.direccion}>
+              <MapPin size={22} weight="duotone" aria-hidden="true" />
+              {info.direccion}
+            </a>
+          )}
+          {hoy && (
+            <p className={estilos.hoy}>
+              Hoy abrimos <strong>{hoy.value}</strong>
+            </p>
+          )}
+          <Link to="/contacto" className={`btn btn-primario ${estilos.cta}`}>
+            Escribinos <ArrowRight size={16} weight="bold" />
+          </Link>
+        </div>
+
+        {horario.length > 0 && (
+          <dl className={estilos.horario}>
+            {horario.map((fila) => (
+              <div key={fila.label} className={fila.label === hoy?.label ? estilos.esHoy : undefined}>
+                <dt>{fila.label}</dt>
+                <dd>{fila.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </section>
     </main>
   );
 }

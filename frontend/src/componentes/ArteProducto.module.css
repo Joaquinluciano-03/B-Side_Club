@@ -1,0 +1,303 @@
+/* Tapa cuadrada. Todo lo de adentro se mide en cqw (ancho de la tapa) para
+   que se vea igual en una card de 180px o en la ficha de 600px. */
+.tapa {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--fondo, var(--carbon));
+  color: var(--tinta, var(--crema));
+}
+
+.foto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============ FUNDA DE PAPEL (vinilo / CD) ============ */
+.funda {
+  /* trama de puntos impresa + sombra suave en el lomo y el borde */
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.16), transparent 7% 93%, rgba(0, 0, 0, 0.1)),
+    radial-gradient(color-mix(in srgb, var(--tinta) 14%, transparent) 0.9px, transparent 1.3px) 0 0 / 7px 7px,
+    var(--fondo);
+}
+
+.fundaTitulo {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 5cqw;
+  /* aire arriba para los tildes de las mayusculas: el recorte de 2 lineas
+     (overflow hidden) se los comia */
+  padding-top: 0.18em;
+  font-weight: 900;
+  font-stretch: 72%;
+  font-size: 10cqw;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: balance;
+}
+
+.fundaPie {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  bottom: 6cqw;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 3.6cqw;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* el troquel: un agujero redondo en la funda que deja ver el disco */
+.troquel {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: 44cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #0e0d0c;
+  /* sombra hacia adentro: el borde del papel cortado */
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.55),
+    0 0 0 1px color-mix(in srgb, var(--tinta) 12%, transparent);
+}
+/* lo que se ve por el troquel: el label del disco con su agujero */
+.troquelLabel,
+.troquelCd {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.troquelLabel {
+  background:
+    radial-gradient(circle, #0e0d0c 0 4.5%, transparent 5%),
+    radial-gradient(circle, transparent 0 60%, rgba(0, 0, 0, 0.18) 61% 62%, transparent 63%),
+    radial-gradient(circle, var(--label) 0 74%, #0e0d0c 75%);
+}
+.troquelCd {
+  background:
+    radial-gradient(circle, #0e0d0c 0 13%, rgba(255, 255, 255, 0.5) 14% 20%, transparent 21%),
+    conic-gradient(from 30deg, #c9cdd1, #f4f6f7, #a8b3bb, #e7d9f2, #c9cdd1, #d8f0ea, #f4f6f7, #c9cdd1);
+}
+
+/* ============ ESTUCHE DE CASSETTE ============ */
+.estuche {
+  background:
+    radial-gradient(rgba(242, 236, 228, 0.07) 0.9px, transparent 1.3px) 0 0 / 7px 7px,
+    #1c1916;
+  display: grid;
+  place-items: center;
+}
+.cassette {
+  width: 80cqw;
+  aspect-ratio: 1.58;
+  background: #2b2622;
+  border: 1px solid #3a3431;
+  border-radius: 2.4cqw;
+  padding: 4.5cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 3cqw;
+  box-shadow: 0 2cqw 5cqw rgba(0, 0, 0, 0.5);
+}
+.etiqueta {
+  background: var(--fondo);
+  color: var(--tinta);
+  border-radius: 1cqw;
+  padding: 2.4cqw 3cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6cqw;
+  text-align: left;
+  min-width: 0;
+}
+.etiquetaTitulo {
+  font-weight: 900;
+  font-stretch: 72%;
+  font-size: 6.4cqw;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.etiquetaArtista {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 3cqw;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ventana {
+  flex: 1;
+  background: #141210;
+  border-radius: 1.4cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18cqw;
+}
+.bobina {
+  width: 9cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #141210 0 30%, transparent 32%),
+    repeating-conic-gradient(#e8e2d8 0 20deg, #8a817b 20deg 60deg);
+}
+
+/* ============ FICHA DE EQUIPO ============ */
+.ficha {
+  background:
+    radial-gradient(color-mix(in srgb, var(--tinta) 14%, transparent) 0.9px, transparent 1.3px) 0 0 / 7px 7px,
+    var(--fondo);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2cqw;
+  /* en % y no en cqw: unidades cqw en el padding del propio contenedor se
+     miden contra la pantalla y le comen todo el ancho al contenido */
+  padding: 7%;
+  text-align: left;
+}
+.fichaMarca {
+  position: absolute;
+  top: 7cqw;
+  left: 7cqw;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 3.4cqw;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.fichaTitulo {
+  font-weight: 900;
+  font-stretch: 62%;
+  font-size: 15cqw;
+  line-height: 0.92;
+  padding-top: 0.18em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fichaSub {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 3.6cqw;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ============ OBJETO QUE ASOMA DE LA FUNDA ============ */
+/* Se posiciona dentro de la card (que tiene position: relative), detras de
+   la tapa. La card decide cuanto asoma con --asomar. */
+.objeto {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  /* --reposo: cuanto asoma quieto. --extra lo suma la card al pasar el mouse */
+  transform: translateX(calc(var(--reposo) + var(--extra, 0%)));
+  transition: transform 420ms var(--ease-out);
+}
+.objetoVinilo,
+.objetoCd {
+  --reposo: 9%;
+  top: 50%;
+  left: 5%;
+  width: 82%;
+  margin-top: -41%; /* centrado vertical (los % de margin son del ancho) */
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(16, 15, 14, 0.35);
+}
+.objetoVinilo {
+  background:
+    radial-gradient(circle closest-side, #0e0d0c 0 3%, transparent 3.4%),
+    radial-gradient(circle closest-side, var(--label) 0 33%, transparent 33.5%),
+    url('/surcos.svg') center / 100% 100% no-repeat,
+    radial-gradient(circle closest-side, #161412 0 95%, #3a3531 98.5%, #0a0909 100%);
+}
+.objetoCd {
+  background:
+    radial-gradient(circle closest-side, transparent 0 13%, rgba(255, 255, 255, 0.55) 14% 30%, transparent 31%),
+    conic-gradient(from 30deg, #c9cdd1, #f4f6f7, #a8b3bb, #e7d9f2, #c9cdd1, #d8f0ea, #f4f6f7, #c9cdd1);
+}
+.objetoCassette {
+  --reposo: 14%;
+  top: 50%;
+  left: 10%;
+  width: 74%;
+  margin-top: -23.4%;
+  aspect-ratio: 1.58;
+  border-radius: 6px;
+  background:
+    linear-gradient(var(--label), var(--label)) 50% 18% / 82% 26% no-repeat,
+    #2b2622;
+  border: 1px solid #3a3431;
+  box-shadow: 0 6px 18px rgba(16, 15, 14, 0.35);
+}
+
+/* ============ MOTIVOS CHICOS (tarjetas por formato) ============ */
+.motivo {
+  display: block;
+  width: 72%;
+  aspect-ratio: 1;
+}
+.motivo_vinilo {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, #0e0d0c 0 4%, transparent 4.5%),
+    radial-gradient(circle closest-side, var(--label) 0 34%, transparent 34.5%),
+    url('/surcos.svg') center / 100% 100% no-repeat,
+    radial-gradient(circle closest-side, #161412 0 95%, #3a3531 98.5%, #0a0909 100%);
+}
+.motivo_cd {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, var(--carbon) 0 13%, rgba(255, 255, 255, 0.55) 14% 30%, transparent 31%),
+    conic-gradient(from 30deg, #c9cdd1, #f4f6f7, #a8b3bb, #e7d9f2, #c9cdd1, #d8f0ea, #f4f6f7, #c9cdd1);
+}
+.motivo_cassette {
+  aspect-ratio: 1.58;
+  border-radius: 5px;
+  background:
+    radial-gradient(circle, #141210 0 30%, #e8e2d8 32% 55%, transparent 57%) 28% 68% / 22% 35% no-repeat,
+    radial-gradient(circle, #141210 0 30%, #e8e2d8 32% 55%, transparent 57%) 72% 68% / 22% 35% no-repeat,
+    linear-gradient(var(--label), var(--label)) 50% 14% / 84% 28% no-repeat,
+    #2b2622;
+  border: 1px solid #3a3431;
+}
+/* equipos: una perilla de amplificador con su marca */
+.motivo_equipo {
+  width: 58%;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--label), var(--label)) 50% 12% / 6% 26% no-repeat,
+    radial-gradient(circle closest-side, #3a3531 0 70%, #5c554f 72% 76%, #26221f 78% 100%);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  rotate: -35deg;
+}

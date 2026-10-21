@@ -37,7 +37,7 @@ export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, em
             borderBottom: '1px solid var(--borde-oscuro)',
           }}
         >
-          <img src="/logo.png" alt="" style={{ width: 56, height: 56, marginBottom: 14 }} />
+          <img src="/logo-256.png" alt="" style={{ width: 56, height: 56, marginBottom: 14 }} />
           <div
             style={{
               fontFamily: 'var(--display)',

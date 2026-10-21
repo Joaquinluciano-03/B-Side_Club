@@ -18,9 +18,9 @@
   --tinta-cuerpo: #333a3c;
   --tinta-suave: #454d50;
   --tinta-dim: #4e5558;
-  --tinta-tenue: #5e676a;
+  --tinta-tenue: #555d60; /* era #5e676a: no llegaba a 4.5:1 sobre el humo */
   --meta: #6e645c; /* labels, gris calido */
-  --apagado: #6f797c; /* placeholder y disabled */
+  --apagado: #6b7578; /* placeholder y disabled (4.5:1 sobre blanco) */
 
   /* ---- Oscuros: hero, portadas, panel ---- */
   --carbon: #100f0e;
@@ -40,10 +40,14 @@
   --naranja: #f26a1b; /* primario */
   --naranja-hover: #ff7d2f;
   --teja: #b8402c; /* secundario */
-  --teal: #0e8fa6; /* enlaces y foco */
+  /* enlaces y foco. El #0e8fa6 de la demo daba 2.7:1 sobre el humo (no se
+     leia): este pasa AA sobre humo, superficie y el fondo info. Sobre carbon
+     el foco usa --foco-oscuro. */
+  --teal: #0a6677;
+  --foco-oscuro: #35d0e8;
   --teal-hover: #7ce4f4;
   --magenta: #c41e75; /* acento puntual */
-  --error: #b33a2b;
+  --error: #a83628;
 
   /* ---- Neon: aparece de a poco, nunca de fondo ---- */
   --neon-rosa: #ff4fa3;
@@ -53,28 +57,84 @@
 
   /* ---- Estados de stock (coinciden con el enum Stock de Prisma) ---- */
   --ok-fondo: #e4f2e9;
-  --ok-texto: #1f7a4e;
+  --ok-texto: #1b6b45;
   --aviso-fondo: #f7ebd5;
-  --aviso-texto: #9a6100;
+  --aviso-texto: #925c00;
   --violeta-fondo: #ede7fa;
   --violeta-texto: #5b45b8;
   --info-fondo: #dff1f5;
-  --info-texto: #0e8fa6;
+  --info-texto: #0a6677;
   --mal-fondo: #fae5e1;
-  --mal-texto: #b33a2b;
+  --mal-texto: #a83628;
 
   /* ---- Tipografia ---- */
   --display: 'Bungee', Impact, sans-serif; /* logo, hero, encabezados. Nunca parrafos */
-  --cuerpo: 'Archivo', system-ui, -apple-system, sans-serif;
-  --mono: 'Space Mono', ui-monospace, monospace; /* etiquetas, años, categorias */
+  /* Archivo variable: pesos 100-900 y ancho 62%-125% (font-stretch) */
+  --cuerpo: 'Archivo Variable', 'Archivo', system-ui, -apple-system, sans-serif;
+  --mono: 'Martian Mono Variable', ui-monospace, monospace; /* etiquetas, años, categorias */
 
-  /* ---- Formas ---- */
+  /* Escala fluida: crece con el ancho de pantalla entre un minimo y un maximo */
+  --t-xs: 0.75rem; /* 12 */
+  --t-sm: 0.875rem; /* 14 */
+  --t-base: 1rem; /* 16 */
+  --t-md: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem); /* 17-20 */
+  --t-lg: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem); /* 20-26 */
+  --t-xl: clamp(1.75rem, 1.3rem + 2vw, 2.75rem); /* 28-44 */
+  --t-2xl: clamp(2.25rem, 1.4rem + 4vw, 4.5rem); /* 36-72 */
+  --t-3xl: clamp(2.75rem, 1.2rem + 7vw, 7.5rem); /* 44-120, solo el hero */
+
+  /* ---- Espaciado (multiplos de 4) ---- */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 64px;
+  --e-9: 96px;
+  --e-10: 128px;
+  --gutter: clamp(16px, 4vw, 40px); /* margen lateral de la pagina */
+  --seccion: clamp(64px, 10vw, 128px); /* aire entre secciones grandes */
+
+  /* ---- Formas ----
+     Regla: controles 8, cards 14, piezas que se presionan y filtros en pildora. */
   --r-badge: 5px;
   --r-control: 8px;
   --r-card: 14px;
+  --r-pildora: 999px;
   --ancho: 1240px;
+  --ancho-texto: 64ch;
 
   --sombra-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  /* sombras teñidas con el carbon, nunca negro puro sobre el gris humo */
+  --sombra-suave: 0 1px 2px rgba(16, 15, 14, 0.08), 0 4px 16px rgba(16, 15, 14, 0.08);
+  --sombra-alta: 0 2px 4px rgba(16, 15, 14, 0.1), 0 18px 40px rgba(16, 15, 14, 0.18);
+
+  /* ---- Motion ----
+     ease-out fuerte para lo que entra o responde a un toque; ease-in-out para
+     lo que se mueve en pantalla; drawer para paneles que se deslizan.
+     Nada de ease-in en interfaz: arranca lento y se siente trabado. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --d-presion: 140ms; /* feedback al presionar */
+  --d-rapida: 180ms; /* hover, color, tooltips */
+  --d-media: 240ms; /* menus, cambios de estado */
+  --d-lenta: 360ms; /* modales, paneles */
+
+  /* ---- Header ---- barra + cinta de categorias. Lo usan las piezas que
+     quedan pegadas debajo del header (barra del catalogo, tapa de la ficha) */
+  --alto-barra: 68px;
+  --alto-banda: 36px;
+  --alto-header: calc(var(--alto-barra) + var(--alto-banda));
+
+  /* ---- Capas (z-index) ---- */
+  --z-base: 1;
+  --z-sticky: 40; /* header */
+  --z-menu: 60; /* menu mobile */
+  --z-modal: 80;
+  --z-toast: 90;
 }
 
 /* Fondo con trama de puntos tipo halftone, igual que la demo */
@@ -101,8 +161,9 @@ a {
   color: var(--teal);
   text-decoration: none;
 }
+/* el cian claro de la demo (--teal-hover) no se leia sobre fondo claro */
 a:hover {
-  color: var(--teal-hover);
+  color: var(--tinta);
 }
 
 ::selection {
@@ -133,59 +194,22 @@ textarea::placeholder {
   background: var(--gris-medio);
 }
 
-/* ---- Animaciones de la demo ---- */
+/* ---- Animaciones compartidas ----
+   Decision del proyecto: las animaciones se ven siempre igual, sin mirar
+   prefers-reduced-motion (con "Efectos de animacion" apagado en Windows el
+   sitio quedaba quieto y se pidio que no pase). No agregar bloques
+   @media (prefers-reduced-motion) sin volver a hablarlo. */
+/* giro del disquito de "Cargando" */
 @keyframes bspin {
   to {
     transform: rotate(360deg);
   }
 }
-@keyframes bmarq {
-  to {
-    transform: translateX(-50%);
-  }
-}
-@keyframes bneon {
-  to {
-    background-position: 200% 0;
-  }
-}
-@keyframes bflick {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 1;
-  }
-  94% {
-    opacity: 0.55;
-  }
-  96% {
-    opacity: 1;
-  }
-}
+/* brillo que barre el skeleton */
 @keyframes bskel {
   to {
     background-position: -220% 0;
   }
 }
-@keyframes toast-entra {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+

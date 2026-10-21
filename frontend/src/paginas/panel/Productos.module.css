@@ -1,0 +1,299 @@
+/* ============ BARRA ============ */
+.barra {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--e-5);
+}
+.buscador {
+  flex: 1 1 280px;
+  max-width: 420px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: 0 var(--e-4);
+  background: #fff;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  color: var(--tinta-tenue);
+  transition:
+    border-color var(--d-rapida) ease,
+    box-shadow var(--d-rapida) ease;
+}
+.buscador:focus-within {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+.buscador input:focus,
+.buscador input:focus-visible {
+  outline: none !important;
+}
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--tinta);
+}
+.total {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  color: var(--tinta-tenue);
+}
+
+/* ============ TABLA ============ */
+.tabla {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+/* cada fila es su propia grilla: todas las columnas con ancho fijo (sin
+   auto), si no el encabezado y las filas calculan anchos distintos */
+.encabezado,
+.fila {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) 116px 124px 132px 340px;
+  align-items: center;
+  gap: var(--e-4);
+  padding: var(--e-3) var(--e-5);
+}
+.encabezado {
+  background: var(--gris-medio);
+  border-bottom: 1px solid var(--borde);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tinta-dim);
+}
+.fila + .fila {
+  border-top: 1px solid var(--borde);
+}
+.fila {
+  transition: background-color var(--d-rapida) ease;
+}
+.fila:hover {
+  background: rgba(25, 28, 29, 0.03);
+}
+.deBaja .miniatura,
+.deBaja .titulo,
+.deBaja .precio {
+  opacity: 0.55;
+}
+
+.colProducto {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-width: 0;
+}
+.colAcciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--e-2);
+}
+.colAcciones :global(.btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.miniatura {
+  width: 48px;
+  flex: none;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(16, 15, 14, 0.2);
+}
+.nombre {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.titulo {
+  font-weight: 800;
+  color: var(--tinta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.titulo:hover {
+  color: var(--naranja);
+}
+.sub {
+  font-size: 12px;
+  color: var(--tinta-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.baja {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--error);
+}
+
+.precio {
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* stock con botones - y + */
+.stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: fit-content;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  background: #fff;
+  padding: 2px;
+}
+.stock button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tinta);
+  cursor: pointer;
+  transition:
+    background-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.stock button:hover:not(:disabled) {
+  background: var(--gris-medio);
+}
+.stock button:active:not(:disabled) {
+  transform: scale(0.9);
+}
+.stock button:disabled {
+  color: var(--apagado);
+  cursor: not-allowed;
+}
+.stock span {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.icono {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--tinta-tenue);
+  cursor: pointer;
+  transition:
+    color var(--d-rapida) ease,
+    background-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.icono:hover {
+  color: var(--tinta);
+  background: var(--gris-medio);
+}
+.icono:active {
+  transform: scale(0.92);
+}
+.destacado,
+.destacado:hover {
+  color: var(--naranja);
+}
+.borrar:hover {
+  color: var(--error);
+  background: var(--mal-fondo);
+}
+/* con descuento aplicado el icono queda naranja, como el de destacado */
+.conDescuento,
+.conDescuento:hover {
+  color: var(--naranja);
+}
+.icono:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.icono:disabled:hover {
+  background: transparent;
+  color: var(--tinta-tenue);
+}
+
+/* modal del descuento */
+.modalAcciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--e-3);
+  margin-top: var(--e-6);
+}
+.quitar {
+  margin-right: auto;
+  color: var(--error);
+}
+
+.paginas {
+  margin-top: var(--e-6);
+}
+
+/* ============ MOBILE: cada fila es una tarjeta ============ */
+@media (max-width: 980px) {
+  .encabezado {
+    display: none;
+  }
+  .fila {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'producto precio'
+      'stock estado'
+      'acciones acciones';
+    row-gap: var(--e-3);
+    padding: var(--e-4);
+  }
+  .colProducto {
+    grid-area: producto;
+  }
+  .precio {
+    grid-area: precio;
+    justify-self: end;
+  }
+  .stock {
+    grid-area: stock;
+  }
+  .estado {
+    grid-area: estado;
+    justify-self: end;
+  }
+  .colAcciones {
+    grid-area: acciones;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-top: var(--e-2);
+    border-top: 1px dashed var(--borde);
+  }
+  .colAcciones :global(.btn-chico) {
+    padding: 9px 12px;
+  }
+  .borrar {
+    margin-left: auto;
+  }
+  .total {
+    margin-left: 0;
+  }
+}

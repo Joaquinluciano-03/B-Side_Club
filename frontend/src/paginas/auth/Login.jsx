@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
+import InputPassword from '../../componentes/InputPassword';
 import { useAuth } from '../../lib/auth';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -37,13 +38,8 @@ export default function Login() {
 
   return (
     <LayoutAuth
-      titulo="INICIAR SESIÓN"
-      bajada="Entrá con tu cuenta del equipo."
-      pie={
-        <>
-          ¿Todavía no hay una cuenta? <Link to="/registro">Registrar el local</Link>
-        </>
-      }
+      titulo="Iniciar sesión"
+      bajada="Entrá con tu cuenta del equipo para cargar discos y responder consultas."
     >
       <form onSubmit={enviar} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {error && <div className="aviso aviso-error">{error}</div>}
@@ -62,9 +58,8 @@ export default function Login() {
 
         <div className="campo">
           <label htmlFor="l-pass">Contraseña</label>
-          <input
+          <InputPassword
             id="l-pass"
-            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
@@ -76,10 +71,7 @@ export default function Login() {
           {enviando ? 'Entrando…' : 'Entrar'}
         </button>
 
-        <Link
-          to="/recuperar"
-          style={{ fontSize: 13, textAlign: 'center', color: 'var(--tinta-tenue)' }}
-        >
+        <Link to="/recuperar" className="btn-enlace" style={{ alignSelf: 'center' }}>
           Olvidé mi contraseña
         </Link>
       </form>

@@ -1,0 +1,83 @@
+/* Precio con descuento (ver Precio.jsx). Las medidas del precio van en em:
+   el tamaño base lo pone el contenedor (.precio de la card, de la ficha...). */
+.precio {
+  display: inline-grid;
+  justify-items: start;
+  align-items: center;
+  column-gap: 0.5em;
+  row-gap: 0.15em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* el precio original: mas chico, apagado y tachado */
+.antes {
+  grid-area: antes;
+  font-size: 0.68em;
+  font-weight: 600;
+  /* sale del color del texto de alrededor: apagado tanto sobre claro como
+     sobre la barra oscura de la ficha en mobile */
+  color: color-mix(in srgb, currentColor 62%, transparent);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.09em;
+  text-decoration-color: currentColor;
+}
+/* el precio que se paga: hereda el tamaño y el peso del contenedor */
+.ahora {
+  grid-area: ahora;
+  text-decoration: none;
+  color: inherit;
+}
+/* el descuento aplicado: etiqueta naranja como las de precio de batea */
+.badge {
+  grid-area: badge;
+  padding: 4px 8px 3px;
+  border-radius: var(--r-badge);
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.ahorro {
+  grid-area: ahorro;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ok-texto);
+}
+
+/* card del catalogo: arriba el original y el descuento, abajo el precio nuevo */
+.card {
+  grid-template-areas:
+    'antes badge'
+    'ahora ahora';
+}
+
+/* ficha: el precio nuevo grande y debajo el original, el descuento y el ahorro */
+.ficha {
+  grid-template-areas:
+    'ahora ahora ahora'
+    'antes badge ahorro';
+  row-gap: 0.3em;
+}
+.ficha .antes {
+  font-size: 0.5em;
+}
+
+/* barra mobile y listado del panel: el precio nuevo y debajo el resto, chico */
+.compacto {
+  grid-template-areas:
+    'ahora ahora'
+    'antes badge';
+  column-gap: 6px;
+}
+.compacto .antes {
+  font-size: 0.78em;
+}
+.compacto .badge {
+  padding: 2px 6px 1px;
+  font-size: 10px;
+}

@@ -3,35 +3,35 @@
 // desarmaban el listado.
 
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { EnvelopeSimple, WhatsappLogo } from '@phosphor-icons/react';
 import { get, patch, del, query } from '../../lib/api';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
 import { Cargando, ErrorCarga, Vacio } from '../../componentes/Estados';
 import Confirmar from '../../componentes/Confirmar';
 import Modal from '../../componentes/Modal';
+import Segmentos from '../../componentes/Segmentos';
 import { useToast } from '../../lib/toast';
+import { linkWhatsApp } from '../../lib/contacto';
 import {
   ESTADOS_CONSULTA,
   etiquetaConsulta,
   formatearFechaHora,
   mensajeDeError,
 } from '../../lib/formato';
+import estilos from './Consultas.module.css';
 
-const chip = (activo) => ({
-  background: activo ? 'var(--naranja)' : 'transparent',
-  color: activo ? 'var(--tinta-sobre-naranja)' : 'var(--tinta-suave)',
-  border: `1px solid ${activo ? 'var(--naranja)' : 'var(--borde-boton)'}`,
-  fontWeight: 700,
-  fontSize: 12,
-  padding: '7px 14px',
-  borderRadius: 999,
-  cursor: 'pointer',
-});
+const FILTROS = [{ valor: '', label: 'Todas' }, ...ESTADOS_CONSULTA.map((e) => ({ valor: e, label: etiquetaConsulta(e) }))];
 
 export default function Consultas() {
   const toast = useToast();
+  const [params, setParams] = useSearchParams();
 
-  const [estado, setEstado] = useState('');
+  // el filtro vive en la URL: el dashboard puede abrir la bandeja ya filtrada
+  const estado = ESTADOS_CONSULTA.includes(params.get('estado')) ? params.get('estado') : '';
+  function setEstado(nuevo) {
+    setParams(nuevo ? { estado: nuevo } : {}, { replace: true });
+  }
   const [consultas, setConsultas] = useState(null);
   const [error, setError] = useState(null);
   const [abierta, setAbierta] = useState(null);
@@ -95,17 +95,16 @@ export default function Consultas() {
 
   return (
     <>
-      <CabeceraPanel kicker="Bandeja" titulo="CONSULTAS" />
+      <CabeceraPanel kicker="Bandeja" titulo="Consultas" />
       <CuerpoPanel>
-        <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 18 }}>
-          <button style={chip(estado === '')} onClick={() => setEstado('')}>
-            Todas
-          </button>
-          {ESTADOS_CONSULTA.map((e) => (
-            <button key={e} style={chip(estado === e)} onClick={() => setEstado(e)}>
-              {etiquetaConsulta(e)}
-            </button>
-          ))}
+        <div className={estilos.filtros}>
+          <Segmentos
+            id="consultas"
+            etiqueta="Filtrar por estado"
+            opciones={FILTROS}
+            valor={estado}
+            onCambiar={setEstado}
+          />
         </div>
 
         {error ? (
@@ -118,38 +117,26 @@ export default function Consultas() {
             texto={estado ? 'Ninguna consulta con ese estado.' : 'Todavía no llegó ninguna consulta.'}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ul className={estilos.bandeja}>
             {consultas.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => abrir(c)}
-                className="card"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '16px 20px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  flexWrap: 'wrap',
-                  // la pendiente se marca con una barra naranja a la izquierda
-                  borderLeft:
-                    c.estado === 'pendiente'
-                      ? '3px solid var(--naranja)'
-                      : '1px solid var(--borde)',
-                }}
-              >
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15 }}>{c.asunto}</div>
-                  <div style={{ color: 'var(--tinta-dim)', fontSize: 13, marginTop: 3 }}>
-                    {c.nombre} · {c.email} · {formatearFechaHora(c.fecha)}
-                  </div>
-                </div>
-                <span className={`badge badge-${c.estado}`}>{etiquetaConsulta(c.estado)}</span>
-              </button>
+              <li key={c.id}>
+                <button
+                  onClick={() => abrir(c)}
+                  className={`${estilos.fila} ${c.estado === 'pendiente' ? estilos.sinLeer : ''}`}
+                >
+                  {/* el punto naranja marca las que nadie abrio todavia */}
+                  <span className={estilos.punto} aria-hidden="true" />
+                  <span className={estilos.remitente}>{c.nombre}</span>
+                  <span className={estilos.asunto}>
+                    {c.asunto}
+                    <span className={estilos.extracto}> · {c.mensaje}</span>
+                  </span>
+                  <span className={estilos.fecha}>{formatearFechaHora(c.fecha)}</span>
+                  <span className={`badge badge-${c.estado}`}>{etiquetaConsulta(c.estado)}</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {/* ---------- Detalle ---------- */}
@@ -162,48 +149,40 @@ export default function Consultas() {
         >
           {abierta && (
             <>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
-                <span className="badge badge-neutro">{abierta.canal}</span>
+              <div className={estilos.detalleEstado}>
                 <span className={`badge badge-${abierta.estado}`}>
                   {etiquetaConsulta(abierta.estado)}
                 </span>
               </div>
 
-              <div className="etiqueta">Asunto</div>
-              <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 16 }}>{abierta.asunto}</div>
+              <h3 className={estilos.detalleAsunto}>{abierta.asunto}</h3>
 
-              <div
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--borde)',
-                  borderRadius: 11,
-                  padding: '16px 18px',
-                  color: 'var(--tinta-cuerpo)',
-                  fontSize: 15,
-                  lineHeight: 1.65,
-                  marginBottom: 18,
-                  whiteSpace: 'pre-wrap',
-                  textWrap: 'pretty',
-                }}
-              >
-                {abierta.mensaje}
-              </div>
+              <p className={estilos.mensaje}>{abierta.mensaje}</p>
 
               {abierta.producto && (
-                <div style={{ fontSize: 13, color: 'var(--meta)', marginBottom: 18 }}>
+                <p className={estilos.detalleProducto}>
                   Consulta por{' '}
                   <Link to={`/producto/${abierta.producto.id}`}>{abierta.producto.nombre}</Link>
-                </div>
+                </p>
               )}
 
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <div className={estilos.detalleAcciones}>
                 <a
                   href={`mailto:${abierta.email}?subject=${encodeURIComponent('Re: ' + abierta.asunto)}`}
                   className="btn btn-primario"
-                  style={{ flex: 1, minWidth: 170, textAlign: 'center' }}
                 >
-                  Responder por mail
+                  <EnvelopeSimple size={18} weight="bold" /> Responder por mail
                 </a>
+                {abierta.telefono && (
+                  <a
+                    href={linkWhatsApp(abierta.telefono, `Hola ${abierta.nombre}! Te escribimos de B-Side Club por tu consulta: "${abierta.asunto}".`)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-secundario"
+                  >
+                    <WhatsappLogo size={18} weight="bold" /> WhatsApp
+                  </a>
+                )}
                 {abierta.estado !== 'respondida' && (
                   <button
                     className="btn btn-secundario"

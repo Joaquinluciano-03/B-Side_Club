@@ -1,49 +1,62 @@
 // Panel interno: sidebar carbon fija + area de contenido gris.
-// En mobile el sidebar se vuelve una barra horizontal scrolleable (lo resuelve
-// el bloque .adm-side de global.css, copiado de la demo).
+// En pantallas chicas el sidebar se esconde y se abre como cajon lateral
+// desde un boton de menu en la barra de arriba.
 
-import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { NavLink, Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import {
+  SquaresFour,
+  Disc,
+  Tag,
+  Megaphone,
+  ChatCircleText,
+  Storefront,
+  EnvelopeSimple,
+  UsersThree,
+  ArrowSquareOut,
+  SignOut,
+  List,
+  X,
+} from '@phosphor-icons/react';
 import { useAuth } from '../lib/auth';
 import { get } from '../lib/api';
 import { etiquetaRol } from '../lib/formato';
+import estilos from './LayoutPanel.module.css';
 
 const SECCIONES = [
-  { a: '/panel', label: 'Dashboard', exacto: true },
-  { a: '/panel/productos', label: 'Productos' },
-  { a: '/panel/categorias', label: 'Categorías' },
-  { a: '/panel/promociones', label: 'Promociones' },
-  { a: '/panel/consultas', label: 'Consultas', badge: 'consultasPendientes' },
-  { a: '/panel/info', label: 'Info del local' },
-  { a: '/panel/invitaciones', label: 'Invitaciones', soloAdmin: true },
-  { a: '/panel/usuarios', label: 'Equipo', soloAdmin: true },
+  { a: '/panel', label: 'Dashboard', icono: SquaresFour, exacto: true },
+  { a: '/panel/productos', label: 'Productos', icono: Disc },
+  { a: '/panel/categorias', label: 'Categorías', icono: Tag },
+  { a: '/panel/promociones', label: 'Promociones', icono: Megaphone },
+  { a: '/panel/consultas', label: 'Consultas', icono: ChatCircleText, badge: 'consultasPendientes' },
+  { a: '/panel/info', label: 'Info del local', icono: Storefront },
+  { a: '/panel/invitaciones', label: 'Invitaciones', icono: EnvelopeSimple, soloAdmin: true },
+  { a: '/panel/usuarios', label: 'Equipo', icono: UsersThree, soloAdmin: true },
 ];
 
-const enlace = (activo) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-  width: '100%',
-  textAlign: 'left',
-  background: activo ? 'var(--cinta)' : 'transparent',
-  color: activo ? 'var(--crema)' : '#9A918B',
-  border: 'none',
-  borderRadius: 'var(--r-control)',
-  padding: '11px 13px',
-  fontSize: 13,
-  fontWeight: 700,
-  cursor: 'pointer',
-  transition: 'color .15s, background .15s',
-  textDecoration: 'none',
-  borderLeft: `2px solid ${activo ? 'var(--naranja)' : 'transparent'}`,
-});
+const claseEnlace = ({ isActive }) => `${estilos.enlace} ${isActive ? estilos.activo : ''}`;
+
+function Marca() {
+  return (
+    <Link to="/panel" className={estilos.marca}>
+      <img src="/logo-256.png" alt="" width="36" height="36" />
+      <span>
+        <span className={estilos.marcaNombre}>
+          B-SIDE <span>CLUB</span>
+        </span>
+        <span className={estilos.marcaSub}>Panel interno</span>
+      </span>
+    </Link>
+  );
+}
 
 export default function LayoutPanel() {
   const { usuario, logout, puedeInvitar } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [metricas, setMetricas] = useState(null);
+  const [abierto, setAbierto] = useState(false);
+  const botonRef = useRef(null);
 
   // el badge de consultas pendientes se refresca al cambiar de seccion:
   // alcanza para que no quede viejo despues de marcar una como leida
@@ -51,7 +64,21 @@ export default function LayoutPanel() {
     get('/dashboard/metricas')
       .then(setMetricas)
       .catch(() => setMetricas(null));
+    setAbierto(false);
   }, [location.pathname]);
+
+  // con el cajon abierto en mobile: Escape lo cierra
+  useEffect(() => {
+    if (!abierto) return;
+    function alTeclear(e) {
+      if (e.key === 'Escape') {
+        setAbierto(false);
+        botonRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', alTeclear);
+    return () => document.removeEventListener('keydown', alTeclear);
+  }, [abierto]);
 
   const visibles = SECCIONES.filter((s) => !s.soloAdmin || puedeInvitar);
   const inicial = (usuario?.nombre || '?').charAt(0).toUpperCase();
@@ -62,231 +89,99 @@ export default function LayoutPanel() {
   }
 
   return (
-    <div className="adm-shell" style={{ display: 'flex', minHeight: '100vh', background: 'var(--panel-fondo)' }}>
-      <aside
-        className="adm-side"
-        style={{
-          position: 'sticky',
-          top: 0,
-          alignSelf: 'flex-start',
-          height: '100vh',
-          width: 252,
-          flexShrink: 0,
-          background: 'var(--tinta-sobre-naranja)',
-          borderRight: '1px solid var(--borde-oscuro)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 5,
-          padding: '18px 13px',
-          overflowY: 'auto',
-        }}
-      >
-        <div
-          className="adm-side-marca"
-          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 8px 16px' }}
+    <div className={estilos.shell}>
+      {/* barra de arriba, solo en pantallas chicas */}
+      <div className={estilos.barraMovil} data-oscuro>
+        <Marca />
+        <button
+          ref={botonRef}
+          type="button"
+          className={estilos.botonMenu}
+          onClick={() => setAbierto(true)}
+          aria-label="Abrir menú del panel"
+          aria-expanded={abierto}
+          aria-controls="panel-menu"
         >
-          <img src="/logo.png" alt="" style={{ width: 36, height: 36 }} />
-          <div>
-            <div
-              style={{
-                fontFamily: 'var(--display)',
-                fontSize: 14,
-                color: 'var(--crema)',
-                lineHeight: 1,
-              }}
-            >
-              B-SIDE <span style={{ color: 'var(--neon-cian)' }}>CLUB</span>
-            </div>
-            <div
-              style={{
-                fontFamily: 'var(--mono)',
-                fontSize: 9,
-                letterSpacing: '.2em',
-                color: 'var(--crema-tenue)',
-                marginTop: 5,
-              }}
-            >
-              PANEL INTERNO
-            </div>
-          </div>
+          <List size={22} weight="bold" />
+          {metricas?.consultasPendientes > 0 && <span className={estilos.puntoAviso} aria-hidden="true" />}
+        </button>
+      </div>
+
+      {abierto && <div className={estilos.velo} onClick={() => setAbierto(false)} aria-hidden="true" />}
+
+      <aside id="panel-menu" className={estilos.lateral} data-abierto={abierto} data-oscuro>
+        <div className={estilos.lateralCabecera}>
+          <Marca />
+          <button
+            type="button"
+            className={estilos.cerrarMenu}
+            onClick={() => setAbierto(false)}
+            aria-label="Cerrar menú"
+          >
+            <X size={20} weight="bold" />
+          </button>
         </div>
 
-        {visibles.map((s) => {
-          const cuenta = s.badge ? metricas?.[s.badge] : 0;
-          return (
-            <NavLink key={s.a} to={s.a} end={s.exacto} style={({ isActive }) => enlace(isActive)}>
-              <span>{s.label}</span>
-              {cuenta > 0 && (
-                <span
-                  style={{
-                    background: 'var(--naranja)',
-                    color: 'var(--tinta-sobre-naranja)',
-                    fontFamily: 'var(--mono)',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    padding: '2px 7px',
-                    borderRadius: 999,
-                  }}
-                >
-                  {cuenta}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
+        <nav className={estilos.nav} aria-label="Secciones del panel">
+          {visibles.map((s) => {
+            const cuenta = s.badge ? metricas?.[s.badge] : 0;
+            const Icono = s.icono;
+            return (
+              <NavLink key={s.a} to={s.a} end={s.exacto} className={claseEnlace}>
+                <Icono size={19} weight="duotone" aria-hidden="true" />
+                <span className={estilos.enlaceTexto}>{s.label}</span>
+                {cuenta > 0 && (
+                  <span className={estilos.badge} aria-label={`${cuenta} pendientes`}>
+                    {cuenta}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
 
-        <div
-          className="adm-side-foot"
-          style={{
-            marginTop: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            paddingTop: 16,
-            borderTop: '1px solid var(--borde-oscuro)',
-          }}
-        >
-          <NavLink
-            to="/panel/perfil"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px' }}
-          >
-            <div
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: '50%',
-                background: 'var(--naranja)',
-                color: 'var(--tinta-sobre-naranja)',
-                fontFamily: 'var(--display)',
-                fontSize: 14,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              {inicial}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  color: 'var(--crema)',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
+        <div className={estilos.pie}>
+          <NavLink to="/panel/perfil" className={estilos.usuario}>
+            <span className={estilos.avatar}>{inicial}</span>
+            <span className={estilos.usuarioTexto}>
+              <span className={estilos.usuarioNombre}>
                 {usuario?.nombre} {usuario?.apellido}
-              </div>
-              <div
-                style={{
-                  fontFamily: 'var(--mono)',
-                  fontSize: 9,
-                  letterSpacing: '.16em',
-                  color: 'var(--crema-tenue)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {etiquetaRol(usuario?.rol)}
-              </div>
-            </div>
+              </span>
+              <span className={estilos.usuarioRol}>{etiquetaRol(usuario?.rol)}</span>
+            </span>
           </NavLink>
 
-          <button
-            onClick={() => navigate('/')}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--borde-oscuro-3)',
-              color: 'var(--crema-dim)',
-              borderRadius: 'var(--r-control)',
-              padding: '11px 13px',
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            Ver el sitio público
-          </button>
-
-          <button
-            onClick={salir}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--borde-oscuro-3)',
-              color: 'var(--crema-dim)',
-              borderRadius: 'var(--r-control)',
-              padding: '11px 13px',
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            Cerrar sesión
+          <Link to="/" className={estilos.accionPie}>
+            <ArrowSquareOut size={18} aria-hidden="true" /> Ver el sitio público
+          </Link>
+          <button type="button" onClick={salir} className={estilos.accionPie}>
+            <SignOut size={18} aria-hidden="true" /> Cerrar sesión
           </button>
         </div>
       </aside>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className={estilos.area}>
         <Outlet />
       </div>
     </div>
   );
 }
 
-/** Encabezado pegajoso de cada seccion del panel. */
+/** Encabezado pegajoso de cada seccion del panel. "kicker" es el contexto
+ *  (en que parte del panel estas), "accion" el boton principal. */
 export function CabeceraPanel({ kicker, titulo, accion }) {
   return (
-    <div
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
-        background: 'rgba(221,225,227,.93)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid var(--borde)',
-        padding: '15px clamp(16px,3vw,30px)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 14,
-        flexWrap: 'wrap',
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontFamily: 'var(--mono)',
-            fontSize: 10,
-            letterSpacing: '.22em',
-            color: 'var(--meta)',
-            marginBottom: 5,
-            textTransform: 'uppercase',
-          }}
-        >
-          {kicker}
-        </div>
-        <h1
-          style={{
-            fontFamily: 'var(--display)',
-            fontSize: 'clamp(19px,2.6vw,26px)',
-            margin: 0,
-            lineHeight: 1.05,
-            fontWeight: 400,
-          }}
-        >
-          {titulo}
-        </h1>
+    <header className={estilos.cabecera}>
+      <div className={estilos.cabeceraTexto}>
+        {kicker && <p className={estilos.contexto}>{kicker}</p>}
+        <h1 className={estilos.titulo}>{titulo}</h1>
       </div>
-      {accion}
-    </div>
+      {accion && <div className={estilos.accion}>{accion}</div>}
+    </header>
   );
 }
 
-/** Cuerpo de cada seccion, con el padding que usa la demo. */
+/** Cuerpo de cada seccion. */
 export function CuerpoPanel({ children }) {
-  return <div style={{ padding: 'clamp(18px,3vw,28px) clamp(16px,3vw,30px) 80px' }}>{children}</div>;
+  return <div className={estilos.cuerpo}>{children}</div>;
 }

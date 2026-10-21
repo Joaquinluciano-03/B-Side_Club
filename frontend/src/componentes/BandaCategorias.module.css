@@ -1,0 +1,69 @@
+/* Reemplaza la linea multicolor bajo el header. La altura es fija aunque las
+   categorias todavia no hayan llegado, asi el header no salta. */
+.banda {
+  height: var(--alto-banda);
+  overflow: hidden;
+  background: var(--carbon-2);
+  border-top: 1px solid var(--borde-oscuro);
+  border-bottom: 1px solid var(--borde-oscuro);
+  /* los bordes se funden para que la cinta entre y salga sin cortes duros */
+  -webkit-mask: linear-gradient(90deg, transparent, #000 6% 94%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 6% 94%, transparent);
+}
+
+.pista {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  animation: correr 60s linear infinite;
+  animation-delay: -6s; /* arranca ya en movimiento, no desde el borde */
+}
+@keyframes correr {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tira {
+  display: flex;
+  align-items: center;
+}
+.item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nombre {
+  padding: 0 26px;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--crema-tenue);
+  user-select: none;
+}
+.punto {
+  font-size: 9px;
+  line-height: 1;
+}
+
+/* entrada: la cinta se despliega desde la izquierda despues del header */
+@keyframes banda-entra {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+.banda {
+  animation: banda-entra 900ms var(--ease-in-out) 450ms backwards;
+}
+/* las categorias llegan de la base un poco despues: aparecen con un fundido */
+@keyframes tira-aparece {
+  from {
+    opacity: 0;
+  }
+}
+.tira {
+  animation: tira-aparece 500ms ease backwards;
+}

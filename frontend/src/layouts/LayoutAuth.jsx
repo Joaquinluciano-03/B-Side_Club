@@ -1,106 +1,41 @@
-// Marco de las pantallas de sesion: fondo carbon con el disco de fondo y una
-// tarjeta centrada. Es el mismo tratamiento del hero, en version sobria.
+// Marco de las pantallas de sesion (login, registro, recuperar, resetear,
+// aceptar invitacion). Pantalla partida: a la izquierda el disco con un label
+// de "solo staff" (el mismo mundo del hero), a la derecha el formulario.
+// En mobile queda solo el formulario, con un label chico arriba.
 
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from '@phosphor-icons/react';
+import estilos from './LayoutAuth.module.css';
 
 export default function LayoutAuth({ titulo, bajada, children, pie }) {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background:
-          'radial-gradient(70% 55% at 50% 0%, rgba(242,106,27,.14), transparent 70%), radial-gradient(40% 40% at 12% 90%, rgba(255,79,163,.10), transparent 70%), radial-gradient(40% 40% at 88% 85%, rgba(53,208,232,.09), transparent 70%), var(--carbon)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px 18px',
-        gap: 26,
-      }}
-    >
-      <Link to="/" style={{ textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--display)',
-            fontSize: 30,
-            letterSpacing: '.02em',
-            lineHeight: 1,
-          }}
-        >
-          <span
-            style={{
-              color: 'var(--neon-rosa-claro)',
-              textShadow: '0 0 4px #FF4FA3, 0 0 14px #FF4FA3, 0 0 30px rgba(255,79,163,.6)',
-            }}
-          >
-            B-SIDE
-          </span>{' '}
-          <span
-            style={{
-              color: 'var(--neon-cian-claro)',
-              textShadow: '0 0 4px #35D0E8, 0 0 14px #35D0E8, 0 0 30px rgba(53,208,232,.6)',
-            }}
-          >
-            CLUB
-          </span>
+    <div className={estilos.pantalla}>
+      <aside className={estilos.disco} aria-hidden="true">
+        <div className={estilos.label}>
+          <span className={estilos.vinilo} />
+          <img src="/logo-512.webp" alt="" className={estilos.logo} width="256" height="256" />
+          <span className={estilos.labelTexto}>Panel interno · Solo staff</span>
         </div>
-        <div
-          style={{
-            fontFamily: 'var(--mono)',
-            fontSize: 9,
-            letterSpacing: '.3em',
-            color: 'var(--crema-tenue)',
-            marginTop: 8,
-            textTransform: 'uppercase',
-          }}
-        >
-          Panel interno
+      </aside>
+
+      <main className={estilos.lado}>
+        <div className={`${estilos.contenido} cascada`} style={{ '--cascada-inicio': '120ms' }}>
+          <Link to="/" className={estilos.marca}>
+            B-SIDE <span>CLUB</span>
+          </Link>
+
+          <h1 className={estilos.titulo}>{titulo}</h1>
+          {bajada && <p className={estilos.bajada}>{bajada}</p>}
+
+          <div className={estilos.formulario}>{children}</div>
+
+          {pie && <div className={estilos.pie}>{pie}</div>}
+
+          <Link to="/" className={estilos.volver}>
+            <ArrowLeft size={14} weight="bold" aria-hidden="true" /> Volver al sitio
+          </Link>
         </div>
-      </Link>
-
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 440,
-          background: 'var(--superficie)',
-          border: '1px solid var(--borde)',
-          borderRadius: 'var(--r-card)',
-          padding: 'clamp(24px, 5vw, 36px)',
-        }}
-      >
-        <h1
-          style={{
-            fontFamily: 'var(--display)',
-            fontSize: 24,
-            margin: '0 0 8px',
-            lineHeight: 1.1,
-            fontWeight: 400,
-          }}
-        >
-          {titulo}
-        </h1>
-        {bajada && (
-          <p style={{ color: 'var(--tinta-tenue)', fontSize: 14, margin: '0 0 24px' }}>{bajada}</p>
-        )}
-        {children}
-      </div>
-
-      {pie && (
-        <div style={{ color: 'var(--crema-dim)', fontSize: 13, textAlign: 'center' }}>{pie}</div>
-      )}
-
-      <Link
-        to="/"
-        style={{
-          fontFamily: 'var(--mono)',
-          fontSize: 10,
-          letterSpacing: '.2em',
-          color: 'var(--crema-tenue)',
-          textTransform: 'uppercase',
-        }}
-      >
-        ← Volver al sitio
-      </Link>
+      </main>
     </div>
   );
 }

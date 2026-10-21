@@ -1,0 +1,81 @@
+.fila {
+  margin-top: var(--e-3);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--e-3) var(--e-4);
+}
+
+/* el valor con su unidad pegada ("$ 20000" o "15 %") */
+.entrada {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 150px;
+  padding: 0 12px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-control);
+  background: #fff;
+  font-weight: 700;
+  color: var(--tinta-dim);
+}
+/* mismo foco que el resto de los campos del panel (global.css, .campo) */
+.entrada:focus-within {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+/* global.css se carga despues que los modulos y tiene reglas para
+   ".campo input": por eso aca se antepone :global(.campo), para ganarle */
+:global(.campo) .entrada input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;
+}
+/* el borde y el foco los dibuja .entrada, no el input de adentro */
+:global(.campo) .entrada input:focus,
+:global(.campo) .entrada input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+:global(.con-error) .entrada {
+  border-color: var(--error);
+}
+:global(.campo.con-error) .entrada input {
+  border: none;
+}
+
+/* como queda el precio: original tachado, el nuevo y el descuento */
+.resumen {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--tinta-dim);
+  font-variant-numeric: tabular-nums;
+}
+.resumen del {
+  color: var(--tinta-tenue);
+}
+.resumen strong {
+  font-size: var(--t-base);
+  color: var(--tinta);
+}
+.descuento {
+  padding: 3px 7px 2px;
+  border-radius: var(--r-badge);
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  font-weight: 700;
+}

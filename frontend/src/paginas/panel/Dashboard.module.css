@@ -1,0 +1,238 @@
+.grilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--e-5);
+  align-items: start;
+}
+
+/* ============ LO URGENTE ============ */
+.urgente {
+  grid-column: 1 / 2;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--e-6);
+  padding: var(--e-6);
+  border-radius: var(--r-card);
+  background: var(--tinta-sobre-naranja);
+  color: var(--crema);
+}
+
+/* digitos en tubos de vidrio: el numero brilla naranja, el tubo es oscuro */
+.nixie {
+  display: flex;
+  gap: 6px;
+}
+.tubo {
+  width: 54px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px 24px 10px 10px;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255, 255, 255, 0.08), transparent 70%),
+    #1d1a17;
+  border: 1px solid #3a3431;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 46px;
+  font-weight: 500;
+  line-height: 1;
+  color: #ffb27a;
+  text-shadow:
+    0 0 6px rgba(242, 106, 27, 0.9),
+    0 0 18px rgba(242, 106, 27, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.urgenteTitulo {
+  margin: 0;
+  font-weight: 800;
+  font-size: var(--t-lg);
+}
+.urgenteBajada {
+  margin: var(--e-2) 0 0;
+  color: var(--crema-dim);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  max-width: 46ch;
+}
+.urgenteBoton {
+  white-space: nowrap;
+}
+
+/* ============ ACCESOS ============ */
+.accesos {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borde);
+  border-radius: var(--r-card);
+  background: var(--superficie);
+  overflow: hidden;
+}
+.acceso {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-4) var(--e-5);
+  color: var(--tinta);
+  font-weight: 700;
+  border-bottom: 1px solid var(--borde);
+  transition: background-color var(--d-rapida) ease;
+}
+.acceso:last-child {
+  border-bottom: none;
+}
+.acceso:hover {
+  color: var(--tinta);
+  background: rgba(242, 106, 27, 0.08);
+}
+.acceso svg:first-child {
+  color: var(--naranja);
+}
+.accesoFlecha {
+  color: var(--tinta-tenue);
+  transition: transform var(--d-rapida) var(--ease-out);
+}
+.acceso:hover .accesoFlecha {
+  transform: translateX(3px);
+}
+
+/* ============ CIFRAS ============ */
+.cifras {
+  grid-column: 1 / 2;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  border-top: 2px solid var(--tinta);
+  border-bottom: 1px solid var(--borde-fuerte);
+}
+.cifra {
+  /* el numero abajo de todo, aunque la etiqueta ocupe dos lineas */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--e-4) var(--e-4) var(--e-4) 0;
+  color: var(--tinta);
+  transition: color var(--d-rapida) ease;
+}
+.cifra:hover {
+  color: var(--naranja);
+}
+.cifra dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tinta-dim);
+}
+.cifra dd {
+  margin: 4px 0 0;
+  font-size: var(--t-xl);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.alerta {
+  color: var(--error);
+}
+
+/* ============ ULTIMAS CONSULTAS ============ */
+.ultimas {
+  grid-column: 1 / -1;
+  margin-top: var(--e-4);
+}
+.ultimasCabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-4);
+  margin-bottom: var(--e-3);
+}
+.ultimasCabecera h2 {
+  margin: 0;
+  font-size: var(--t-md);
+  font-weight: 800;
+}
+.sinConsultas {
+  color: var(--tinta-dim);
+}
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--borde-fuerte);
+}
+.lista li {
+  border-bottom: 1px solid var(--borde);
+}
+.consulta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--e-4);
+  padding: var(--e-3) var(--e-2);
+  color: var(--tinta);
+  transition: background-color var(--d-rapida) ease;
+}
+.consulta:hover {
+  color: var(--tinta);
+  background: rgba(25, 28, 29, 0.04);
+}
+.consultaTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.consultaNombre {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.consultaAsunto {
+  font-size: 13px;
+  color: var(--tinta-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.consultaFecha {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  color: var(--tinta-tenue);
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .grilla {
+    grid-template-columns: 1fr;
+  }
+  .urgente,
+  .accesos,
+  .cifras {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+@media (max-width: 640px) {
+  .urgente {
+    grid-template-columns: auto 1fr;
+    gap: var(--e-4);
+    padding: var(--e-5);
+  }
+  .urgenteBoton {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+  .tubo {
+    width: 42px;
+    height: 60px;
+    font-size: 34px;
+  }
+  .consultaFecha {
+    display: none;
+  }
+}
