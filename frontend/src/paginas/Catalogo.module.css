@@ -113,6 +113,11 @@
   scrollbar-width: none;
   scroll-snap-type: x proximity;
   margin-bottom: -2px; /* se apoyan sobre el borde de la barra */
+  /* el scroll horizontal (para mobile) tambien recorta arriba: este aire es
+     el lugar donde se estira la pestaña al pasar el mouse. El margen
+     negativo lo compensa, asi la barra queda del mismo alto */
+  padding-top: 10px;
+  margin-top: -10px;
 }
 .separadores::-webkit-scrollbar {
   display: none;
@@ -125,30 +130,51 @@
   display: inline-flex;
   align-items: baseline;
   gap: var(--e-2);
-  padding: 12px 18px 11px;
-  border: 2px solid var(--tinta);
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
-  background: var(--superficie);
+  /* el borde lo dibuja ::before; este padding incluye sus 2px */
+  padding: 14px 20px 11px;
+  border: none;
+  background: none;
   color: var(--tinta);
   font-weight: 800;
   font-stretch: 105%;
   font-size: var(--t-sm);
   cursor: pointer;
-  transition: transform var(--d-rapida) var(--ease-out);
+}
+/* La forma de la pestaña (borde y fondo) es una capa aparte, mas larga hacia
+   abajo: lo que sobra queda escondido bajo la linea de la barra (el scroll
+   de .separadores lo recorta). Al pasar el mouse la capa sube y la pestaña
+   se estira hacia arriba sin despegarse de la barra, como el señalador de
+   una carpeta que asoma, mientras el color pasa de a poco a naranja. */
+.separador::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -10px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px 10px 0 0;
+  background-color: var(--superficie);
+  transition:
+    translate 280ms var(--ease-out),
+    background-color 320ms ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .separador:hover:not(.separadorActivo) {
-    transform: translateY(-3px);
+  .separador:hover:not(.separadorActivo)::before {
+    translate: 0 -8px;
+    background-color: var(--naranja);
+  }
+  /* el texto sube la mitad, asi queda centrado en la pestaña estirada */
+  .separador:hover:not(.separadorActivo) .separadorNombre,
+  .separador:hover:not(.separadorActivo) .separadorCantidad {
+    translate: 0 -4px;
+    color: var(--tinta-sobre-naranja);
   }
 }
 .separador:focus-visible {
   outline-offset: -5px;
 }
-/* rellena el separador por dentro de su borde (inset 0 = caja de padding) */
+/* la seleccionada: rellena la pestaña por dentro de su borde de 2px */
 .pestana {
   position: absolute;
-  inset: 0;
+  inset: 2px 2px 0;
   background: var(--naranja);
   z-index: 0;
 }
@@ -156,6 +182,9 @@
 .separadorCantidad {
   position: relative;
   z-index: 1;
+  transition:
+    translate 280ms var(--ease-out),
+    color 320ms ease;
 }
 .separadorCantidad {
   font-family: var(--mono);
