@@ -44,79 +44,8 @@
   top: calc(var(--alto-header) + var(--e-5));
 }
 
-/* misma mecanica que la card: la funda al 86% y el disco asomando a la
-   derecha. Aca asoma mas, sale solo al cargar la pagina. */
-.tapa {
-  position: relative;
-  aspect-ratio: 1 / 0.86;
-  --extra: 0%;
-  animation: sacarDisco 900ms var(--ease-out) 200ms both;
-}
-@keyframes sacarDisco {
-  from {
-    --extra: 0%;
-  }
-  to {
-    --extra: 9%;
-  }
-}
-@property --extra {
-  syntax: '<percentage>';
-  inherits: true;
-  initial-value: 0%;
-}
-.funda {
-  position: relative;
-  z-index: 1;
-  width: 86%;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow:
-    0 2px 4px rgba(16, 15, 14, 0.16),
-    0 24px 48px rgba(16, 15, 14, 0.22);
-}
-.vendido .funda {
-  filter: grayscale(1);
-}
-
-.miniaturas {
-  display: flex;
-  gap: var(--e-2);
-  margin-top: var(--e-4);
-  flex-wrap: wrap;
-}
-.miniaturas button {
-  width: 72px;
-  height: 72px;
-  padding: 0;
-  border-radius: var(--r-control);
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
-  background: var(--carbon);
-  opacity: 0.7;
-  transition:
-    opacity var(--d-rapida) ease,
-    border-color var(--d-rapida) ease;
-}
-.miniaturas button:hover {
-  opacity: 1;
-}
-.miniaturas img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.miniaturaActiva {
-  border-color: var(--naranja) !important;
-  opacity: 1 !important;
-}
-.notaFotos {
-  margin: var(--e-3) 0 0;
-  font-size: 13px;
-  color: var(--tinta-tenue);
-}
+/* la tapa, las flechas, las miniaturas y la vista grande estan en
+   componentes/GaleriaProducto.module.css */
 
 /* ============ HOJA ============ */
 .hoja {
