@@ -63,11 +63,13 @@
   text-overflow: ellipsis;
 }
 
-/* el troquel: un agujero redondo en la funda que deja ver el disco */
+/* el troquel: un agujero redondo en la funda que deja ver el disco, centrado
+   en la tapa. Entra entre el titulo (hasta dos lineas: termina cerca del 26%
+   de alto) y el pie (empieza cerca del 90%): el troquel va del 28% al 72% */
 .troquel {
   position: absolute;
   left: 50%;
-  top: 56%;
+  top: 50%;
   width: 44cqw;
   aspect-ratio: 1;
   translate: -50% -50%;
