@@ -39,14 +39,14 @@ Una disquería que escucha cada disco antes de venderlo. Cada ficha describe el 
 ## Brand Commitments
 
 - Nombre: **B-Side Club**. Logo existente en `frontend/public/logo.png`: cassette con brazo de tocadiscos dentro de un círculo cian, con "B SIDE" en rosa y "CLUB" en cian.
-- Voz: rioplatense, cercana, honesta y con humor seco ("Un disco no se compra, se encuentra", "Probado, no listado"). Usa el voseo.
+- Voz: rioplatense, cercana, honesta y con humor seco ("Un disco no se compra, se encuentra"). Usa el voseo.
 - El catálogo nunca se presenta como "usados" ni "escuchados" a secas: se dice "discos nuevos o usados con garantía de calidad". La sección de destacados de la home se llama "Destacados y ofertas".
 - Metáfora rectora: Lado A / Lado B.
 - El diseño original está en `demo/demo.html`. El usuario pidió una evolución **más audaz** de ese estilo, no una copia literal.
 
 ## Evidence on Hand
 
-- Contenido de la demo: textos de Nosotros, los pilares ("Probado, no listado", "Estado real, sin vueltas", "Reservas por mensaje") y los datos del local (dirección, horarios, redes). Todo es ficticio, para el TPO.
+- Contenido de la demo: textos de Nosotros, los pilares ("Garantía de calidad", "Estado real, sin vueltas", "Reservas por mensaje") y los datos del local (dirección, horarios, redes). Todo es ficticio, para el TPO.
 - No hay testimonios, prensa ni métricas reales. No inventarlos.
 - No hay fotos reales del local ni del equipo todavía.
 

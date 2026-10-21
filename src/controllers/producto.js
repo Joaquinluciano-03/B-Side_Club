@@ -4,9 +4,9 @@ const productoService = require('../services/producto.service');
 
 async function listar(req, res, next) {
   try {
-    const { categoriaId, destacado, q, esActivo, page, pageSize } = req.query;
+    const { categoriaId, destacado, conDescuento, q, esActivo, page, pageSize } = req.query;
     const resultado = await productoService.listar(
-      { categoriaId, destacado, q, esActivo, page, pageSize },
+      { categoriaId, destacado, conDescuento, q, esActivo, page, pageSize },
       { esAdmin: Boolean(req.user) }
     );
     res.json(resultado);

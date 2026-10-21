@@ -38,10 +38,18 @@ function Elegidos() {
   const [destacados, setDestacados] = useState(null);
   const { total } = useConteos();
 
+  // las ofertas (productos con descuento) primero y despues los destacados,
+  // sin repetir los que son las dos cosas; hasta 8 en total
   useEffect(() => {
-    get(`/productos${query({ destacado: 'true', pageSize: 8 })}`)
-      .then((r) => setDestacados(r.productos))
-      .catch(() => setDestacados([]));
+    const pedir = (filtro) =>
+      get(`/productos${query({ ...filtro, pageSize: 8 })}`)
+        .then((r) => r.productos)
+        .catch(() => []);
+    Promise.all([pedir({ conDescuento: 'true' }), pedir({ destacado: 'true' })]).then(([ofertas, elegidos]) => {
+      const vistos = new Set();
+      const lista = [...ofertas, ...elegidos].filter((p) => !vistos.has(p.id) && vistos.add(p.id));
+      setDestacados(lista.slice(0, 8));
+    });
   }, []);
 
   // sin destacados cargados la seccion no aporta: mejor no mostrarla
@@ -108,9 +116,9 @@ function LadoB() {
     <section className={estilos.ladoB} aria-labelledby="ladob-titulo" data-oscuro>
       <div className={estilos.ladoBInterior}>
         <h2 id="ladob-titulo" className={estilos.ladoBTitulo}>
-          Probado,
+          Un disco no se compra,
           <br />
-          no listado.
+          <span className={estilos.ladoBAcento}>se encuentra.</span>
         </h2>
         <dl className={estilos.promesas}>
           {PROMESAS.map((p) => (
