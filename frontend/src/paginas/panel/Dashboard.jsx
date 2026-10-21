@@ -52,7 +52,8 @@ export default function Dashboard() {
       .catch((err) => setError(mensajeDeError(err)));
   }, [intento]);
 
-  const pendientes = metricas?.consultasPendientes ?? 0;
+  // sin responder = sin leer + leidas: todo lo que todavia hay que contestar
+  const pendientes = metricas?.consultasSinResponder ?? metricas?.consultasPendientes ?? 0;
 
   return (
     <>
@@ -81,7 +82,7 @@ export default function Dashboard() {
                 </p>
               </div>
               {pendientes > 0 && (
-                <Link to="/panel/consultas?estado=pendiente" className={`btn btn-primario ${estilos.urgenteBoton}`}>
+                <Link to="/panel/consultas?estado=sin_responder" className={`btn btn-primario ${estilos.urgenteBoton}`}>
                   Responder
                 </Link>
               )}

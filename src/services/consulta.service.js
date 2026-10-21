@@ -3,6 +3,8 @@
 const { prisma } = require('../config/db');
 
 const ESTADOS_VALIDOS = ['pendiente', 'leida', 'respondida'];
+// "sin responder": las que todavia hay que contestar, se hayan leido o no
+const SIN_RESPONDER = ['pendiente', 'leida'];
 
 async function crear({ nombre, email, telefono, asunto, mensaje, productoId }) {
   if (productoId) {
@@ -33,7 +35,9 @@ async function listar({ estado } = {}) {
 
   // el estado es un enum en la base: un valor cualquiera metido en el where
   // falla como error interno, asi que lo validamos antes y devolvemos 400
-  if (estado) {
+  if (estado === 'sin_responder') {
+    where.estado = { in: SIN_RESPONDER };
+  } else if (estado) {
     if (!ESTADOS_VALIDOS.includes(estado)) {
       const error = new Error(`Estado inválido. Debe ser uno de: ${ESTADOS_VALIDOS.join(', ')}`);
       error.status = 400;

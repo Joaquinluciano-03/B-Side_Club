@@ -21,14 +21,24 @@ import {
 } from '../../lib/formato';
 import estilos from './Consultas.module.css';
 
-const FILTROS = [{ valor: '', label: 'Todas' }, ...ESTADOS_CONSULTA.map((e) => ({ valor: e, label: etiquetaConsulta(e) }))];
+// "Sin responder" junta las pendientes y las leidas: lo que falta contestar
+// (es lo que cuenta el inicio del panel)
+const SIN_RESPONDER = ['pendiente', 'leida'];
+const FILTROS = [
+  { valor: '', label: 'Todas' },
+  { valor: 'sin_responder', label: 'Sin responder' },
+  ...ESTADOS_CONSULTA.map((e) => ({ valor: e, label: etiquetaConsulta(e) })),
+];
+const VALORES_FILTRO = FILTROS.map((f) => f.valor);
 
 export default function Consultas() {
   const toast = useToast();
   const [params, setParams] = useSearchParams();
 
   // el filtro vive en la URL: el dashboard puede abrir la bandeja ya filtrada
-  const estado = ESTADOS_CONSULTA.includes(params.get('estado')) ? params.get('estado') : '';
+  const estado = VALORES_FILTRO.includes(params.get('estado')) ? params.get('estado') : '';
+  // ¿una consulta en este estado entra en el filtro elegido?
+  const entraEnFiltro = (e) => !estado || (estado === 'sin_responder' ? SIN_RESPONDER.includes(e) : e === estado);
   function setEstado(nuevo) {
     setParams(nuevo ? { estado: nuevo } : {}, { replace: true });
   }
@@ -69,7 +79,7 @@ export default function Consultas() {
       await patch(`/consultas/${c.id}/estado`, { estado: nuevo });
       setConsultas((prev) =>
         // si hay un filtro puesto y la consulta ya no entra, la sacamos de la lista
-        estado && nuevo !== estado
+        !entraEnFiltro(nuevo)
           ? prev.filter((x) => x.id !== c.id)
           : prev.map((x) => (x.id === c.id ? { ...x, estado: nuevo } : x))
       );
