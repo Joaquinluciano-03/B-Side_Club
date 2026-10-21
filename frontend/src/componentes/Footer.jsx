@@ -114,7 +114,9 @@ export default function Footer() {
         <span>
           © {new Date().getFullYear()} {info?.nombre || 'B-Side Club'}
         </span>
-        <Link to="/login">Panel interno</Link>
+        {/* el acceso del equipo: el login manda al panel (y si ya hay sesion,
+            va directo). El header no lo muestra para no distraer al visitante */}
+        <Link to="/login">Iniciar sesión</Link>
       </div>
     </footer>
   );

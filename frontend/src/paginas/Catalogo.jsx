@@ -1,11 +1,10 @@
 // El catalogo. Busqueda + filtro por categoria + paginacion, todo reflejado en
 // la URL para que un filtro se pueda compartir y el boton Atras funcione.
-// Los filtros son separadores de batea, cada uno con su cantidad; la pestaña
-// naranja se desliza hasta el separador elegido.
+// Los filtros son separadores de batea, cada uno con su cantidad; el elegido
+// queda estirado y naranja (todo en Catalogo.module.css).
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion, MotionConfig } from 'motion/react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useConteos } from '../lib/useConteos';
@@ -35,17 +34,6 @@ function Separador({ activo, onClick, nombre, cantidad }) {
       className={`${estilos.separador} ${activo ? estilos.separadorActivo : ''}`}
       onClick={onClick}
     >
-      {/* la pestaña naranja es un solo elemento que viaja entre separadores.
-          No lleva borde propio (el borde es el del separador) y el radio va
-          por style: asi Motion lo corrige mientras escala y no se deforma */}
-      {activo && (
-        <motion.span
-          layoutId="pestana-activa"
-          className={estilos.pestana}
-          style={{ borderRadius: '8px 8px 0 0' }}
-          transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
-        />
-      )}
       <span className={estilos.separadorNombre}>{nombre}</span>
       {cantidad !== null && cantidad !== undefined && (
         <span className={estilos.separadorCantidad}>{cantidad}</span>
@@ -164,27 +152,23 @@ export default function Catalogo() {
             )}
           </label>
 
-          {/* reducedMotion="never": la pestaña se desliza siempre, aunque el sistema
-              tenga "Efectos de animacion" apagado (decision del proyecto, ver tokens.css) */}
-          <MotionConfig reducedMotion="never">
-            <div className={estilos.separadores} role="tablist" aria-label="Formato">
+          <div className={estilos.separadores} role="tablist" aria-label="Formato">
+            <Separador
+              activo={!categoriaId}
+              onClick={() => cambiarCategoria('')}
+              nombre="Todo"
+              cantidad={total}
+            />
+            {categorias.map((c) => (
               <Separador
-                activo={!categoriaId}
-                onClick={() => cambiarCategoria('')}
-                nombre="Todo"
-                cantidad={total}
+                key={c.id}
+                activo={String(c.id) === categoriaId}
+                onClick={() => cambiarCategoria(String(c.id))}
+                nombre={c.nombre}
+                cantidad={c.total}
               />
-              {categorias.map((c) => (
-                <Separador
-                  key={c.id}
-                  activo={String(c.id) === categoriaId}
-                  onClick={() => cambiarCategoria(String(c.id))}
-                  nombre={c.nombre}
-                  cantidad={c.total}
-                />
-              ))}
-            </div>
-          </MotionConfig>
+            ))}
+          </div>
         </div>
       </div>
 
