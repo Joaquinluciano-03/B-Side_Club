@@ -5,11 +5,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CaretRight, WhatsappLogo, EnvelopeSimple, SealCheck, PencilSimple, Wrench } from '@phosphor-icons/react';
-import { get, query, urlImagen } from '../lib/api';
+import { get, query } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useStoreInfo } from '../lib/useStoreInfo';
 import { linkWhatsApp } from '../lib/contacto';
-import ArteProducto, { ObjetoInterior, formatoDe } from '../componentes/ArteProducto';
+import { formatoDe } from '../componentes/ArteProducto';
+import GaleriaProducto from '../componentes/GaleriaProducto';
 import CardProducto from '../componentes/CardProducto';
 import Precio from '../componentes/Precio';
 import { Vacio } from '../componentes/Estados';
@@ -70,13 +71,11 @@ export default function DetalleProducto() {
   const [producto, setProducto] = useState(null);
   const [error, setError] = useState(null);
   const [relacionados, setRelacionados] = useState([]);
-  const [imagenActiva, setImagenActiva] = useState(0);
 
   useEffect(() => {
     let vigente = true;
     setProducto(null);
     setError(null);
-    setImagenActiva(0);
     window.scrollTo(0, 0);
 
     get(`/productos/${id}`)
@@ -121,9 +120,6 @@ export default function DetalleProducto() {
 
   if (!producto) return <Esqueleto />;
 
-  // solo las fotos reales (urlImagen descarta los rellenos del seed viejo)
-  const imagenes = (producto.imagenes || []).filter((img) => urlImagen(img.url));
-  const portada = imagenes[imagenActiva];
   const vendido = producto.estado_stock === 'vendido';
   const consultar = esAConsultar(producto.precio);
   const { titulo, artista } = separarNombre(producto.nombre);
@@ -182,32 +178,9 @@ export default function DetalleProducto() {
       )}
 
       <div className={estilos.grilla}>
-        {/* ---------- la tapa, con el disco asomando ---------- */}
-        <div className={estilos.galeria}>
-          <div className={`${estilos.tapa} ${vendido ? estilos.vendido : ''}`}>
-            <ObjetoInterior producto={producto} />
-            <div className={estilos.funda}>
-              <ArteProducto producto={producto} imagen={portada} prioridad />
-            </div>
-          </div>
-
-          {imagenes.length > 1 && (
-            <div className={estilos.miniaturas}>
-              {imagenes.map((img, i) => (
-                <button
-                  key={img.id}
-                  onClick={() => setImagenActiva(i)}
-                  aria-label={`Ver foto ${i + 1} de ${imagenes.length}`}
-                  aria-pressed={i === imagenActiva}
-                  className={i === imagenActiva ? estilos.miniaturaActiva : undefined}
-                >
-                  <img src={urlImagen(img.url)} alt="" loading="lazy" />
-                </button>
-              ))}
-            </div>
-          )}
-          {imagenes.length > 0 && <p className={estilos.notaFotos}>Fotos del ejemplar exacto que te llevás.</p>}
-        </div>
+        {/* ---------- la tapa con sus fotos (flechas, deslizar, teclado y vista
+            grande: ver GaleriaProducto). La key la reinicia al cambiar de producto */}
+        <GaleriaProducto key={producto.id} producto={producto} vendido={vendido} className={estilos.galeria} />
 
         {/* ---------- la hoja de inspeccion ---------- */}
         <div className={`${estilos.hoja} cascada`} style={{ '--cascada-inicio': '160ms' }}>

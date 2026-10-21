@@ -1,0 +1,292 @@
+/* Galeria de la ficha (ver GaleriaProducto.jsx). La tapa usa la misma
+   mecanica que la card: la funda al 86% y el disco asomando a la derecha,
+   que sale solo al cargar la pagina. */
+.tapa {
+  position: relative;
+  aspect-ratio: 1 / 0.86;
+  --extra: 0%;
+  animation: sacar-disco 900ms var(--ease-out) 200ms both;
+}
+/* --extra es lo que asoma el disco (lo usa ObjetoInterior); registrada para
+   poder animarla */
+@property --extra {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+@keyframes sacar-disco {
+  from {
+    --extra: 0%;
+  }
+  to {
+    --extra: 9%;
+  }
+}
+
+.funda {
+  position: relative;
+  z-index: 1;
+  width: 86%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 4px rgba(16, 15, 14, 0.16),
+    0 24px 48px rgba(16, 15, 14, 0.22);
+}
+.vendido .funda {
+  filter: grayscale(1);
+}
+
+/* la foto: se toca para verla en grande; deja el scroll vertical al
+   navegador y se queda con los gestos horizontales (deslizar) */
+.visor {
+  display: block;
+  cursor: zoom-in;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.visor img {
+  -webkit-user-drag: none;
+}
+
+/* la foto nueva entra desde el lado hacia el que se avanzo */
+.cuadro {
+  animation: foto-entra 260ms var(--ease-out);
+}
+.cuadro[data-direccion='1'] {
+  --desde: 14px;
+}
+.cuadro[data-direccion='-1'] {
+  --desde: -14px;
+}
+@keyframes foto-entra {
+  from {
+    opacity: 0;
+    translate: var(--desde, 0) 0;
+  }
+}
+
+/* ---- flechas, lupa y contador sobre la foto ---- */
+.flecha,
+.lupa {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(16, 15, 14, 0.62);
+  color: var(--crema);
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition:
+    opacity var(--d-rapida) ease,
+    background-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.flecha {
+  top: 50%;
+  translate: 0 -50%;
+}
+.anterior {
+  left: 12px;
+}
+.siguiente {
+  right: 12px;
+}
+.lupa {
+  right: 12px;
+  bottom: 12px;
+  width: 38px;
+  height: 38px;
+}
+.flecha:hover,
+.lupa:hover {
+  background: rgba(16, 15, 14, 0.85);
+}
+.flecha:active,
+.lupa:active {
+  transform: scale(0.92);
+}
+.flecha:focus-visible,
+.lupa:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 2px;
+}
+/* con mouse aparecen al pasar por la foto (o con el foco del teclado); en
+   pantallas tactiles quedan siempre a la vista */
+@media (hover: hover) and (pointer: fine) {
+  .funda .flecha,
+  .funda .lupa {
+    opacity: 0;
+  }
+  .funda:hover .flecha,
+  .funda:hover .lupa,
+  .funda:focus-within .flecha,
+  .funda:focus-within .lupa {
+    opacity: 1;
+  }
+}
+
+.contador {
+  position: absolute;
+  z-index: 2;
+  left: 12px;
+  top: 12px;
+  padding: 5px 9px 4px;
+  border-radius: var(--r-badge);
+  background: rgba(16, 15, 14, 0.62);
+  color: var(--crema);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* ---- miniaturas: una tira que se desliza si no entran ---- */
+.miniaturas {
+  display: flex;
+  gap: var(--e-2);
+  margin-top: var(--e-4);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding: 3px; /* que el borde de la activa no se corte */
+}
+.miniaturas::-webkit-scrollbar {
+  display: none;
+}
+.miniaturas button {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  scroll-snap-align: start;
+  border-radius: var(--r-control);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: var(--carbon);
+  opacity: 0.65;
+  transition:
+    opacity var(--d-rapida) ease,
+    border-color var(--d-rapida) ease;
+}
+.miniaturas button:hover {
+  opacity: 1;
+}
+.miniaturas img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.miniaturaActiva {
+  border-color: var(--naranja) !important;
+  opacity: 1 !important;
+}
+.nota {
+  margin: var(--e-3) 0 0;
+  font-size: 13px;
+  color: var(--tinta-tenue);
+}
+
+/* ---- la vista grande ---- */
+.grande {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none !important;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+}
+.grande::backdrop {
+  background: rgba(12, 11, 10, 0.92);
+}
+.grandeMarco {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 64px 72px;
+  touch-action: pan-y;
+  user-select: none;
+}
+.grandeFoto {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  animation: foto-entra 260ms var(--ease-out);
+  -webkit-user-drag: none;
+}
+.grandeFoto[data-direccion='1'] {
+  --desde: 24px;
+}
+.grandeFoto[data-direccion='-1'] {
+  --desde: -24px;
+}
+.grande .contador {
+  left: 50%;
+  top: 22px;
+  translate: -50% 0;
+  font-size: 12px;
+}
+.flechaGrande {
+  width: 52px;
+  height: 52px;
+}
+.grande .anterior {
+  left: 18px;
+}
+.grande .siguiente {
+  right: 18px;
+}
+.cerrar {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(242, 236, 228, 0.12);
+  color: var(--crema);
+  cursor: pointer;
+  transition: background-color var(--d-rapida) ease;
+}
+.cerrar:hover {
+  background: rgba(242, 236, 228, 0.22);
+}
+.cerrar:focus-visible {
+  outline: 2px solid var(--naranja);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .grandeMarco {
+    padding: 64px 12px;
+  }
+  .flechaGrande {
+    width: 44px;
+    height: 44px;
+  }
+  .grande .anterior {
+    left: 8px;
+  }
+  .grande .siguiente {
+    right: 8px;
+  }
+}
