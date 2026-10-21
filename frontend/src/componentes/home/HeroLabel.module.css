@@ -231,29 +231,6 @@
   mask: radial-gradient(circle closest-side, transparent 50%, #000 52% 94%, transparent 96%);
 }
 
-/* marcas del eje alrededor del agujero: los rayoncitos que deja el pinche del
-   tocadiscos en el label cuando se pone el disco mil veces */
-.agujero::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 360%;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: repeating-conic-gradient(
-    from 12deg,
-    rgba(20, 18, 16, 0.22) 0deg 1.2deg,
-    transparent 1.2deg 9deg,
-    rgba(20, 18, 16, 0.12) 9deg 10deg,
-    transparent 10deg 23deg
-  );
-  -webkit-mask: radial-gradient(circle closest-side, transparent 30%, #000 34% 60%, transparent 100%);
-  mask: radial-gradient(circle closest-side, transparent 30%, #000 34% 60%, transparent 100%);
-  pointer-events: none;
-}
-
 .catalogo {
   position: absolute;
   top: 14%;
