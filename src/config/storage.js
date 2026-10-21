@@ -26,6 +26,17 @@ function getCliente() {
     error.status = 500;
     throw error;
   }
+  // Las claves son texto ASCII. Si aparece otro caracter (tipicamente "•"),
+  // se copio la version oculta que muestra el panel de Supabase antes de
+  // tocar "Reveal": fetch no puede mandarla en los headers y cada subida
+  // falla con un error tecnico que no dice nada. Mejor avisarlo claro.
+  if (!/^[\x21-\x7e]+$/.test(SERVICE_KEY) || !/^[\x21-\x7e]+$/.test(URL_SUPABASE)) {
+    const error = new Error(
+      'La SUPABASE_SERVICE_ROLE_KEY (o la SUPABASE_URL) está mal copiada: tiene caracteres ocultos como "•". Volvé a copiarla completa desde Supabase (Reveal) y cargala de nuevo.'
+    );
+    error.status = 500;
+    throw error;
+  }
   if (!cliente) {
     cliente = createClient(URL_SUPABASE, SERVICE_KEY, {
       auth: { persistSession: false },
