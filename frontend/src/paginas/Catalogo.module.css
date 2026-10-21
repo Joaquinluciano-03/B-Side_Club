@@ -156,14 +156,25 @@
     translate 280ms var(--ease-out),
     background-color 320ms ease;
 }
+/* La seleccionada queda estirada y naranja, igual que con el mouse encima.
+   El naranja va tambien en la forma (::before), no solo en .pestana: si no,
+   entre el borde y el relleno asomaba una linea clara de menos de un pixel */
+.separadorActivo::before {
+  translate: 0 -8px;
+  background-color: var(--naranja);
+}
+/* el texto sube la mitad, asi queda centrado en la pestaña estirada */
+.separadorActivo .separadorNombre,
+.separadorActivo .separadorCantidad {
+  translate: 0 -4px;
+}
 @media (hover: hover) and (pointer: fine) {
-  .separador:hover:not(.separadorActivo)::before {
+  .separador:hover::before {
     translate: 0 -8px;
     background-color: var(--naranja);
   }
-  /* el texto sube la mitad, asi queda centrado en la pestaña estirada */
-  .separador:hover:not(.separadorActivo) .separadorNombre,
-  .separador:hover:not(.separadorActivo) .separadorCantidad {
+  .separador:hover .separadorNombre,
+  .separador:hover .separadorCantidad {
     translate: 0 -4px;
     color: var(--tinta-sobre-naranja);
   }
@@ -171,10 +182,12 @@
 .separador:focus-visible {
   outline-offset: -5px;
 }
-/* la seleccionada: rellena la pestaña por dentro de su borde de 2px */
+/* el relleno naranja que viaja de una pestaña a otra al cambiar (Motion
+   layoutId). Cubre la forma estirada por dentro de su borde de 2px: arriba
+   arranca 6px por encima del boton (8px de estiramiento menos el borde) */
 .pestana {
   position: absolute;
-  inset: 2px 2px 0;
+  inset: -6px 2px 0;
   background: var(--naranja);
   z-index: 0;
 }
