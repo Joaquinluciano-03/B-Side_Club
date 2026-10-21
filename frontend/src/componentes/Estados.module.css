@@ -1,0 +1,80 @@
+/* ---- skeleton con la forma de la card ---- */
+.skelCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+.skelFunda {
+  width: 88%;
+  aspect-ratio: 1;
+  border-radius: 3px;
+}
+.skelTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 12%;
+}
+
+/* ---- vacio y error ---- */
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--e-8) var(--e-5);
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: var(--r-card);
+}
+.icono {
+  color: var(--naranja);
+  margin-bottom: var(--e-4);
+}
+.error .icono {
+  color: var(--error);
+}
+.titulo {
+  margin: 0 0 var(--e-2);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-lg);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.texto {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--tinta-dim);
+  text-wrap: pretty;
+}
+.acciones {
+  margin-top: var(--e-5);
+  display: flex;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- cargando ---- */
+.cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-3);
+  padding: var(--e-8) var(--e-5);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
+.discoCargando {
+  width: 22px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--carbon) 0 10%, var(--naranja) 11% 34%, transparent 35%),
+    conic-gradient(var(--carbon) 0 85%, #4a433f 85% 100%);
+  animation: bspin 0.9s linear infinite;
+}

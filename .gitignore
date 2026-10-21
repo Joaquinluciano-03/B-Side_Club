@@ -5,3 +5,6 @@ node_modules
 /prisma/migrations
 # imagenes subidas en desarrollo: son datos, no codigo
 /uploads
+
+# capturas y logs del MCP de Playwright
+.playwright-mcp/

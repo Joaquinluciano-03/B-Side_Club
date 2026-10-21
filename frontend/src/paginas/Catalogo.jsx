@@ -1,12 +1,19 @@
-// "El cajón". Busqueda + filtro por categoria + paginacion, todo reflejado en
+// El catalogo. Busqueda + filtro por categoria + paginacion, todo reflejado en
 // la URL para que un filtro se pueda compartir y el boton Atras funcione.
+// Los filtros son separadores de batea, cada uno con su cantidad; la pestaña
+// naranja se desliza hasta el separador elegido.
 
-import { useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { motion } from 'motion/react';
+import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
+import { useConteos } from '../lib/useConteos';
 import CardProducto from '../componentes/CardProducto';
+import Paginacion from '../componentes/Paginacion';
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../componentes/Estados';
 import { mensajeDeError } from '../lib/formato';
+import estilos from './Catalogo.module.css';
 
 // La busqueda dispara un pedido por tecla si no se la frena, y el backend
 // tiene un techo de 300 pedidos cada 15 minutos: escribir "pink floyd" se
@@ -20,33 +27,36 @@ function useDebounce(valor, ms = 350) {
   return debounced;
 }
 
-const chip = (activo) => ({
-  background: activo ? 'var(--naranja)' : 'transparent',
-  color: activo ? 'var(--tinta-sobre-naranja)' : 'var(--tinta-suave)',
-  border: `1px solid ${activo ? 'var(--naranja)' : 'var(--borde-boton)'}`,
-  fontWeight: activo ? 800 : 700,
-  fontSize: 13,
-  padding: '9px 16px',
-  borderRadius: 999,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-  transition: 'all .15s',
-});
-
-const botonPagina = (activo, deshabilitado) => ({
-  background: activo ? 'var(--naranja)' : 'transparent',
-  color: deshabilitado ? 'var(--apagado)' : activo ? 'var(--tinta-sobre-naranja)' : 'var(--tinta)',
-  border: `1px solid ${activo ? 'var(--naranja)' : 'var(--borde-boton)'}`,
-  fontWeight: 700,
-  fontSize: 13,
-  padding: '9px 14px',
-  borderRadius: 'var(--r-control)',
-  cursor: deshabilitado ? 'not-allowed' : 'pointer',
-  minWidth: 40,
-});
+function Separador({ activo, onClick, nombre, cantidad }) {
+  return (
+    <button
+      role="tab"
+      aria-selected={activo}
+      className={`${estilos.separador} ${activo ? estilos.separadorActivo : ''}`}
+      onClick={onClick}
+    >
+      {/* la pestaña naranja es un solo elemento que viaja entre separadores.
+          No lleva borde propio (el borde es el del separador) y el radio va
+          por style: asi Motion lo corrige mientras escala y no se deforma */}
+      {activo && (
+        <motion.span
+          layoutId="pestana-activa"
+          className={estilos.pestana}
+          style={{ borderRadius: '8px 8px 0 0' }}
+          transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
+        />
+      )}
+      <span className={estilos.separadorNombre}>{nombre}</span>
+      {cantidad !== null && cantidad !== undefined && (
+        <span className={estilos.separadorCantidad}>{cantidad}</span>
+      )}
+    </button>
+  );
+}
 
 export default function Catalogo() {
   const [params, setParams] = useSearchParams();
+  const { total, categorias } = useConteos();
 
   const categoriaId = params.get('categoriaId') || '';
   const page = Number(params.get('page')) || 1;
@@ -57,16 +67,14 @@ export default function Catalogo() {
   const [texto, setTexto] = useState(qUrl);
   const q = useDebounce(texto);
 
-  const [categorias, setCategorias] = useState([]);
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(null);
   const [intento, setIntento] = useState(0);
 
+  // si la busqueda cambia desde afuera (el buscador del hero), sincronizamos
   useEffect(() => {
-    get('/categorias')
-      .then(setCategorias)
-      .catch(() => setCategorias([]));
-  }, []);
+    setTexto(qUrl);
+  }, [qUrl]);
 
   // cuando cambia el texto buscado volvemos a la pagina 1: quedarse en la 3
   // de una busqueda nueva casi siempre deja la pantalla vacia
@@ -110,6 +118,7 @@ export default function Catalogo() {
     const nuevos = new URLSearchParams(params);
     nuevos.set('page', String(n));
     setParams(nuevos);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function limpiar() {
@@ -117,144 +126,119 @@ export default function Catalogo() {
     setParams(new URLSearchParams());
   }
 
-  // ventana de paginas alrededor de la actual, para no imprimir 30 botones
-  const paginas = useMemo(() => {
-    if (!datos) return [];
-    const total = datos.totalPages;
-    const desde = Math.max(1, Math.min(page - 2, total - 4));
-    const hasta = Math.min(total, desde + 4);
-    return Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
-  }, [datos, page]);
-
   const hayFiltros = Boolean(qUrl || categoriaId);
+  const categoriaActual = categorias.find((c) => String(c.id) === categoriaId);
 
   return (
-    <main className="contenido">
-      <div className="kicker">02 — Catálogo</div>
-      <h1 className="titulo">EL CAJÓN</h1>
+    <main className={estilos.pagina}>
+      <header className={`${estilos.cabecera} cascada`}>
+        <h1 className={estilos.titulo}>Catálogo</h1>
+        <p className={estilos.bajada}>
+          {total !== null ? `${total} títulos` : 'Discos'} usados, escuchados enteros antes de
+          llegar acá. Si no está, escribinos y lo buscamos.
+        </p>
+      </header>
 
-      {/* buscador */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 18 }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
-          <input
-            placeholder="Buscar por artista, disco o sello…"
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            aria-label="Buscar en el catálogo"
-            style={{
-              width: '100%',
-              background: '#fff',
-              border: '1px solid var(--borde-fuerte)',
-              borderRadius: 9,
-              padding: '14px 14px 14px 42px',
-              color: 'var(--tinta)',
-              fontSize: 15,
-              outline: 'none',
-            }}
-            onFocus={(e) => (e.target.style.borderColor = 'var(--naranja)')}
-            onBlur={(e) => (e.target.style.borderColor = 'var(--borde-fuerte)')}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              left: 15,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: 13,
-              height: 13,
-              border: '2px solid var(--tinta-tenue)',
-              borderRadius: '50%',
-            }}
-          />
-        </div>
-        <div className="mono" style={{ whiteSpace: 'nowrap', fontSize: 12 }}>
-          {datos ? `${datos.total} ${datos.total === 1 ? 'título' : 'títulos'}` : '—'}
-        </div>
-      </div>
+      {/* barra de busqueda y separadores: queda pegada arriba al bajar */}
+      <div className={estilos.barra}>
+        <div className={estilos.barraInterior}>
+          <label className={estilos.buscador}>
+            <MagnifyingGlass size={18} weight="bold" aria-hidden="true" />
+            <span className="sr-only">Buscar en el catálogo</span>
+            <input
+              type="search"
+              placeholder="Buscar artista, disco o sello"
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              autoComplete="off"
+            />
+            {texto && (
+              <button
+                type="button"
+                className={estilos.borrar}
+                onClick={() => setTexto('')}
+                aria-label="Borrar búsqueda"
+              >
+                <X size={14} weight="bold" />
+              </button>
+            )}
+          </label>
 
-      {/* chips de categoria */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 30 }}>
-        <button style={chip(!categoriaId)} onClick={() => cambiarCategoria('')}>
-          Todo
-        </button>
-        {categorias.map((c) => (
-          <button
-            key={c.id}
-            style={chip(String(c.id) === categoriaId)}
-            onClick={() => cambiarCategoria(String(c.id))}
-          >
-            {c.nombre}
-          </button>
-        ))}
-      </div>
-
-      {error ? (
-        <ErrorCarga mensaje={error} onReintentar={() => setIntento((i) => i + 1)} />
-      ) : datos === null ? (
-        <SkeletonGrilla cantidad={8} />
-      ) : datos.productos.length === 0 ? (
-        <Vacio
-          titulo="SIN RESULTADOS"
-          texto={
-            hayFiltros
-              ? 'No encontramos nada con esa búsqueda. Probá con el artista o escribinos y lo buscamos.'
-              : 'Todavía no hay productos cargados en el catálogo.'
-          }
-        >
-          {hayFiltros && (
-            <button className="btn btn-secundario" onClick={limpiar}>
-              Limpiar filtros
-            </button>
-          )}
-        </Vacio>
-      ) : (
-        <>
-          <div className="grilla-productos">
-            {datos.productos.map((p) => (
-              <CardProducto key={p.id} producto={p} />
+          <div className={estilos.separadores} role="tablist" aria-label="Formato">
+            <Separador
+              activo={!categoriaId}
+              onClick={() => cambiarCategoria('')}
+              nombre="Todo"
+              cantidad={total}
+            />
+            {categorias.map((c) => (
+              <Separador
+                key={c.id}
+                activo={String(c.id) === categoriaId}
+                onClick={() => cambiarCategoria(String(c.id))}
+                nombre={c.nombre}
+                cantidad={c.total}
+                />
             ))}
           </div>
+        </div>
+      </div>
 
-          {datos.totalPages > 1 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 14,
-                flexWrap: 'wrap',
-                marginTop: 34,
-              }}
-            >
-              <div className="mono">
-                PÁGINA {datos.page} DE {datos.totalPages}
-              </div>
-              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', alignItems: 'center' }}>
-                <button
-                  style={botonPagina(false, page <= 1)}
-                  disabled={page <= 1}
-                  onClick={() => irAPagina(page - 1)}
-                >
-                  ← Anterior
-                </button>
-                {paginas.map((n) => (
-                  <button key={n} style={botonPagina(n === page, false)} onClick={() => irAPagina(n)}>
-                    {n}
-                  </button>
-                ))}
-                <button
-                  style={botonPagina(false, page >= datos.totalPages)}
-                  disabled={page >= datos.totalPages}
-                  onClick={() => irAPagina(page + 1)}
-                >
-                  Siguiente →
-                </button>
-              </div>
+      <section className={estilos.resultados} aria-live="polite" aria-busy={datos === null}>
+        {/* sin filtros, la cantidad ya esta en el separador "Todo" */}
+        {hayFiltros && datos && datos.productos.length > 0 && (
+          <div className={estilos.resumen}>
+            <span>
+              {datos.total} {datos.total === 1 ? 'título' : 'títulos'}
+              {categoriaActual ? ` en ${categoriaActual.nombre}` : ''}
+              {qUrl ? ` para "${qUrl}"` : ''}
+            </span>
+            {hayFiltros && (
+              <button className="btn-enlace" onClick={limpiar}>
+                Ver todo el catálogo
+              </button>
+            )}
+          </div>
+        )}
+
+        {error ? (
+          <ErrorCarga mensaje={error} onReintentar={() => setIntento((i) => i + 1)} />
+        ) : datos === null ? (
+          <SkeletonGrilla cantidad={8} />
+        ) : datos.productos.length === 0 ? (
+          <Vacio
+            titulo={hayFiltros ? 'No está en el cajón' : 'Todavía no hay discos'}
+            texto={
+              hayFiltros
+                ? 'No encontramos nada con esa búsqueda. Probá con el nombre del artista, o escribinos y lo salimos a buscar.'
+                : 'Todavía no hay productos cargados en el catálogo.'
+            }
+          >
+            {hayFiltros && (
+              <button className="btn btn-secundario" onClick={limpiar}>
+                Ver todo el catálogo
+              </button>
+            )}
+            <Link className="btn btn-primario" to="/contacto">
+              Pedir un disco
+            </Link>
+          </Vacio>
+        ) : (
+          <>
+            <div className="grilla-productos">
+              {datos.productos.map((p, i) => (
+                <div key={p.id} className={estilos.entra} style={{ '--i': i }}>
+                  <CardProducto producto={p} prioridad={i < 4} />
+                </div>
+              ))}
             </div>
-          )}
-        </>
-      )}
+
+            <div className={estilos.paginas}>
+              <Paginacion pagina={datos.page} totalPaginas={datos.totalPages} onCambiar={irAPagina} />
+            </div>
+          </>
+        )}
+      </section>
     </main>
   );
 }

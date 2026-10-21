@@ -1,20 +1,23 @@
-// Avisos flotantes. La demo los define como una pastilla oscura abajo al
-// centro, con un punto de color segun el tipo.
+// Avisos flotantes: una pastilla oscura abajo al centro, con un icono segun
+// el tipo. Entran desde abajo con @starting-style (toast.module.css).
 //
 // Sirven para confirmar algo que YA pasó ("Cambios guardados"). Para los
 // errores que la persona tiene que leer y corregir en el formulario seguimos
 // usando el .aviso inline: un toast se va solo y eso no se puede perder.
 
 import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { CheckCircle, WarningCircle, Info } from '@phosphor-icons/react';
+import estilos from './toast.module.css';
 
 const Ctx = createContext(null);
 
 const DURACION = 4000;
 
-const PUNTOS = {
-  ok: 'var(--ok-texto)',
-  error: 'var(--error)',
-  info: 'var(--neon-cian)',
+// cada tipo con su icono: el estado se lee por la forma, no solo por el color
+const ICONOS = {
+  ok: CheckCircle,
+  error: WarningCircle,
+  info: Info,
 };
 
 export function ToastProvider({ children }) {
@@ -47,54 +50,21 @@ export function ToastProvider({ children }) {
       {children}
 
       {/* aria-live para que un lector de pantalla lo anuncie sin robar el foco */}
-      <div
-        aria-live="polite"
-        aria-atomic="false"
-        style={{
-          position: 'fixed',
-          left: '50%',
-          bottom: 26,
-          transform: 'translateX(-50%)',
-          zIndex: 95,
-          display: 'flex',
-          flexDirection: 'column-reverse',
-          gap: 10,
-          alignItems: 'center',
-          pointerEvents: 'none',
-          maxWidth: 'calc(100vw - 36px)',
-        }}
-      >
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            role="status"
-            onClick={() => cerrar(t.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              background: 'var(--tinta-sobre-naranja)',
-              border: '1px solid var(--borde-oscuro-3)',
-              borderRadius: 11,
-              padding: '14px 18px',
-              boxShadow: '0 18px 40px rgba(0,0,0,.35)',
-              pointerEvents: 'auto',
-              cursor: 'pointer',
-              animation: 'toast-entra .22s ease-out',
-            }}
-          >
+      <div aria-live="polite" aria-atomic="false" className={estilos.pila}>
+        {toasts.map((t) => {
+          const Icono = ICONOS[t.tipo] || ICONOS.info;
+          return (
             <div
-              style={{
-                width: 9,
-                height: 9,
-                borderRadius: '50%',
-                background: PUNTOS[t.tipo] || PUNTOS.info,
-                flexShrink: 0,
-              }}
-            />
-            <div style={{ color: 'var(--crema)', fontSize: 14, fontWeight: 700 }}>{t.mensaje}</div>
-          </div>
-        ))}
+              key={t.id}
+              role="status"
+              onClick={() => cerrar(t.id)}
+              className={`${estilos.toast} ${estilos[t.tipo] || ''}`}
+            >
+              <Icono size={18} weight="fill" className={estilos.icono} aria-hidden="true" />
+              <span>{t.mensaje}</span>
+            </div>
+          );
+        })}
       </div>
     </Ctx.Provider>
   );

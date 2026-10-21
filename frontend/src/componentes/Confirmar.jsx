@@ -1,22 +1,31 @@
 // Dialogo de confirmacion para las acciones que borran.
 // Usa <dialog> nativo: trae el foco atrapado y el cierre con Escape sin que
-// tengamos que implementarlos a mano.
+// tengamos que implementarlos a mano. El foco arranca en "Cancelar", que es
+// la opcion segura si alguien aprieta Enter sin leer.
 
 import { useEffect, useRef } from 'react';
+import estilos from './Dialogo.module.css';
 
 export default function Confirmar({ abierto, titulo, texto, textoBoton = 'Eliminar', onConfirmar, onCancelar }) {
   const ref = useRef(null);
+  const cancelarRef = useRef(null);
 
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (abierto && !d.open) d.showModal();
+    if (abierto && !d.open) {
+      d.showModal();
+      cancelarRef.current?.focus();
+    }
     if (!abierto && d.open) d.close();
   }, [abierto]);
 
   return (
     <dialog
       ref={ref}
+      className={estilos.dialogo}
+      style={{ maxWidth: 440 }}
+      aria-labelledby="confirmar-titulo"
       onCancel={(e) => {
         e.preventDefault();
         onCancelar();
@@ -25,33 +34,17 @@ export default function Confirmar({ abierto, titulo, texto, textoBoton = 'Elimin
         // click en el backdrop (fuera de la tarjeta) = cancelar
         if (e.target === ref.current) onCancelar();
       }}
-      style={{
-        border: '1px solid var(--borde)',
-        borderRadius: 'var(--r-card)',
-        padding: 0,
-        maxWidth: 420,
-        width: 'calc(100% - 36px)',
-        background: 'var(--superficie)',
-        color: 'var(--tinta)',
-      }}
     >
-      <div style={{ padding: 26 }}>
-        <h2
-          style={{
-            fontFamily: 'var(--display)',
-            fontSize: 20,
-            margin: '0 0 10px',
-            fontWeight: 400,
-          }}
-        >
+      <div className={estilos.confirmar}>
+        <h2 id="confirmar-titulo" className={estilos.titulo}>
           {titulo}
         </h2>
-        <p style={{ color: 'var(--tinta-suave)', fontSize: 14, margin: '0 0 24px' }}>{texto}</p>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-          <button className="btn btn-secundario btn-chico" onClick={onCancelar}>
+        <p className={estilos.confirmarTexto}>{texto}</p>
+        <div className={estilos.acciones}>
+          <button ref={cancelarRef} className="btn btn-secundario btn-chico" onClick={onCancelar}>
             Cancelar
           </button>
-          <button className="btn btn-chico" style={{ background: 'var(--error)', color: '#fff' }} onClick={onConfirmar}>
+          <button className="btn btn-peligro-lleno btn-chico" onClick={onConfirmar}>
             {textoBoton}
           </button>
         </div>

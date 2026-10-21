@@ -2,9 +2,10 @@
 
 React + Vite + React Router. Consume la API que está en `../src`.
 
-El diseño sale de `demo/demo.html`: los colores, tipografías y componentes
-están copiados de ahí, no elegidos de nuevo. Si hay que cambiar algo visual,
-el lugar es `src/estilos/tokens.css`.
+El diseño es una evolución de `demo/demo.html` con una idea central: **el
+sitio es un vinilo** (el hero es el label de un disco, el catálogo son fundas
+con el disco adentro, Nosotros es el Lado B). Las reglas del sistema están en
+[`../DESIGN.md`](../DESIGN.md); los valores, en `src/estilos/tokens.css`.
 
 ## Levantarlo
 
@@ -37,15 +38,25 @@ carpeta del servidor: una función no tiene disco propio.
 
 ```
 src/
-  estilos/      tokens.css (el sistema de diseño) + global.css (componentes)
-  lib/          api.js (único punto de contacto con el backend), auth.jsx, formato.js
-  componentes/  piezas compartidas (Header, CardProducto, ArteProducto, Estados…)
+  estilos/      tokens.css (colores, tipografia, espaciado, motion) +
+                global.css (botones, badges, campos, tablas: lo compartido)
+  lib/          api.js (único punto de contacto con el backend), auth.jsx,
+                formato.js, horario.js, contacto.js, useConteos.js
+  componentes/  piezas compartidas (Header, Footer, CardProducto, ArteProducto,
+                Paginacion, Segmentos, Modal, Confirmar…) y home/HeroLabel
   layouts/      LayoutPublico, LayoutAuth, LayoutPanel
   paginas/      Home, Catalogo, DetalleProducto, Nosotros, Contacto
     auth/       Login, Registro, Recuperar, Resetear, AceptarInvitacion
     panel/      Dashboard, Productos, FormProducto, Categorias, Consultas,
-                InfoLocal, Invitaciones, Usuarios, Perfil
+                Promociones, InfoLocal, Invitaciones, Usuarios, Perfil
 ```
+
+**Estilos:** cada componente o página tiene su `Nombre.module.css` al lado
+(CSS Modules, viene con Vite). En JSX no van `style={{}}` nuevos: los que
+quedan en algunas pantallas del panel son de antes del rediseño. Fuentes
+autohospedadas con `@fontsource` (Bungee, Archivo y Martian Mono, variables);
+íconos de `@phosphor-icons/react`; `motion` solo para la pestaña que se desliza
+en filtros.
 
 ### Tres cosas que conviene saber antes de tocar el código
 
@@ -60,13 +71,21 @@ cuentas. `precio: null` significa "a consultar", no "gratis".
 **Las búsquedas van con debounce de 350 ms.** El backend tiene un techo de 300
 pedidos cada 15 minutos; sin debounce, escribir "pink floyd" se come 11 de una.
 
+**El nombre del producto se carga como "Título — Artista".** El backend tiene
+un solo campo; `separarNombre()` (lib/formato.js) lo parte en dos líneas y el
+formulario del panel lo carga en dos campos.
+
+**El horario del local es un arreglo `[{ label, value }]`.** Siempre leelo con
+`normalizarHorario()` (lib/horario.js), que también entiende la forma vieja.
+
 ## Las imágenes
 
 Si un producto tiene fotos cargadas, se muestran. Si no, `ArteProducto` dibuja
-el motivo que le toca a su categoría (disco de vinilo, cassette, cinta
-diagonal, halftone) con un color estable derivado del nombre. Son los mismos
-motivos que define la demo, y evitan que el catálogo tenga huecos grises
-mientras el local todavía no sacó las fotos.
+una tapa genérica según el formato: funda de papel con troquel para vinilos y
+CDs, estuche con etiqueta para cassettes, ficha impresa para equipos, con un
+color estable derivado del nombre. `urlImagen()` trata como "sin foto" las URLs
+de relleno del seed viejo (`placehold.co`) y las rutas `/uploads` de antes de
+pasar a Supabase.
 
 ## Build
 

@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
+import InputPassword, { Entrada } from '../../componentes/InputPassword';
 import { post } from '../../lib/api';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -102,7 +103,8 @@ export default function AceptarInvitacion() {
         {campos.map((c) => (
           <div key={c.k} className={`campo ${errores[c.k] ? 'con-error' : ''}`}>
             <label htmlFor={`inv-${c.k}`}>{c.label}</label>
-            <input
+            <Entrada
+              as={c.tipo === 'password' ? InputPassword : 'input'}
               id={`inv-${c.k}`}
               type={c.tipo}
               value={form[c.k]}

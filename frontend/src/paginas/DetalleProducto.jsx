@@ -1,19 +1,71 @@
-// Ficha del producto. Un producto dado de baja da 404 al visitante (lo filtra
-// el backend); el staff logueado si lo ve, con un aviso de que no esta publico.
+// Ficha del producto: la hoja de inspeccion del ejemplar. Un producto dado de
+// baja da 404 al visitante (lo filtra el backend); el staff logueado si lo
+// ve, con un aviso de que no esta publico.
 
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { CaretRight, WhatsappLogo, EnvelopeSimple, Headphones, PencilSimple, Wrench } from '@phosphor-icons/react';
 import { get, query, urlImagen } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import ArteProducto from '../componentes/ArteProducto';
+import { useStoreInfo } from '../lib/useStoreInfo';
+import { linkWhatsApp } from '../lib/contacto';
+import ArteProducto, { ObjetoInterior, formatoDe } from '../componentes/ArteProducto';
 import CardProducto from '../componentes/CardProducto';
-import { Cargando, Vacio } from '../componentes/Estados';
-import { formatearPrecio, esAConsultar, etiquetaStock, mensajeDeError } from '../lib/formato';
+import Precio from '../componentes/Precio';
+import { Vacio } from '../componentes/Estados';
+import {
+  esAConsultar,
+  etiquetaStock,
+  mensajeDeError,
+  separarNombre,
+  gradoGoldmine,
+  ESCALA_GOLDMINE,
+} from '../lib/formato';
+import estilos from './DetalleProducto.module.css';
+
+function EscalaEstado({ condicion }) {
+  const grado = gradoGoldmine(condicion);
+  if (!grado) return null;
+  return (
+    <div className={estilos.escala}>
+      <p className={estilos.escalaTitulo}>Estado del ejemplar (escala Goldmine)</p>
+      <ol className={estilos.escalaLista}>
+        {ESCALA_GOLDMINE.map((g) => (
+          <li
+            key={g.codigo}
+            className={g.codigo === grado ? estilos.escalaActual : undefined}
+            aria-current={g.codigo === grado ? 'true' : undefined}
+          >
+            <span className={estilos.escalaCodigo}>{g.codigo}</span>
+            <span className={estilos.escalaNombre}>{g.nombre}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function Esqueleto() {
+  return (
+    <main className={estilos.pagina} aria-busy="true">
+      <div className={estilos.grilla}>
+        <div className={`skel ${estilos.esqueletoTapa}`} />
+        <div className={estilos.esqueletoTexto}>
+          <div className="skel-linea" style={{ width: '30%' }} />
+          <div className="skel-linea" style={{ width: '80%', height: 40 }} />
+          <div className="skel-linea" style={{ width: '45%', height: 18 }} />
+          <div className="skel-linea" style={{ width: '35%', height: 34, marginTop: 20 }} />
+          <div className="skel-linea" style={{ width: '100%', height: 70, marginTop: 20 }} />
+        </div>
+      </div>
+    </main>
+  );
+}
 
 export default function DetalleProducto() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { esStaff } = useAuth();
+  const { info } = useStoreInfo();
 
   const [producto, setProducto] = useState(null);
   const [error, setError] = useState(null);
@@ -25,6 +77,7 @@ export default function DetalleProducto() {
     setProducto(null);
     setError(null);
     setImagenActiva(0);
+    window.scrollTo(0, 0);
 
     get(`/productos/${id}`)
       .then((p) => {
@@ -46,34 +99,80 @@ export default function DetalleProducto() {
 
   if (error) {
     return (
-      <main className="contenido">
+      <main className={estilos.pagina}>
         <Vacio
-          titulo={error.status === 404 ? 'NO ENCONTRAMOS ESE DISCO' : 'NO CARGÓ'}
+          titulo={error.status === 404 ? 'Ese disco ya no está en el cajón' : 'No se pudo cargar'}
           texto={
             error.status === 404
-              ? 'Puede que se haya vendido o que ya no esté publicado.'
+              ? 'Puede que se haya vendido o que ya no esté publicado. Escribinos y te avisamos si entra otro.'
               : mensajeDeError(error)
           }
         >
-          <button className="btn btn-secundario" onClick={() => navigate('/catalogo')}>
+          <Link className="btn btn-secundario" to="/catalogo">
             Volver al catálogo
-          </button>
+          </Link>
+          <Link className="btn btn-primario" to="/contacto">
+            Escribinos
+          </Link>
         </Vacio>
       </main>
     );
   }
 
-  if (!producto) return <Cargando texto="Buscando el disco…" />;
+  if (!producto) return <Esqueleto />;
 
-  const imagenes = producto.imagenes || [];
+  // solo las fotos reales (urlImagen descarta los rellenos del seed viejo)
+  const imagenes = (producto.imagenes || []).filter((img) => urlImagen(img.url));
   const portada = imagenes[imagenActiva];
-  const sinStock = producto.estado_stock === 'vendido';
+  const vendido = producto.estado_stock === 'vendido';
+  const consultar = esAConsultar(producto.precio);
+  const { titulo, artista } = separarNombre(producto.nombre);
+  const formato = formatoDe(producto.categoria?.nombre);
+  const categoria = producto.categoria;
+
+  const mensaje = `Hola B-Side Club! Me interesa "${producto.nombre}" (${window.location.href}). ¿Sigue disponible?`;
+  const whatsapp = linkWhatsApp(info?.whatsapp, mensaje);
+  const formulario = `/contacto?productoId=${producto.id}`;
+
+  const ctaPrincipal = vendido ? (
+    <Link className={`btn btn-primario ${estilos.cta}`} to={formulario}>
+      <EnvelopeSimple size={18} weight="bold" /> Avisame si entra otro
+    </Link>
+  ) : whatsapp ? (
+    <a className={`btn btn-primario ${estilos.cta}`} href={whatsapp} target="_blank" rel="noreferrer">
+      <WhatsappLogo size={18} weight="bold" /> Consultar por WhatsApp
+    </a>
+  ) : (
+    <Link className={`btn btn-primario ${estilos.cta}`} to={formulario}>
+      <EnvelopeSimple size={18} weight="bold" /> Consultar por este disco
+    </Link>
+  );
+
+  const ficha = [
+    ['Formato', categoria?.nombre],
+    ['Año', producto.anio],
+    ['Condición', producto.condicion],
+    [
+      'Disponibilidad',
+      producto.stock > 1 && !vendido
+        ? `${etiquetaStock(producto.estado_stock)} · ${producto.stock} en el local`
+        : etiquetaStock(producto.estado_stock),
+    ],
+  ].filter(([, v]) => v !== null && v !== undefined && v !== '');
 
   return (
-    <main className="contenido">
-      <Link to="/catalogo" className="btn-enlace" style={{ marginBottom: 22, display: 'inline-block' }}>
-        ← Volver al catálogo
-      </Link>
+    <main className={estilos.pagina}>
+      <nav className={estilos.migas} aria-label="Estás en">
+        <Link to="/catalogo">Catálogo</Link>
+        {categoria && (
+          <>
+            <CaretRight size={12} aria-hidden="true" />
+            <Link to={`/catalogo${query({ categoriaId: categoria.id })}`}>{categoria.nombre}</Link>
+          </>
+        )}
+        <CaretRight size={12} aria-hidden="true" />
+        <span aria-current="page">{titulo}</span>
+      </nav>
 
       {producto.esActivo === false && (
         <div className="aviso aviso-error">
@@ -82,197 +181,108 @@ export default function DetalleProducto() {
         </div>
       )}
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 34,
-          alignItems: 'start',
-        }}
-      >
-        {/* ---------- Arte ---------- */}
-        <div>
-          <div
-            style={{
-              borderRadius: 'var(--r-card)',
-              overflow: 'hidden',
-              border: '1px solid var(--borde)',
-              background: 'var(--carbon)',
-            }}
-          >
-            {portada ? (
-              <img
-                src={urlImagen(portada.url)}
-                alt={portada.alt || producto.nombre}
-                style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block' }}
-              />
-            ) : (
-              <ArteProducto
-                producto={producto}
-                categoria={producto.categoria?.nombre}
-                girando
-                mostrarTag={false}
-              />
-            )}
+      <div className={estilos.grilla}>
+        {/* ---------- la tapa, con el disco asomando ---------- */}
+        <div className={estilos.galeria}>
+          <div className={`${estilos.tapa} ${vendido ? estilos.vendido : ''}`}>
+            <ObjetoInterior producto={producto} />
+            <div className={estilos.funda}>
+              <ArteProducto producto={producto} imagen={portada} prioridad />
+            </div>
           </div>
 
           {imagenes.length > 1 && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+            <div className={estilos.miniaturas}>
               {imagenes.map((img, i) => (
                 <button
                   key={img.id}
                   onClick={() => setImagenActiva(i)}
-                  aria-label={`Ver imagen ${i + 1}`}
-                  style={{
-                    width: 64,
-                    height: 64,
-                    padding: 0,
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    border: `2px solid ${i === imagenActiva ? 'var(--naranja)' : 'var(--borde)'}`,
-                    background: 'var(--carbon)',
-                  }}
+                  aria-label={`Ver foto ${i + 1} de ${imagenes.length}`}
+                  aria-pressed={i === imagenActiva}
+                  className={i === imagenActiva ? estilos.miniaturaActiva : undefined}
                 >
-                  <img
-                    src={urlImagen(img.url)}
-                    alt={img.alt || ''}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
+                  <img src={urlImagen(img.url)} alt="" loading="lazy" />
                 </button>
               ))}
             </div>
           )}
+          {imagenes.length > 0 && <p className={estilos.notaFotos}>Fotos del ejemplar exacto que te llevás.</p>}
         </div>
 
-        {/* ---------- Datos ---------- */}
-        <div>
-          <div className="kicker">{producto.categoria?.nombre}</div>
+        {/* ---------- la hoja de inspeccion ---------- */}
+        <div className={`${estilos.hoja} cascada`} style={{ '--cascada-inicio': '160ms' }}>
+          <p className={estilos.meta}>
+            {categoria?.nombre}
+            {producto.anio ? ` · ${producto.anio}` : ''}
+          </p>
+          <h1 className={estilos.titulo}>{titulo}</h1>
+          {artista && <p className={estilos.artista}>{artista}</p>}
 
-          <h1
-            style={{
-              fontFamily: 'var(--display)',
-              fontSize: 'clamp(26px, 4.5vw, 42px)',
-              lineHeight: 1.08,
-              margin: '0 0 14px',
-              fontWeight: 400,
-            }}
-          >
-            {producto.nombre}
-          </h1>
-
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
-            <span className={`badge badge-${producto.estado_stock}`}>
-              {etiquetaStock(producto.estado_stock)}
-            </span>
-            {producto.anio && (
-              <span className="badge badge-neutro">{producto.anio}</span>
-            )}
-            {producto.destacado && (
-              <span
-                className="badge"
-                style={{
-                  background: 'var(--naranja)',
-                  color: 'var(--tinta-sobre-naranja)',
-                  border: '1px solid var(--naranja)',
-                }}
-              >
-                Destacado
+          <div className={estilos.precioFila}>
+            <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''} ${vendido ? estilos.tachado : ''}`}>
+              {consultar ? 'A consultar' : <Precio producto={producto} variante="ficha" />}
+            </p>
+            {producto.estado_stock !== 'disponible' && !(producto.estado_stock === 'a_consultar' && consultar) && (
+              <span className={`badge badge-${producto.estado_stock}`}>
+                {etiquetaStock(producto.estado_stock)}
               </span>
             )}
           </div>
-
-          <div
-            style={{
-              fontSize: esAConsultar(producto.precio) ? 22 : 34,
-              fontWeight: 900,
-              lineHeight: 1,
-              marginBottom: 6,
-              color: esAConsultar(producto.precio) ? 'var(--teal)' : 'var(--tinta)',
-              fontFamily: esAConsultar(producto.precio) ? 'var(--mono)' : 'var(--cuerpo)',
-              letterSpacing: esAConsultar(producto.precio) ? '.06em' : 'normal',
-            }}
-          >
-            {esAConsultar(producto.precio) ? 'A CONSULTAR' : formatearPrecio(producto.precio)}
-          </div>
-
-          {esAConsultar(producto.precio) && (
-            <div style={{ color: 'var(--meta)', fontSize: 13, marginBottom: 18 }}>
-              Es una pieza especial: el precio lo charlamos.
-            </div>
+          {consultar && !vendido && (
+            <p className={estilos.notaPrecio}>Es una pieza especial: el precio lo charlamos.</p>
           )}
 
-          <p
-            style={{
-              color: 'var(--tinta-cuerpo)',
-              fontSize: 16,
-              margin: '20px 0',
-              textWrap: 'pretty',
-            }}
-          >
-            {producto.descripcion}
-          </p>
+          {formato !== 'equipo' && <EscalaEstado condicion={producto.condicion} />}
 
-          {/* ficha tecnica */}
-          <div
-            className="card"
-            style={{ padding: 0, overflow: 'hidden', marginBottom: 24 }}
-          >
-            {[
-              ['Categoría', producto.categoria?.nombre],
-              ['Año', producto.anio],
-              ['Condición', producto.condicion],
-              ['Disponibilidad', etiquetaStock(producto.estado_stock)],
-              esStaff ? ['Stock', producto.stock] : null,
-            ]
-              .filter((f) => f && f[1] !== null && f[1] !== undefined && f[1] !== '')
-              .map(([k, v], i, arr) => (
-                <div
-                  key={k}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 16,
-                    padding: '13px 18px',
-                    borderBottom: i < arr.length - 1 ? '1px solid #c2cacd' : 'none',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: 'var(--mono)',
-                      fontSize: 10,
-                      letterSpacing: '.18em',
-                      color: 'var(--meta)',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {k}
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 700, textAlign: 'right' }}>{v}</span>
-                </div>
-              ))}
-          </div>
+          <p className={estilos.descripcion}>{producto.descripcion}</p>
 
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <button
-              className="btn btn-primario"
-              disabled={sinStock}
-              onClick={() => navigate(`/contacto?productoId=${producto.id}`)}
-            >
-              {sinStock ? 'Vendido' : 'Consultar por este disco'}
-            </button>
+          <dl className={estilos.ficha}>
+            {ficha.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className={estilos.acciones}>
+            {ctaPrincipal}
+            {!vendido && whatsapp && (
+              <Link className="btn btn-secundario" to={formulario}>
+                Escribir un mensaje
+              </Link>
+            )}
             {esStaff && (
               <Link to={`/panel/productos/${producto.id}`} className="btn btn-secundario">
-                Editar
+                <PencilSimple size={16} weight="bold" /> Editar
               </Link>
             )}
           </div>
+
+          <p className={estilos.promesa}>
+            {formato === 'equipo' ? (
+              <Wrench size={20} weight="duotone" aria-hidden="true" />
+            ) : (
+              <Headphones size={20} weight="duotone" aria-hidden="true" />
+            )}
+            <span>
+              {formato === 'equipo'
+                ? 'Revisado por nuestro técnico antes de publicarlo.'
+                : 'Lo escuchamos entero antes de publicarlo.'}{' '}
+              Si te interesa, te lo guardamos 48 hs.
+            </span>
+          </p>
         </div>
       </div>
 
       {relacionados.length > 0 && (
-        <section style={{ marginTop: 70 }}>
-          <div className="divisor">Más en {producto.categoria?.nombre}</div>
+        <section className={estilos.relacionados}>
+          <div className={estilos.relacionadosCabecera}>
+            <h2>Más de {categoria?.nombre}</h2>
+            <Link className="btn-enlace" to={`/catalogo${query({ categoriaId: categoria?.id })}`}>
+              Ver todos
+            </Link>
+          </div>
           <div className="grilla-productos">
             {relacionados.map((p) => (
               <CardProducto key={p.id} producto={p} />
@@ -280,6 +290,30 @@ export default function DetalleProducto() {
           </div>
         </section>
       )}
+
+      {/* mobile: precio y consulta siempre a mano */}
+      <div className={estilos.barraMovil} data-oscuro>
+        <div>
+          <p className={estilos.barraTitulo}>{titulo}</p>
+          <p className={estilos.barraPrecio}>
+            {consultar ? 'A consultar' : <Precio producto={producto} variante="compacto" />}
+          </p>
+        </div>
+        {/* el mismo destino que el CTA principal, con rotulo corto */}
+        {vendido ? (
+          <Link className={`btn btn-primario ${estilos.cta}`} to={formulario}>
+            Avisame
+          </Link>
+        ) : whatsapp ? (
+          <a className={`btn btn-primario ${estilos.cta}`} href={whatsapp} target="_blank" rel="noreferrer">
+            <WhatsappLogo size={18} weight="bold" /> Consultar
+          </a>
+        ) : (
+          <Link className={`btn btn-primario ${estilos.cta}`} to={formulario}>
+            Consultar
+          </Link>
+        )}
+      </div>
     </main>
   );
 }

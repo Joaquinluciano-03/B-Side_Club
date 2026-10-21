@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>B · El label</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bungee&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--carbon:#100f0e;--crema:#f2ece4;--naranja:#f26a1b;--tinta-n:#141210;--rosa:#ff4fa3;--cian:#35d0e8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;height:900px;overflow:hidden;font-family:Archivo,sans-serif;background:var(--carbon);color:var(--crema);position:relative}
+  /* surcos: el vinilo entero, centrado a la derecha y recortado por el viewport */
+  .vinilo{position:absolute;width:1700px;height:1700px;left:-130px;top:-400px;border-radius:50%;
+    background:repeating-radial-gradient(circle,transparent 0 3px,rgba(255,255,255,.05) 3px 4px),radial-gradient(circle,#221d18,#0e0d0c 72%)}
+  .label{position:absolute;width:760px;height:760px;left:340px;top:70px;border-radius:50%;background:var(--naranja);color:var(--tinta-n);
+    box-shadow:inset 0 0 0 10px rgba(0,0,0,.08),0 0 0 2px #0c0b0a}
+  .hole{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px;border-radius:50%;background:var(--carbon)}
+  .arco{position:absolute;inset:0}
+  .centro{position:absolute;left:50%;top:118px;transform:translateX(-50%);text-align:center;width:520px}
+  .sello{font-family:'Space Mono';font-size:12px;letter-spacing:.24em}
+  .centro h1{font-family:Bungee;font-size:84px;line-height:.92;margin:14px 0 6px}
+  .centro .lado{font-family:Bungee;font-size:22px}
+  .lista{position:absolute;left:150px;right:150px;top:436px;font-family:'Space Mono';font-size:15px}
+  .lista div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(20,18,16,.25)}
+  .lista b{font-family:Archivo;font-weight:800;font-size:17px;font-stretch:105%}
+  .buscar{position:absolute;left:50%;top:640px;transform:translateX(-50%);width:420px;height:52px;border-radius:999px;background:var(--tinta-n);color:var(--crema);display:flex;align-items:center;padding:0 20px;gap:10px;font-size:15px}
+  .buscar span{flex:1;opacity:.6}
+  header{position:absolute;top:0;left:0;right:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px}
+  .marca{font-family:Bungee;font-size:26px}
+  .marca .b{color:#ffc9e4;text-shadow:0 0 10px var(--rosa)} .marca .c{color:#cff6fc;text-shadow:0 0 10px var(--cian)}
+  .lateral{position:absolute;right:48px;bottom:56px;width:250px;text-align:right}
+  .lateral p{color:#a79e97;font-size:15px;line-height:1.5;margin-bottom:16px}
+  .cta{display:inline-block;background:var(--naranja);color:var(--tinta-n);font-weight:800;letter-spacing:.06em;font-size:14px;padding:15px 22px;border-radius:999px}
+  .izq{position:absolute;left:48px;bottom:56px;font-family:'Space Mono';font-size:12px;letter-spacing:.2em;color:#8a817b;line-height:1.9}
+</style></head><body>
+<div class="vinilo"></div>
+<header><div class="marca"><span class="b">B-SIDE</span> <span class="c">CLUB</span></div>
+<div style="font-family:'Space Mono';font-size:12px;letter-spacing:.2em;color:#8a817b">INGRESAR</div></header>
+<div class="label">
+  <div class="centro">
+    <div class="sello">B-SIDE CLUB · CAT. Nº BSC-1998 · 33⅓ RPM</div>
+    <h1>EL CAJÓN</h1>
+    <div class="lado">LADO A</div>
+  </div>
+  <div class="lista">
+    <div><span>A1</span><b>Recién llegados</b><span>22 títulos</span></div>
+    <div><span>A2</span><b>Vinilos</b><span>9</span></div>
+    <div><span>A3</span><b>Cassettes · CDs · Equipos</b><span>13</span></div>
+    <div><span>B1</span><b>El local, Chacarita</b><span>13 a 23 hs</span></div>
+    <div><span>B2</span><b>Escribinos</b><span>WhatsApp</span></div>
+  </div>
+  <div class="buscar"><span>Buscar artista, disco o sello</span>⌕</div>
+  <div class="hole"></div>
+</div>
+<div class="izq">DISCOS USADOS<br>ESCUCHADOS ENTEROS<br>DESDE 1998</div>
+<div class="lateral"><p>Vinilos, cassettes, CDs y equipos. Cada ficha cuenta el estado real del ejemplar.</p><span class="cta">VER EL CATÁLOGO</span></div>
+</body></html>

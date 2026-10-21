@@ -1,24 +1,42 @@
-// Dashboard: metricas de GET /api/dashboard/metricas + ultimas consultas.
+// Dashboard: el mostrador del local. Arriba lo urgente (consultas sin
+// responder, con digitos tipo tubo nixie), los accesos de todos los dias y
+// las cifras del catalogo. Todo sale de GET /api/dashboard/metricas y
+// GET /api/consultas: no se muestran metricas que el backend no tiene.
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Plus, ChatCircleText, Storefront, CaretRight } from '@phosphor-icons/react';
 import { get } from '../../lib/api';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
 import { Cargando, ErrorCarga } from '../../componentes/Estados';
 import { useAuth } from '../../lib/auth';
 import { etiquetaConsulta, formatearFecha, mensajeDeError } from '../../lib/formato';
+import estilos from './Dashboard.module.css';
 
-const TARJETAS = [
-  { k: 'consultasPendientes', label: 'Consultas pendientes', a: '/panel/consultas', destacar: true },
-  { k: 'productosActivos', label: 'Productos publicados', a: '/panel/productos' },
+const CIFRAS = [
+  { k: 'productosActivos', label: 'Publicados', a: '/panel/productos' },
   { k: 'productosInactivos', label: 'Dados de baja', a: '/panel/productos' },
-  { k: 'productosSinStock', label: 'Sin stock', a: '/panel/productos' },
-  { k: 'invitacionesPendientes', label: 'Invitaciones abiertas', a: '/panel/invitaciones' },
-  { k: 'totalUsuarios', label: 'Gente en el equipo', a: '/panel/usuarios' },
+  { k: 'productosSinStock', label: 'Sin stock', a: '/panel/productos', alerta: true },
+  { k: 'invitacionesPendientes', label: 'Invitaciones abiertas', a: '/panel/invitaciones', soloAdmin: true },
+  { k: 'totalUsuarios', label: 'En el equipo', a: '/panel/usuarios', soloAdmin: true },
 ];
 
+// cada digito en su "tubo": siempre al menos dos, como un contador fisico
+function Nixie({ valor }) {
+  const digitos = String(valor).padStart(2, '0').split('');
+  return (
+    <span className={estilos.nixie} aria-hidden="true">
+      {digitos.map((d, i) => (
+        <span key={i} className={estilos.tubo}>
+          {d}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function Dashboard() {
-  const { usuario } = useAuth();
+  const { usuario, puedeInvitar } = useAuth();
   const [metricas, setMetricas] = useState(null);
   const [consultas, setConsultas] = useState([]);
   const [error, setError] = useState(null);
@@ -34,140 +52,101 @@ export default function Dashboard() {
       .catch((err) => setError(mensajeDeError(err)));
   }, [intento]);
 
+  const pendientes = metricas?.consultasPendientes ?? 0;
+
   return (
     <>
-      <CabeceraPanel kicker={`Hola, ${usuario?.nombre || ''}`} titulo="DASHBOARD" />
+      <CabeceraPanel kicker={`Hola, ${usuario?.nombre || ''}`} titulo="Mostrador" />
       <CuerpoPanel>
         {error ? (
           <ErrorCarga mensaje={error} onReintentar={() => setIntento((i) => i + 1)} />
         ) : !metricas ? (
           <Cargando />
         ) : (
-          <>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-                gap: 14,
-                marginBottom: 18,
-              }}
-            >
-              {TARJETAS.map((t) => {
-                const valor = metricas[t.k] ?? 0;
-                const resaltar = t.destacar && valor > 0;
+          <div className={`${estilos.grilla} cascada`}>
+            <section className={estilos.urgente} aria-label="Consultas sin responder">
+              <Nixie valor={pendientes} />
+              <div className={estilos.urgenteTexto}>
+                <p className={estilos.urgenteTitulo}>
+                  {pendientes === 0
+                    ? 'No hay consultas sin responder'
+                    : pendientes === 1
+                      ? 'Consulta sin responder'
+                      : 'Consultas sin responder'}
+                </p>
+                <p className={estilos.urgenteBajada}>
+                  {pendientes === 0
+                    ? 'Está todo al día. Las nuevas llegan desde el formulario del sitio.'
+                    : 'Llegaron desde el formulario del sitio. Respondelas por mail o WhatsApp y marcalas como respondidas.'}
+                </p>
+              </div>
+              {pendientes > 0 && (
+                <Link to="/panel/consultas?estado=pendiente" className={`btn btn-primario ${estilos.urgenteBoton}`}>
+                  Responder
+                </Link>
+              )}
+            </section>
+
+            <nav className={estilos.accesos} aria-label="Accesos rápidos">
+              <Link to="/panel/productos/nuevo" className={estilos.acceso}>
+                <Plus size={22} weight="bold" aria-hidden="true" />
+                <span>Cargar un producto</span>
+                <CaretRight size={16} aria-hidden="true" className={estilos.accesoFlecha} />
+              </Link>
+              <Link to="/panel/consultas" className={estilos.acceso}>
+                <ChatCircleText size={22} weight="duotone" aria-hidden="true" />
+                <span>Ver todas las consultas</span>
+                <CaretRight size={16} aria-hidden="true" className={estilos.accesoFlecha} />
+              </Link>
+              <Link to="/panel/info" className={estilos.acceso}>
+                <Storefront size={22} weight="duotone" aria-hidden="true" />
+                <span>Horarios y datos del local</span>
+                <CaretRight size={16} aria-hidden="true" className={estilos.accesoFlecha} />
+              </Link>
+            </nav>
+
+            <dl className={estilos.cifras}>
+              {CIFRAS.filter((c) => !c.soloAdmin || puedeInvitar).map((c) => {
+                const valor = metricas[c.k] ?? 0;
                 return (
-                  <Link
-                    key={t.k}
-                    to={t.a}
-                    className="card"
-                    style={{
-                      padding: 20,
-                      color: 'inherit',
-                      borderColor: resaltar ? 'var(--naranja)' : 'var(--borde)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontFamily: 'var(--mono)',
-                        fontSize: 10,
-                        letterSpacing: '.18em',
-                        color: 'var(--tinta-dim)',
-                        marginBottom: 12,
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {t.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 32,
-                        fontWeight: 900,
-                        lineHeight: 1,
-                        color: resaltar ? 'var(--naranja)' : 'var(--tinta)',
-                      }}
-                    >
-                      {valor}
-                    </div>
+                  <Link key={c.k} to={c.a} className={estilos.cifra}>
+                    <dt>{c.label}</dt>
+                    <dd className={c.alerta && valor > 0 ? estilos.alerta : undefined}>{valor}</dd>
                   </Link>
                 );
               })}
-            </div>
+            </dl>
 
-            <div className="card">
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 12,
-                  marginBottom: 6,
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: 'var(--mono)',
-                    fontSize: 10,
-                    letterSpacing: '.2em',
-                    color: 'var(--tinta-dim)',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Últimas consultas
-                </div>
+            <section className={estilos.ultimas} aria-labelledby="ultimas-titulo">
+              <div className={estilos.ultimasCabecera}>
+                <h2 id="ultimas-titulo">Últimas consultas</h2>
                 <Link to="/panel/consultas" className="btn-enlace">
                   Ver todas
                 </Link>
               </div>
 
               {consultas.length === 0 ? (
-                <div style={{ color: 'var(--meta)', fontSize: 14, padding: '18px 0' }}>
-                  Todavía no llegó ninguna consulta.
-                </div>
+                <p className={estilos.sinConsultas}>Todavía no llegó ninguna consulta.</p>
               ) : (
-                consultas.map((c) => (
-                  <Link
-                    key={c.id}
-                    to="/panel/consultas"
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '12px 0',
-                      borderBottom: '1px solid #c2cacd',
-                      color: 'inherit',
-                    }}
-                  >
-                    <div style={{ minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 14,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {c.nombre}
-                      </div>
-                      <div
-                        style={{
-                          color: 'var(--tinta-dim)',
-                          fontSize: 12,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {c.producto ? c.producto.nombre : c.asunto} · {formatearFecha(c.fecha)}
-                      </div>
-                    </div>
-                    <span className={`badge badge-${c.estado}`}>{etiquetaConsulta(c.estado)}</span>
-                  </Link>
-                ))
+                <ul className={estilos.lista}>
+                  {consultas.map((c) => (
+                    <li key={c.id}>
+                      <Link to="/panel/consultas" className={estilos.consulta}>
+                        <span className={estilos.consultaTexto}>
+                          <span className={estilos.consultaNombre}>{c.nombre}</span>
+                          <span className={estilos.consultaAsunto}>
+                            {c.producto ? c.producto.nombre : c.asunto}
+                          </span>
+                        </span>
+                        <span className={estilos.consultaFecha}>{formatearFecha(c.fecha)}</span>
+                        <span className={`badge badge-${c.estado}`}>{etiquetaConsulta(c.estado)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               )}
-            </div>
-          </>
+            </section>
+          </div>
         )}
       </CuerpoPanel>
     </>

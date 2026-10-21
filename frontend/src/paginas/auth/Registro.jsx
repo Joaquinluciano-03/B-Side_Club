@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
+import InputPassword, { Entrada } from '../../componentes/InputPassword';
 import { useAuth } from '../../lib/auth';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -87,7 +88,8 @@ export default function Registro() {
         {campos.map((c) => (
           <div key={c.k} className={`campo ${errores[c.k] ? 'con-error' : ''}`}>
             <label htmlFor={`r-${c.k}`}>{c.label}</label>
-            <input
+            <Entrada
+              as={c.tipo === 'password' ? InputPassword : 'input'}
               id={`r-${c.k}`}
               type={c.tipo}
               value={form[c.k]}

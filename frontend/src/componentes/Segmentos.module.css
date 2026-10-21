@@ -1,0 +1,43 @@
+.segmentos {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--r-pildora);
+  background: var(--gris-medio);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.segmentos::-webkit-scrollbar {
+  display: none;
+}
+.opcion {
+  position: relative;
+  flex: none;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--r-pildora);
+  background: transparent;
+  color: var(--tinta-dim);
+  font-family: var(--cuerpo);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color var(--d-rapida) ease;
+}
+.opcion:hover {
+  color: var(--tinta);
+}
+.activa,
+.activa:hover {
+  color: var(--crema);
+}
+.fondo {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-pildora);
+  background: var(--tinta);
+}
+.texto {
+  position: relative;
+}

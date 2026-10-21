@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
+import InputPassword from '../../componentes/InputPassword';
 import { post } from '../../lib/api';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -84,9 +85,8 @@ export default function Resetear() {
 
         <div className={`campo ${errorCampo ? 'con-error' : ''}`}>
           <label htmlFor="rs-pass">Contraseña nueva</label>
-          <input
+          <InputPassword
             id="rs-pass"
-            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
@@ -96,9 +96,8 @@ export default function Resetear() {
 
         <div className={`campo ${errorCampo ? 'con-error' : ''}`}>
           <label htmlFor="rs-rep">Repetir contraseña</label>
-          <input
+          <InputPassword
             id="rs-rep"
-            type="password"
             value={repetir}
             onChange={(e) => setRepetir(e.target.value)}
             autoComplete="new-password"

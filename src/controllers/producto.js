@@ -29,7 +29,10 @@ async function obtener(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    const { nombre, anio, precio, stock, estado_stock, condicion, destacado, descripcion, categoriaId } = req.body;
+    const {
+      nombre, anio, precio, stock, estado_stock, condicion, destacado, descripcion, categoriaId,
+      descuento_tipo, descuento_valor,
+    } = req.body;
 
     if (!nombre || !anio || stock === undefined || !descripcion || !categoriaId) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
@@ -37,6 +40,7 @@ async function crear(req, res, next) {
 
     const producto = await productoService.crear({
       nombre, anio, precio, stock, estado_stock, condicion, destacado, descripcion, categoriaId,
+      descuento_tipo, descuento_valor,
     });
     res.status(201).json(producto);
   } catch (err) {

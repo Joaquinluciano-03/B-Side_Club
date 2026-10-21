@@ -50,6 +50,18 @@ async function actualizar(req, res, next) {
   }
 }
 
+async function subirImagen(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se recibió ninguna imagen' });
+    }
+    const promocion = await promocionService.subirImagenPromocion(req.params.id, req.file);
+    res.json(promocion);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function eliminar(req, res, next) {
   try {
     await promocionService.eliminar(req.params.id);
@@ -59,4 +71,4 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { listar, obtener, crear, actualizar, eliminar };
+module.exports = { listar, obtener, crear, actualizar, subirImagen, eliminar };

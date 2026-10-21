@@ -11,6 +11,8 @@ import { useToast } from '../../lib/toast';
 import { formatearDia, mensajeDeError } from '../../lib/formato';
 import { estadoVigencia } from '../../lib/promociones';
 
+const MAX_MB = 5; // mismo limite que el backend (config/multer.js)
+
 const VACIA = {
   titulo: '',
   descripcion: '',
@@ -39,6 +41,19 @@ export default function Promociones() {
   const [guardando, setGuardando] = useState(false);
   const [aBorrar, setABorrar] = useState(null);
   const [recargar, setRecargar] = useState(0);
+  const [archivo, setArchivo] = useState(null); // imagen elegida, se sube al guardar
+  const [previa, setPrevia] = useState(null);
+
+  // vista previa local del archivo elegido; se libera al cambiarlo
+  useEffect(() => {
+    if (!archivo) {
+      setPrevia(null);
+      return;
+    }
+    const url = URL.createObjectURL(archivo);
+    setPrevia(url);
+    return () => URL.revokeObjectURL(url);
+  }, [archivo]);
 
   useEffect(() => {
     setError(null);
@@ -51,11 +66,13 @@ export default function Promociones() {
   function abrirNueva() {
     setEditando('nueva');
     setForm(VACIA);
+    setArchivo(null);
     setErrores({});
   }
 
   function abrirEdicion(p) {
     setEditando(p.id);
+    setArchivo(null);
     setForm({
       titulo: p.titulo ?? '',
       descripcion: p.descripcion ?? '',
@@ -95,13 +112,27 @@ export default function Promociones() {
 
     setGuardando(true);
     try {
-      if (editando === 'nueva') {
-        await post('/promociones', cuerpo);
-        toast.exito('Promoción creada.');
-      } else {
-        await put(`/promociones/${editando}`, cuerpo);
-        toast.exito('Cambios guardados.');
+      const guardada =
+        editando === 'nueva'
+          ? await post('/promociones', cuerpo)
+          : await put(`/promociones/${editando}`, cuerpo);
+
+      // la imagen va en un segundo pedido (multipart) una vez que la promo
+      // ya existe y tiene id. Si falla, los datos quedaron guardados igual.
+      if (archivo) {
+        const fd = new FormData();
+        fd.append('imagen', archivo);
+        try {
+          await post(`/promociones/${guardada.id}/imagen`, fd);
+        } catch (err) {
+          toast.error(`Se guardó la promoción, pero no la imagen: ${mensajeDeError(err)}`);
+          setEditando(null);
+          setRecargar((r) => r + 1);
+          return;
+        }
       }
+
+      toast.exito(editando === 'nueva' ? 'Promoción creada.' : 'Cambios guardados.');
       setEditando(null);
       setRecargar((r) => r + 1);
     } catch (err) {
@@ -109,6 +140,21 @@ export default function Promociones() {
     } finally {
       setGuardando(false);
     }
+  }
+
+  function elegirImagen(file) {
+    setErrores((e) => ({ ...e, imagen: null }));
+    if (!file) return;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setErrores((e) => ({ ...e, imagen: `La imagen supera los ${MAX_MB} MB.` }));
+      return;
+    }
+    setArchivo(file);
+  }
+
+  function quitarImagen() {
+    setArchivo(null);
+    campo('imagenUrl', '');
   }
 
   async function alternarActiva(p) {
@@ -177,17 +223,40 @@ export default function Promociones() {
                 />
               </div>
 
-              <div className="campo">
-                <label htmlFor="pr-img">URL de la imagen</label>
+              <div className={`campo ${errores.imagen ? 'con-error' : ''}`}>
+                <label htmlFor="pr-img">Imagen</label>
+                {(previa || form.imagenUrl) && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                    <img
+                      src={previa || form.imagenUrl}
+                      alt="Vista previa de la imagen de la promoción"
+                      style={{
+                        width: 120,
+                        height: 68,
+                        objectFit: 'cover',
+                        borderRadius: 'var(--r-control)',
+                        border: '1px solid var(--borde)',
+                      }}
+                    />
+                    <button type="button" className="btn btn-peligro btn-chico" onClick={quitarImagen}>
+                      Quitar imagen
+                    </button>
+                  </div>
+                )}
                 <input
                   id="pr-img"
-                  value={form.imagenUrl}
-                  onChange={(e) => campo('imagenUrl', e.target.value)}
-                  placeholder="https://…"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => elegirImagen(e.target.files?.[0])}
                 />
-                <div className="campo-ayuda">
-                  Opcional. Si no ponés ninguna, la banda usa el fondo con la trama del sitio.
-                </div>
+                {errores.imagen ? (
+                  <div className="campo-error">{errores.imagen}</div>
+                ) : (
+                  <div className="campo-ayuda">
+                    Opcional, hasta {MAX_MB} MB. Si no subís ninguna, la banda usa el fondo con la
+                    trama del sitio.
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

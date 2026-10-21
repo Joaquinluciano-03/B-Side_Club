@@ -111,5 +111,11 @@ export function query(params) {
 // ejemplo) y asi no revientan.
 export function urlImagen(url) {
   if (!url) return null;
+  // las imagenes de relleno del seed viejo (placehold.co) no son fotos: se
+  // tratan como "sin imagen" y el sitio dibuja la tapa generica del formato
+  if (url.includes('placehold.co')) return null;
+  // rutas relativas a /uploads son de cuando las fotos se guardaban en el
+  // disco del server; el backend ya no sirve esa carpeta (ver src/app.js)
+  if (url.startsWith('/uploads')) return null;
   return url;
 }

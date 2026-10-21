@@ -1,6 +1,7 @@
 // logica de negocio de promociones/novedades
 
 const { prisma } = require('../config/db');
+const { subirImagen, borrarImagen } = require('../config/storage');
 
 // Mismo criterio que productos: el visitante solo ve las promociones activas.
 // El panel (con token) puede pedir todas, o filtrar con soloActivas.
@@ -66,9 +67,28 @@ async function actualizar(id, data) {
   });
 }
 
-async function eliminar(id) {
-  await obtenerPorId(id);
-  await prisma.promocion.delete({ where: { id: Number(id) } });
+// Sube la imagen a Supabase Storage (mismo bucket que los productos) y la deja
+// como imagenUrl de la promocion. Si ya tenia una nuestra, se borra despues:
+// primero la nueva, asi si la subida falla la promo no queda sin imagen.
+async function subirImagenPromocion(id, file) {
+  const promocion = await obtenerPorId(id);
+  const url = await subirImagen(file);
+
+  const actualizada = await prisma.promocion.update({
+    where: { id: Number(id) },
+    data: { imagenUrl: url },
+  });
+
+  // borrarImagen ignora las URLs que no son de nuestro storage (una pegada a mano)
+  await borrarImagen(promocion.imagenUrl);
+  return actualizada;
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+async function eliminar(id) {
+  const promocion = await obtenerPorId(id);
+  await prisma.promocion.delete({ where: { id: Number(id) } });
+  // la fila primero, igual que con las imagenes de productos
+  await borrarImagen(promocion.imagenUrl);
+}
+
+module.exports = { listar, obtenerPorId, crear, actualizar, subirImagenPromocion, eliminar };

@@ -8,7 +8,8 @@ const multer = require('multer');
 const ERRORES_MULTER = {
   LIMIT_FILE_SIZE: 'La imagen supera el maximo de 5 MB',
   LIMIT_FILE_COUNT: 'Se pueden subir hasta 5 imagenes por vez',
-  LIMIT_UNEXPECTED_FILE: 'El campo del archivo tiene que llamarse "imagenes"',
+  LIMIT_UNEXPECTED_FILE:
+    'Campo de archivo inesperado: "imagenes" para productos, "imagen" para promociones',
 };
 
 function errorHandler(err, req, res, next) {

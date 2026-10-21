@@ -1,0 +1,76 @@
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+}
+
+.numeros {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--e-1);
+}
+
+.numero,
+.flecha {
+  height: 44px;
+  border-radius: var(--r-pildora);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--tinta);
+  font-weight: 700;
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color var(--d-rapida) ease,
+    border-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.numero {
+  min-width: 44px;
+}
+.numero:hover {
+  border-color: var(--borde-boton);
+}
+.actual,
+.actual:hover {
+  background: var(--tinta);
+  border-color: var(--tinta);
+  color: var(--crema);
+}
+
+.flecha {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: 0 var(--e-4);
+  border-color: var(--borde-boton);
+}
+.flecha:hover:not(:disabled) {
+  border-color: var(--tinta);
+}
+.flecha:disabled {
+  color: var(--apagado);
+  border-color: var(--borde);
+  cursor: not-allowed;
+}
+
+.numero:active,
+.flecha:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@media (max-width: 520px) {
+  .flecha span {
+    display: none;
+  }
+  .flecha {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+}

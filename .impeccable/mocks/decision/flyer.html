@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>C · El flyer de la pared</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bungee&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--humo:#d5dadd;--tinta:#191c1d;--carbon:#100f0e;--naranja:#f26a1b;--teal:#0e8fa6;--magenta:#c41e75}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;height:900px;overflow:hidden;font-family:Archivo,sans-serif;color:var(--tinta);position:relative;
+    background:radial-gradient(rgba(25,28,29,.09) 1.1px,transparent 1.5px) 0 0/9px 9px,#cfd5d8}
+  header{position:absolute;top:0;left:0;right:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:var(--carbon);color:#f2ece4}
+  .marca{font-family:Bungee;font-size:24px}.marca .c{color:var(--naranja)}
+  nav{display:flex;gap:26px;font-weight:700;font-size:14px}
+  /* el flyer fotocopiado, pegado con cinta */
+  .flyer{position:absolute;left:96px;top:118px;width:760px;height:740px;background:#f4f4f1;transform:rotate(-1.6deg);
+    box-shadow:0 18px 40px rgba(16,15,14,.22);padding:44px 48px;
+    background-image:radial-gradient(rgba(0,0,0,.14) .8px,transparent 1.2px);background-size:4px 4px}
+  .cinta{position:absolute;width:150px;height:38px;background:rgba(242,236,228,.75);border:1px solid rgba(0,0,0,.06)}
+  .flyer h1{font-family:Bungee;font-size:104px;line-height:.86;letter-spacing:-.01em}
+  .flyer h1 .n{color:var(--naranja)}
+  .flyer .linea{font-family:'Space Mono';font-size:15px;letter-spacing:.14em;margin:22px 0 18px;text-transform:uppercase}
+  .flyer .buscar{display:flex;height:58px;border:2.5px solid var(--tinta);background:#fff;align-items:center;padding:0 8px 0 20px;width:560px}
+  .flyer .buscar span{flex:1;font-size:17px;color:#6f797c}
+  .flyer .buscar b{background:var(--tinta);color:#fff;padding:12px 20px;font-size:14px;letter-spacing:.06em}
+  .tiras{position:absolute;left:0;right:0;bottom:0;height:150px;display:flex;border-top:2px dashed #555}
+  .tiras div{flex:1;border-right:2px dashed #555;writing-mode:vertical-rl;transform:rotate(180deg);font-family:'Space Mono';font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:.06em}
+  .tiras div:nth-child(3){transform:rotate(180deg) translateY(-10px) rotate(4deg);background:#f4f4f1}
+  .polas{position:absolute;right:70px;top:120px;width:470px;height:740px}
+  .pola{position:absolute;width:210px;background:#fff;padding:12px 12px 16px;box-shadow:0 12px 26px rgba(16,15,14,.2)}
+  .pola .img{height:186px;background:var(--carbon);display:flex;align-items:center;justify-content:center}
+  .pola .d{width:76%;height:76%;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 2px,rgba(255,255,255,.07) 2px 3px),radial-gradient(circle,var(--c) 0 20%,#0c0b0a 21%)}
+  .pola .t{font-weight:800;font-size:16px;margin-top:10px}
+  .pola .p{font-family:'Space Mono';font-size:14px}
+  .sticker{position:absolute;right:-14px;top:-14px;width:74px;height:74px;border-radius:50%;background:var(--naranja);display:flex;align-items:center;justify-content:center;font-family:Bungee;font-size:15px;transform:rotate(12deg)}
+</style></head><body>
+<header><div class="marca">B-SIDE <span class="c">CLUB</span></div><nav><span>Catálogo</span><span>El local</span><span>Contacto</span></nav></header>
+<div class="flyer">
+  <div class="cinta" style="left:-30px;top:-14px;transform:rotate(-30deg)"></div>
+  <div class="cinta" style="right:-30px;top:-10px;transform:rotate(28deg)"></div>
+  <h1>DISCOS<br>USADOS<br><span class="n">ESCUCHADOS</span><br>ENTEROS.</h1>
+  <div class="linea">Vinilos · cassettes · CDs · equipos. Chacarita, desde 1998</div>
+  <div class="buscar"><span>¿Qué andás buscando?</span><b>BUSCAR</b></div>
+  <div class="tiras"><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div><div>WhatsApp 11 5555-0142</div></div>
+</div>
+<div class="polas">
+  <div class="pola" style="left:10px;top:0;transform:rotate(4deg)"><div class="img"><div class="d" style="--c:#9a6100"></div></div><div class="t">Vida · Vox Dei</div><div class="p">$ 155.000</div><div class="sticker">ÚLT.</div></div>
+  <div class="pola" style="left:240px;top:120px;transform:rotate(-5deg)"><div class="img"><div class="d" style="--c:#c41e75"></div></div><div class="t">Signos · Soda Stereo</div><div class="p">$ 120.000</div></div>
+  <div class="pola" style="left:40px;top:330px;transform:rotate(-2deg)"><div class="img"><div class="d" style="--c:#5b45b8"></div></div><div class="t">Purple Rain · Prince</div><div class="p">$ 135.000</div></div>
+  <div class="pola" style="left:250px;top:440px;transform:rotate(6deg)"><div class="img"><div class="d" style="--c:#0e8fa6"></div></div><div class="t">Technics SL-1200</div><div class="p">A consultar</div></div>
+</div>
+</body></html>

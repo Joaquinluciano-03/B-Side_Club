@@ -1,64 +1,54 @@
-// Card del catalogo. La forma sale de "CARD DE PRODUCTO" en la demo:
-// arte cuadrado arriba, badge de stock, titulo, meta y precio.
+// Card del catalogo: la tapa como una funda con el disco adentro. Quieta, el
+// disco asoma un poco por el costado; al pasar el mouse (o con foco) se
+// desliza afuera, como cuando sacas un disco de la batea para mirarlo.
+// Abajo, sin caja: estado (solo si no es "disponible"), titulo, artista,
+// formato y año, y el precio (con el descuento, si tiene).
 
 import { Link } from 'react-router-dom';
-import ArteProducto from './ArteProducto';
-import { formatearPrecio, etiquetaStock, esAConsultar } from '../lib/formato';
+import ArteProducto, { ObjetoInterior } from './ArteProducto';
+import Precio from './Precio';
+import { etiquetaStock, esAConsultar, separarNombre } from '../lib/formato';
+import estilos from './CardProducto.module.css';
 
-export default function CardProducto({ producto }) {
+export default function CardProducto({ producto, prioridad = false }) {
   const { id, nombre, anio, precio, estado_stock, categoria, esActivo } = producto;
+  const { titulo, artista } = separarNombre(nombre);
+  const consultar = esAConsultar(precio);
+  // "a consultar" con precio null ya lo dice el precio: no repetirlo en un badge
+  const mostrarEstado = estado_stock !== 'disponible' && !(estado_stock === 'a_consultar' && consultar);
 
   return (
     <Link
       to={`/producto/${id}`}
-      className="card-producto"
-      style={{
-        background: 'var(--superficie)',
-        border: '1px solid var(--borde)',
-        borderRadius: 'var(--r-card)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        color: 'inherit',
-        transition: 'border-color .15s, transform .15s',
-        // un producto inactivo solo lo ve el staff: lo marcamos para que se
-        // note de un vistazo que el publico no lo esta viendo
-        opacity: esActivo === false ? 0.55 : 1,
-      }}
+      className={`${estilos.card} ${estado_stock === 'vendido' ? estilos.vendido : ''}`}
     >
-      <ArteProducto producto={producto} categoria={categoria?.nombre} />
+      <div className={estilos.arte}>
+        <ObjetoInterior producto={producto} />
+        <div className={estilos.funda}>
+          <ArteProducto producto={producto} prioridad={prioridad} />
+        </div>
+      </div>
 
-      <div
-        style={{
-          padding: '14px 15px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 7,
-          flex: 1,
-        }}
-      >
-        <span className={`badge badge-${estado_stock}`}>{etiquetaStock(estado_stock)}</span>
+      <div className={estilos.texto}>
+        {(mostrarEstado || esActivo === false) && (
+          <div className={estilos.estados}>
+            {/* inactivo: solo lo ve el staff con sesion iniciada */}
+            {esActivo === false && <span className="badge badge-neutro">Oculto al público</span>}
+            {mostrarEstado && (
+              <span className={`badge badge-${estado_stock}`}>{etiquetaStock(estado_stock)}</span>
+            )}
+          </div>
+        )}
 
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.25 }}>{nombre}</div>
-
-        <div style={{ color: 'var(--meta)', fontSize: 13 }}>
+        <h3 className={estilos.titulo}>{titulo}</h3>
+        {artista && <p className={estilos.artista}>{artista}</p>}
+        <p className={estilos.meta}>
           {categoria?.nombre}
           {anio ? ` · ${anio}` : ''}
-        </div>
-
-        <div
-          style={{
-            marginTop: 'auto',
-            paddingTop: 4,
-            fontWeight: 800,
-            fontSize: 16,
-            color: esAConsultar(precio) ? 'var(--teal)' : 'var(--tinta)',
-            fontFamily: esAConsultar(precio) ? 'var(--mono)' : 'var(--cuerpo)',
-            letterSpacing: esAConsultar(precio) ? '.08em' : 'normal',
-          }}
-        >
-          {esAConsultar(precio) ? 'A CONSULTAR' : formatearPrecio(precio)}
-        </div>
+        </p>
+        <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
+          {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}
+        </p>
       </div>
     </Link>
   );

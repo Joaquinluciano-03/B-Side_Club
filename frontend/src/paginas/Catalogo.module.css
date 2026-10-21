@@ -1,0 +1,259 @@
+.pagina {
+  flex: 1;
+  width: 100%;
+  padding-bottom: var(--seccion);
+}
+
+/* ============ CABECERA ============ */
+.cabecera {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: var(--e-8) var(--gutter) var(--e-6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-6);
+  flex-wrap: wrap;
+}
+.titulo {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-2xl);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.bajada {
+  margin: 0;
+  max-width: 40ch;
+  color: var(--tinta-dim);
+  font-size: var(--t-md);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ============ BARRA (pegada arriba) ============ */
+.barra {
+  position: sticky;
+  top: var(--alto-header); /* debajo del header */
+  z-index: calc(var(--z-sticky) - 1);
+  background: color-mix(in srgb, var(--humo) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 2px solid var(--tinta);
+}
+.barraInterior {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: var(--e-4) var(--gutter) 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-5);
+}
+
+.buscador {
+  flex: 0 1 380px;
+  align-self: center;
+  margin-bottom: var(--e-4);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: 0 var(--e-2) 0 var(--e-4);
+  background: #fff;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  color: var(--tinta-tenue);
+  cursor: text;
+  transition:
+    border-color var(--d-rapida) ease,
+    box-shadow var(--d-rapida) ease;
+}
+.buscador:focus-within {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+/* el anillo lo dibuja la pildora; el input no agrega el suyo (quedaba un
+   rectangulo adentro de la pildora) */
+.buscador input:focus,
+.buscador input:focus-visible {
+  outline: none !important;
+}
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--tinta);
+  font-size: 16px;
+}
+.buscador input::-webkit-search-cancel-button {
+  display: none;
+}
+.borrar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  background: var(--gris-medio);
+  color: var(--tinta);
+  cursor: pointer;
+}
+
+/* los separadores de batea: pestañas que asoman sobre la linea del cajon */
+.separadores {
+  display: flex;
+  gap: var(--e-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  margin-bottom: -2px; /* se apoyan sobre el borde de la barra */
+}
+.separadores::-webkit-scrollbar {
+  display: none;
+}
+
+.separador {
+  position: relative;
+  flex: none;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--e-2);
+  padding: 12px 18px 11px;
+  border: 2px solid var(--tinta);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: var(--superficie);
+  color: var(--tinta);
+  font-weight: 800;
+  font-stretch: 105%;
+  font-size: var(--t-sm);
+  cursor: pointer;
+  transition: transform var(--d-rapida) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .separador:hover:not(.separadorActivo) {
+    transform: translateY(-3px);
+  }
+}
+.separador:focus-visible {
+  outline-offset: -5px;
+}
+/* rellena el separador por dentro de su borde (inset 0 = caja de padding) */
+.pestana {
+  position: absolute;
+  inset: 0;
+  background: var(--naranja);
+  z-index: 0;
+}
+.separadorNombre,
+.separadorCantidad {
+  position: relative;
+  z-index: 1;
+}
+.separadorCantidad {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--tinta-tenue);
+  font-variant-numeric: tabular-nums;
+}
+.separadorActivo {
+  color: var(--tinta-sobre-naranja);
+}
+.separadorActivo .separadorCantidad {
+  color: var(--tinta-sobre-naranja);
+}
+
+/* ============ RESULTADOS ============ */
+.resultados {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: var(--e-6) var(--gutter) 0;
+}
+
+.resumen {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--e-6);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--tinta-tenue);
+}
+
+/* las cards entran escalonadas (40ms entre una y otra) */
+.entra {
+  animation: entrar 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.paginas {
+  margin-top: var(--e-8);
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 760px) {
+  .cabecera {
+    padding-top: var(--e-7);
+    padding-bottom: var(--e-5);
+  }
+  .barraInterior {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--e-3);
+    padding-top: var(--e-3);
+  }
+  .buscador {
+    flex: none;
+    align-self: stretch;
+    margin-bottom: 0;
+  }
+  /* los separadores llegan hasta el borde de la pantalla al deslizar */
+  .separadores {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+}
+
+/* entrada: la barra de busqueda y los separadores llegan despues del titulo;
+   los separadores suben uno tras otro como pestañas que asoman del cajon */
+@keyframes barra-entra {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes separador-asoma {
+  from {
+    translate: 0 100%;
+  }
+}
+.barra {
+  animation: barra-entra 500ms ease 150ms backwards;
+}
+.separadores > * {
+  animation: separador-asoma 520ms var(--ease-out) backwards;
+}
+.separadores > :nth-child(1) { animation-delay: 260ms; }
+.separadores > :nth-child(2) { animation-delay: 320ms; }
+.separadores > :nth-child(3) { animation-delay: 380ms; }
+.separadores > :nth-child(4) { animation-delay: 440ms; }
+.separadores > :nth-child(n + 5) { animation-delay: 500ms; }
