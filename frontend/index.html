@@ -32,11 +32,11 @@
 
     <!-- carga mas rapida: el sitio es una SPA, asi que sin esto el navegador
          recien descubre estos archivos cuando termina de bajar y correr el JS.
-         - Supabase: ahi estan las fotos; se abre la conexion de antemano
-         - el dibujo del disco: es lo mas grande de la primera pantalla, pero
-           solo lo tienen la home y el login; en las otras paginas precargarlo
-           seria bajarlo de mas (y el navegador avisa que no se uso) -->
-    <link rel="preconnect" href="https://fsjrwohystupyccnhqub.supabase.co" />
+         El dibujo del disco es lo mas grande de la primera pantalla, pero
+         solo lo tienen la home y el login; en las otras paginas precargarlo
+         seria bajarlo de mas (y el navegador avisa que no se uso).
+         La direccion de Supabase no se escribe aca: SUPABASE_URL esta marcada
+         como secreta en Netlify y el build falla si aparece en el codigo. -->
     <script>
       if (location.pathname === '/' || location.pathname === '/login') {
         for (const archivo of ['/surcos.svg', '/imperfecciones.svg']) {
