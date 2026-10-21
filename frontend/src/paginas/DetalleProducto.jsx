@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CaretRight, WhatsappLogo, EnvelopeSimple, Headphones, PencilSimple, Wrench } from '@phosphor-icons/react';
+import { CaretRight, WhatsappLogo, EnvelopeSimple, SealCheck, PencilSimple, Wrench } from '@phosphor-icons/react';
 import { get, query, urlImagen } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useStoreInfo } from '../lib/useStoreInfo';
@@ -263,12 +263,12 @@ export default function DetalleProducto() {
             {formato === 'equipo' ? (
               <Wrench size={20} weight="duotone" aria-hidden="true" />
             ) : (
-              <Headphones size={20} weight="duotone" aria-hidden="true" />
+              <SealCheck size={20} weight="duotone" aria-hidden="true" />
             )}
             <span>
               {formato === 'equipo'
                 ? 'Revisado por nuestro técnico antes de publicarlo.'
-                : 'Lo escuchamos entero antes de publicarlo.'}{' '}
+                : 'Lo revisamos antes de publicarlo: tiene garantía de calidad.'}{' '}
               Si te interesa, te lo guardamos 48 hs.
             </span>
           </p>

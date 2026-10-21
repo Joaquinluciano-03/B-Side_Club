@@ -168,7 +168,7 @@ export default function InfoLocal() {
                   id="si-desc"
                   value={form.description}
                   onChange={(e) => campo('description', e.target.value)}
-                  placeholder="Disquería en Chacarita. Escuchamos todo antes de vender."
+                  placeholder="Disquería en Chacarita. Discos nuevos o usados con garantía de calidad."
                   style={{ minHeight: 90 }}
                 />
                 <div className="campo-ayuda">Se muestra en el pie del sitio y en Nosotros.</div>

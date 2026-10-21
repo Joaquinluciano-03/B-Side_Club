@@ -123,7 +123,7 @@ export default function Categorias() {
                   id="cat-desc"
                   value={form.descripcion}
                   onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
-                  placeholder='LPs de 12", usados y escuchados enteros'
+                  placeholder='LPs de 12", nuevos o usados con garantía de calidad'
                 />
               </div>
               <div style={{ display: 'flex', gap: 10 }}>

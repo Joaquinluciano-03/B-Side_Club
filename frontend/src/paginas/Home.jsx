@@ -21,8 +21,8 @@ const COLORES_FORMATO = ['#F26A1B', '#0E8FA6', '#C41E75', '#9A6100', '#5B45B8'];
 
 const PROMESAS = [
   {
-    titulo: 'Escuchado entero',
-    texto: 'Cada disco pasa por la bandeja antes de entrar al catálogo. Si suena mal, lo decimos en la ficha.',
+    titulo: 'Garantía de calidad',
+    texto: 'Cada disco, nuevo o usado, se revisa antes de entrar al catálogo. Si tiene algún detalle, lo decimos en la ficha.',
   },
   {
     titulo: 'Estado real, sin vueltas',
@@ -30,7 +30,7 @@ const PROMESAS = [
   },
   {
     titulo: 'Reservas por mensaje',
-    texto: 'Te lo guardamos 48 hs. Escribinos por WhatsApp o Instagram y pasá a escucharlo.',
+    texto: 'Te lo guardamos 48 hs. Escribinos por WhatsApp o Instagram y pasá a buscarlo.',
   },
 ];
 
@@ -51,7 +51,7 @@ function Elegidos() {
     <section className={estilos.elegidos} aria-labelledby="elegidos-titulo">
       <div className={estilos.cabecera}>
         <h2 id="elegidos-titulo" className={estilos.h2}>
-          Elegidos del cajón
+          Destacados y ofertas
         </h2>
         <Link to="/catalogo" className={estilos.verTodo}>
           {total !== null ? `Ver los ${total} títulos` : 'Ver el catálogo'}
@@ -108,7 +108,7 @@ function LadoB() {
     <section className={estilos.ladoB} aria-labelledby="ladob-titulo" data-oscuro>
       <div className={estilos.ladoBInterior}>
         <h2 id="ladob-titulo" className={estilos.ladoBTitulo}>
-          Escuchado,
+          Probado,
           <br />
           no listado.
         </h2>

@@ -499,7 +499,7 @@ export default function FormProducto() {
                 checked={form.destacado}
                 onChange={(v) => campo('destacado', v)}
                 titulo="Destacado en la home"
-                ayuda="Aparece en “Elegidos del cajón”."
+                ayuda="Aparece en “Destacados y ofertas”."
               />
             </fieldset>
 

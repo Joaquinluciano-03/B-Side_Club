@@ -25,7 +25,7 @@ export default function Footer() {
             B-SIDE <span>CLUB</span>
           </Link>
           <p className={estilos.descripcion}>
-            {info?.description || 'Discos usados, escuchados y honestos. Chacarita, Buenos Aires.'}
+            {info?.description || 'Discos nuevos o usados con garantía de calidad. Chacarita, Buenos Aires.'}
           </p>
           {hoy && (
             <p className={estilos.hoy}>
