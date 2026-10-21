@@ -27,6 +27,15 @@
     'titulo bajada';
   gap: var(--e-3) var(--e-8);
   align-items: end;
+  position: relative;
+}
+/* el cassette arriba a la derecha, sobre la bajada. Va fuera de la grilla
+   para no empujar el titulo hacia abajo (la cabecera queda del mismo alto) */
+.cassette {
+  position: absolute;
+  top: var(--e-7);
+  right: var(--gutter);
+  width: clamp(220px, 21vw, 300px);
 }
 .lado {
   grid-area: lado;
@@ -171,8 +180,17 @@
 @media (max-width: 860px) {
   .cabecera {
     grid-template-columns: 1fr;
-    grid-template-areas: 'lado' 'titulo' 'bajada';
+    grid-template-areas: 'cassette' 'lado' 'titulo' 'bajada';
+    position: static;
     padding-top: var(--e-8);
+  }
+  /* en pantallas angostas va en la grilla, arriba de todo y a la derecha */
+  .cassette {
+    position: static;
+    grid-area: cassette;
+    justify-self: end;
+    width: min(240px, 62vw);
+    margin-bottom: var(--e-4);
   }
   .tema {
     grid-template-columns: 1fr;
