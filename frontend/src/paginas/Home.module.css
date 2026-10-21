@@ -153,10 +153,16 @@
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
-  font-size: clamp(2.5rem, 1.1rem + 4.6vw, 6rem);
-  line-height: 0.92;
+  /* el tamaño deja "se encuentra." en una sola linea y balance reparte la
+     primera frase en dos: quedan tres renglones parejos */
+  font-size: clamp(2.2rem, 0.9rem + 3.4vw, 4rem);
+  line-height: 0.95;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--crema);
+}
+.ladoBAcento {
+  color: var(--naranja);
 }
 .promesas {
   margin: 0;

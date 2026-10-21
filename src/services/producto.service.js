@@ -60,10 +60,12 @@ async function validarCategoria(categoriaId) {
   }
 }
 
-async function listar({ categoriaId, destacado, q, esActivo, page, pageSize } = {}, { esAdmin = false } = {}) {
+async function listar({ categoriaId, destacado, conDescuento, q, esActivo, page, pageSize } = {}, { esAdmin = false } = {}) {
   const where = {};
   if (categoriaId) where.categoriaId = Number(categoriaId);
   if (destacado !== undefined) where.destacado = destacado === 'true';
+  // conDescuento=true: solo los que tienen un descuento cargado (las ofertas)
+  if (conDescuento === 'true') where.descuento_tipo = { not: null };
   if (q) {
     where.OR = [
       { nombre: { contains: q, mode: 'insensitive' } },
