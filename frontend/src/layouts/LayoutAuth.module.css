@@ -49,13 +49,23 @@
   translate: -50% -50%;
   z-index: -1;
   border-radius: 50%;
+  /* sombra centrada: el disco gira y una sombra corrida daria vueltas con el */
+  box-shadow: 0 0 120px rgba(0, 0, 0, 0.75);
+}
+/* el dibujo del disco va en ::before y es lo unico que gira. El .vinilo solo
+   hace la entrada (escala y opacidad): una animacion por elemento, asi las
+   dos corren en la GPU (juntas en el mismo elemento Chrome no puede) */
+.vinilo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   background:
     url('/imperfecciones.svg') center / 100% 100% no-repeat,
     radial-gradient(circle closest-side, transparent 43.3%, #121110 43.5% 49.4%, rgba(255, 255, 255, 0.14) 49.6%, transparent 50.2%),
     url('/surcos.svg') center / 100% 100% no-repeat,
     radial-gradient(circle closest-side, #161412 0 93%, #23201d 96.5%, #3a3531 98.6%, #0a0909 99.6%, transparent 100%);
-  /* sombra centrada: el disco gira y una sombra corrida daria vueltas con el */
-  box-shadow: 0 0 120px rgba(0, 0, 0, 0.75);
+  animation: auth-gira 30s linear infinite;
   will-change: rotate;
 }
 .logo {
@@ -182,9 +192,7 @@
   }
 }
 .vinilo {
-  animation:
-    auth-gira 30s linear infinite,
-    auth-disco-baja 1s var(--ease-out) backwards;
+  animation: auth-disco-baja 1s var(--ease-out) backwards;
 }
 .label {
   animation: auth-label-entra 900ms var(--ease-out) 200ms backwards;

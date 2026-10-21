@@ -70,7 +70,24 @@
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.75);
 }
 
-.vinilo {
+/* El giro del disco son tres rotaciones que se suman: la constante, el
+   arranque al cargar y la que agrega el scroll. Van en tres capas anidadas,
+   una animacion por capa, porque asi cada una corre en la GPU. Antes iban
+   las tres en el mismo elemento combinadas con animation-composition: add, y
+   Chrome no puede llevar eso a la GPU: el disco giraba desde el hilo
+   principal y se trababa cuando la pagina estaba ocupada.
+     .vinilo         -> posicion, tamaño y "disco-baja" (al cargar)
+     .viniloScroll   -> lo que suma el scroll
+     .viniloArranque -> el arranque desde quieto
+     .viniloGiro     -> el giro constante, y lleva el dibujo del disco */
+.viniloScroll,
+.viniloArranque,
+.viniloGiro {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.viniloGiro {
   background:
     /* polvo, rayones, una huella y zonas gastadas (public/imperfecciones.svg).
        Es lo unico que no es circular: es lo que hace visible el giro */
@@ -102,30 +119,39 @@
       transparent 100%
     );
   /* gira siempre, despacio (33⅓ RPM real seria una vuelta cada 1,8 s y el
-     polvo se volveria un borron). Con el scroll suma vueltas: bajar la pagina
-     "acelera" el disco. animation-composition: add suma las dos rotaciones */
-  /* al cargar: el disco baja sobre el plato (aparece un poco mas grande) y
-     arranca desde quieto, como una bandeja al darle play. El arranque resta
-     al giro base una curva cuadratica: velocidad 0 al principio y la normal
-     a los 1.8s (15 grados/s * 1.8s / 2 = 13.5 grados). */
-  animation:
-    girar 24s linear infinite,
-    arranque 1.8s cubic-bezier(0.3333, 0.6667, 0.6667, 1) backwards,
-    disco-baja 1s var(--ease-out) backwards;
-  animation-composition: replace, add, replace;
+     polvo se volveria un borron) */
+  animation: girar 24s linear infinite;
+}
+/* al cargar: el disco baja sobre el plato (aparece un poco mas grande) */
+.vinilo {
+  animation: disco-baja 1s var(--ease-out) backwards;
+}
+/* y arranca desde quieto, como una bandeja al darle play: el arranque le
+   resta al giro una curva cuadratica (velocidad 0 al principio y la normal a
+   los 1.8s: 15 grados/s * 1.8s / 2 = 13.5 grados). "both" deja la resta
+   puesta al terminar, asi no hay salto cuando se apaga */
+.viniloArranque {
+  animation: arranque 1.8s cubic-bezier(0.3333, 0.6667, 0.6667, 1) both;
+}
+/* con el scroll suma vueltas: bajar la pagina "acelera" el disco */
+@supports (animation-timeline: scroll()) {
+  .viniloScroll {
+    animation: girar-scroll linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+}
+/* la capa con el dibujo es grande y solo rota: se prepara como capa propia
+   para que la GPU la dibuje una vez y despues solo la gire */
+.viniloGiro {
   will-change: rotate;
 }
-@supports (animation-timeline: scroll()) {
-  .vinilo {
-    animation:
-      girar 24s linear infinite,
-      girar-scroll linear both,
-      arranque 1.8s cubic-bezier(0.3333, 0.6667, 0.6667, 1) backwards,
-      disco-baja 1s var(--ease-out) backwards;
-    animation-timeline: auto, scroll(root), auto, auto;
-    animation-range: normal, 0 100vh, normal, normal;
-    animation-composition: replace, add, add, replace;
-  }
+/* fuera de pantalla se pausa todo lo que anima en el hero (data-quieto lo
+   pone usePausarFueraDePantalla en HeroLabel.jsx); las entradas ya terminaron
+   para entonces, asi que solo afecta a los loops */
+.hero[data-quieto] *,
+.hero[data-quieto] *::after {
+  animation-play-state: paused !important;
 }
 @keyframes girar {
   to {
@@ -277,12 +303,22 @@
     inset 0 0.25cqw 0 0.3cqw rgba(255, 255, 255, 0.04),
     0 1cqw 2.2cqw rgba(20, 18, 16, 0.45);
 }
-/* la luz que se derrama sobre el naranja: respira como un neon real */
-.placa::after {
-  content: '';
+/* la luz que se derrama sobre el naranja: se prende con el cartel y despues
+   respira como un neon real. Son dos animaciones de opacidad, asi que van en
+   dos elementos (.luz se prende, su ::after respira): en el mismo elemento
+   Chrome no las puede correr en la GPU. El degradado ya es suave de por si:
+   no lleva filter: blur (se comparo y se ve igual, y el blur es caro) */
+.luz {
   position: absolute;
   inset: -40% -14%;
   z-index: -1;
+  pointer-events: none;
+  animation: luz-enciende 1.6s steps(1) 900ms backwards;
+}
+.luz::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
   background: radial-gradient(
     ellipse at 50% 50%,
@@ -290,10 +326,7 @@
     rgba(53, 208, 232, 0.32) 45%,
     transparent 70%
   );
-  filter: blur(2.4cqw);
-  animation:
-    luz-enciende 1.6s steps(1) 900ms backwards,
-    respira 3.8s ease-in-out 2.6s infinite alternate;
+  animation: respira 3.8s ease-in-out 2.6s infinite alternate;
 }
 @keyframes luz-enciende {
   0% {

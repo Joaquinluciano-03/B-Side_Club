@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, MotionConfig } from 'motion/react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useConteos } from '../lib/useConteos';
@@ -164,23 +164,27 @@ export default function Catalogo() {
             )}
           </label>
 
-          <div className={estilos.separadores} role="tablist" aria-label="Formato">
-            <Separador
-              activo={!categoriaId}
-              onClick={() => cambiarCategoria('')}
-              nombre="Todo"
-              cantidad={total}
-            />
-            {categorias.map((c) => (
+          {/* reducedMotion="never": la pestaña se desliza siempre, aunque el sistema
+              tenga "Efectos de animacion" apagado (decision del proyecto, ver tokens.css) */}
+          <MotionConfig reducedMotion="never">
+            <div className={estilos.separadores} role="tablist" aria-label="Formato">
               <Separador
-                key={c.id}
-                activo={String(c.id) === categoriaId}
-                onClick={() => cambiarCategoria(String(c.id))}
-                nombre={c.nombre}
-                cantidad={c.total}
+                activo={!categoriaId}
+                onClick={() => cambiarCategoria('')}
+                nombre="Todo"
+                cantidad={total}
+              />
+              {categorias.map((c) => (
+                <Separador
+                  key={c.id}
+                  activo={String(c.id) === categoriaId}
+                  onClick={() => cambiarCategoria(String(c.id))}
+                  nombre={c.nombre}
+                  cantidad={c.total}
                 />
-            ))}
-          </div>
+              ))}
+            </div>
+          </MotionConfig>
         </div>
       </div>
 
