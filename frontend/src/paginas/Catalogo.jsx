@@ -134,8 +134,8 @@ export default function Catalogo() {
       <header className={`${estilos.cabecera} cascada`}>
         <h1 className={estilos.titulo}>Catálogo</h1>
         <p className={estilos.bajada}>
-          {total !== null ? `${total} títulos` : 'Discos'} usados, escuchados enteros antes de
-          llegar acá. Si no está, escribinos y lo buscamos.
+          {total !== null ? `${total} títulos` : 'Discos'} nuevos o usados, todos con garantía de
+          calidad. Si no está, escribinos y lo buscamos.
         </p>
       </header>
 

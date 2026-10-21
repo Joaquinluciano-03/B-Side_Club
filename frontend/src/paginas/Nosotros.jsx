@@ -7,6 +7,7 @@ import { MapPin, ArrowRight } from '@phosphor-icons/react';
 import { useStoreInfo } from '../lib/useStoreInfo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkMapa } from '../lib/contacto';
+import Cassette from '../componentes/Cassette';
 import estilos from './Nosotros.module.css';
 
 const TEMAS = [
@@ -14,13 +15,13 @@ const TEMAS = [
     lado: 'B1',
     titulo: 'Empezó como un cajón',
     texto:
-      'Arrancamos vendiendo los duplicados de nuestra propia colección en una feria de Chacarita. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente escuchara antes de comprar. Esa bandeja todavía está en el mostrador.',
+      'Arrancamos vendiendo los duplicados de nuestra propia colección en una feria de Chacarita. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente probara los discos antes de comprar. Esa bandeja todavía está en el mostrador.',
   },
   {
     lado: 'B2',
-    titulo: 'Escuchamos todo',
+    titulo: 'Garantía de calidad',
     texto:
-      'Cada disco que entra pasa entero por la bandeja antes de llegar al catálogo. Si salta, si tiene ruido de fondo, si la tapa está gastada: lo escribimos en la ficha. Preferimos vender menos y que nadie se lleve una sorpresa.',
+      'Cada disco que entra, nuevo o usado, se revisa antes de llegar al catálogo. Si salta, si tiene ruido de fondo, si la tapa está gastada: lo escribimos en la ficha. Preferimos vender menos y que nadie se lleve una sorpresa.',
   },
   {
     lado: 'B3',
@@ -39,10 +40,12 @@ export default function Nosotros() {
     <main className={estilos.pagina} data-oscuro>
       <header className={`${estilos.cabecera} cascada`}>
         <p className={estilos.lado}>Lado B</p>
+        {/* arriba a la derecha, un cassette sonando (el lado B) */}
+        <Cassette className={estilos.cassette} />
         <h1 className={estilos.titulo}>La historia</h1>
         <p className={estilos.bajada}>
           {info?.description ||
-            'Una disquería chica en Chacarita, especializada en usados que pasaron por la bandeja antes de entrar al catálogo.'}
+            'Una disquería chica en Chacarita: discos nuevos o usados, todos con garantía de calidad.'}
         </p>
       </header>
 
@@ -59,7 +62,7 @@ export default function Nosotros() {
       <section className={estilos.visita} aria-labelledby="visita-titulo">
         <div>
           <h2 id="visita-titulo" className={estilos.visitaTitulo}>
-            Pasá a escucharlo
+            Pasá a visitarnos
           </h2>
           {info?.direccion && (
             <a href={linkMapa(info.direccion)} target="_blank" rel="noreferrer" className={estilos.direccion}>
