@@ -157,8 +157,8 @@
     background-color 320ms ease;
 }
 /* La seleccionada queda estirada y naranja, igual que con el mouse encima.
-   El naranja va tambien en la forma (::before), no solo en .pestana: si no,
-   entre el borde y el relleno asomaba una linea clara de menos de un pixel */
+   Al cambiar de seleccion, la anterior baja y la nueva sube con la misma
+   transicion del hover (de a poco, sin nada que viaje entre pestañas) */
 .separadorActivo::before {
   translate: 0 -8px;
   background-color: var(--naranja);
@@ -181,15 +181,6 @@
 }
 .separador:focus-visible {
   outline-offset: -5px;
-}
-/* el relleno naranja que viaja de una pestaña a otra al cambiar (Motion
-   layoutId). Cubre la forma estirada por dentro de su borde de 2px: arriba
-   arranca 6px por encima del boton (8px de estiramiento menos el borde) */
-.pestana {
-  position: absolute;
-  inset: -6px 2px 0;
-  background: var(--naranja);
-  z-index: 0;
 }
 .separadorNombre,
 .separadorCantidad {

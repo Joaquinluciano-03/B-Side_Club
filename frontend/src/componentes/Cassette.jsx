@@ -32,10 +32,6 @@ export default function Cassette({ className = '' }) {
           <span className={estilos.cintaBoca} />
         </div>
       </div>
-      <figcaption className={estilos.sonando}>
-        <span className={estilos.luz} />
-        Sonando · Lado B
-      </figcaption>
     </figure>
   );
 }

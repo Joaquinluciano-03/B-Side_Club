@@ -3,9 +3,6 @@
    Todas las animaciones son de transform (giro y escala): corren en la GPU. */
 .figura {
   margin: 0;
-  display: grid;
-  justify-items: center;
-  gap: 14px;
 }
 
 .cassette {
@@ -13,7 +10,8 @@
   width: 100%;
   aspect-ratio: 1.58;
   container-type: inline-size;
-  border-radius: 4.2cqw;
+  /* esquinas apenas redondeadas, como la carcasa real (no una pastilla) */
+  border-radius: 1.6cqw;
   /* plastico oscuro con cinco tornillos (cuatro esquinas y uno abajo) */
   background:
     radial-gradient(circle, #6b625b 0 0.9cqw, #2a2522 1cqw 1.4cqw, transparent 1.5cqw) 3.4cqw 3.4cqw / 3cqw 3cqw no-repeat,
@@ -36,7 +34,7 @@
   right: 7cqw;
   top: 5.5cqw;
   height: 40cqw;
-  border-radius: 2cqw;
+  border-radius: 0.8cqw;
   /* papel crema con la franja naranja de la marca arriba y renglones */
   background:
     linear-gradient(var(--naranja), var(--naranja)) 0 0 / 100% 8.5cqw no-repeat,
@@ -218,31 +216,5 @@
 @keyframes corre {
   to {
     translate: -4cqw 0;
-  }
-}
-
-/* ---- "sonando" ---- */
-.sonando {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--mono);
-  font-stretch: 87.5%;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--crema-dim);
-}
-.luz {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--neon-cian);
-  box-shadow: 0 0 8px var(--neon-cian);
-  animation: titila 1.6s ease-in-out infinite;
-}
-@keyframes titila {
-  50% {
-    opacity: 0.25;
   }
 }

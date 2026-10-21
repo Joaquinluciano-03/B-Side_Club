@@ -69,27 +69,6 @@
   transform: scaleX(1);
 }
 
-.ingreso {
-  font-family: var(--mono);
-  font-stretch: 87.5%;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--crema-dim);
-  border: 1px solid var(--borde-oscuro-2);
-  border-radius: var(--r-pildora);
-  padding: 9px 14px;
-  transition:
-    color var(--d-rapida) ease,
-    border-color var(--d-rapida) ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .ingreso:hover {
-    color: var(--crema);
-    border-color: var(--crema-tenue);
-  }
-}
-
 /* ---- Menu mobile ---- */
 .botonMenu {
   display: none;
@@ -158,10 +137,6 @@
   }
   .panel .link::after {
     display: none;
-  }
-  .panel .ingreso {
-    align-self: flex-start;
-    margin-top: var(--e-4);
   }
 }
 

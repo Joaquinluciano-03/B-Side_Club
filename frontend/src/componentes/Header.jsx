@@ -6,7 +6,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { List, X } from '@phosphor-icons/react';
-import { useAuth } from '../lib/auth';
 import BandaCategorias from './BandaCategorias';
 import Neon from './Neon';
 import estilos from './Header.module.css';
@@ -22,7 +21,6 @@ const NAV = [
 const claseLink = ({ isActive }) => `${estilos.link} ${isActive ? estilos.activo : ''}`;
 
 export default function Header() {
-  const { esStaff } = useAuth();
   const [abierto, setAbierto] = useState(false);
   const { pathname } = useLocation();
   const botonRef = useRef(null);
@@ -47,8 +45,6 @@ export default function Header() {
     return () => document.removeEventListener('keydown', alTeclear);
   }, [abierto]);
 
-  const ingreso = esStaff ? { a: '/panel', label: 'Panel' } : { a: '/login', label: 'Ingresar' };
-
   return (
     <header className={estilos.header} data-oscuro>
       <div className={estilos.barra}>
@@ -63,9 +59,6 @@ export default function Header() {
               {n.label}
             </NavLink>
           ))}
-          <Link to={ingreso.a} className={estilos.ingreso}>
-            {ingreso.label}
-          </Link>
         </nav>
 
         <button
@@ -94,9 +87,6 @@ export default function Header() {
             {n.label}
           </NavLink>
         ))}
-        <Link to={ingreso.a} className={estilos.ingreso}>
-          {ingreso.label}
-        </Link>
       </div>
 
       {/* la cinta de categorias (reemplaza la linea multicolor) */}
