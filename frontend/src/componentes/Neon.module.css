@@ -50,14 +50,12 @@
   animation: tubo-enciende 1.3s linear backwards;
   animation-delay: calc(var(--inicio) + var(--l) * var(--paso));
 }
-/* el tubo flojo: despues de encenderse, cada tanto titila */
+/* el tubo flojo: despues de encenderse, cada tanto titila. Va en un span
+   dentro de la letra (la letra ya tiene el encendido) */
 .floja {
-  animation:
-    tubo-enciende 1.3s linear backwards,
-    tubo-flojo 6.5s linear infinite;
-  animation-delay:
-    calc(var(--inicio) + var(--l) * var(--paso)),
-    calc(var(--inicio) + 3.6s);
+  display: inline-block;
+  animation: tubo-flojo 6.5s linear infinite;
+  animation-delay: calc(var(--inicio) + 3.6s);
 }
 @keyframes tubo-enciende {
   0%,

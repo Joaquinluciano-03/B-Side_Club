@@ -27,8 +27,11 @@ export default function Neon({ texto, inicio = 900, paso = 95, className = '' })
           {[...palabra].map((letra, j) => {
             const n = l++;
             return (
-              <span key={j} className={`${estilos.letra} ${n === floja ? estilos.floja : ''}`} style={{ '--l': n }}>
-                {letra}
+              <span key={j} className={estilos.letra} style={{ '--l': n }}>
+                {/* el parpadeo del tubo flojo va en un span aparte: dos
+                    animaciones de opacidad en el mismo elemento no pueden
+                    correr en la GPU */}
+                {n === floja ? <span className={estilos.floja}>{letra}</span> : letra}
               </span>
             );
           })}

@@ -3,7 +3,7 @@
 // al pasar por un tema "baja la pua" hasta esa fila. El buscador del pie del
 // label lleva al catalogo con la busqueda hecha.
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { query } from '../../lib/api';
@@ -57,8 +57,27 @@ function Tracklist({ temas, className }) {
   );
 }
 
+// Pausa las animaciones que no terminan nunca (el disco, la luz del cartel,
+// el tubo flojo) mientras el hero esta fuera de pantalla: nadie las ve y la
+// GPU igual las tendria que mover en cada cuadro. Al volver siguen de donde
+// estaban. Se marca con data-quieto en la seccion (ver HeroLabel.module.css).
+function usePausarFueraDePantalla() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) return;
+    const obs = new IntersectionObserver(([e]) => {
+      el.toggleAttribute('data-quieto', !e.isIntersecting);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
+
 export default function HeroLabel() {
   const navigate = useNavigate();
+  const heroRef = usePausarFueraDePantalla();
   const { info } = useStoreInfo();
   const { total, categorias: todas, cargando } = useConteos();
   // el lado A tiene lugar para tres formatos ademas de "recien llegados"
@@ -95,13 +114,20 @@ export default function HeroLabel() {
   }
 
   return (
-    <section className={estilos.hero} aria-labelledby="hero-titulo" data-oscuro>
+    <section ref={heroRef} className={estilos.hero} aria-labelledby="hero-titulo" data-oscuro>
       <div className={estilos.label}>
         {/* detras del label, centrados en el: la sombra sobre la mesa (quieta),
             el vinilo (gira) y los reflejos de la luz (quietos: la luz no se
             mueve, el disco si) */}
         <span className={estilos.sombra} aria-hidden="true" />
-        <span className={estilos.vinilo} aria-hidden="true" />
+        {/* tres capas anidadas, una rotacion cada una (ver HeroLabel.module.css) */}
+        <span className={estilos.vinilo} aria-hidden="true">
+          <span className={estilos.viniloScroll}>
+            <span className={estilos.viniloArranque}>
+              <span className={estilos.viniloGiro} />
+            </span>
+          </span>
+        </span>
         <span className={estilos.brillo} aria-hidden="true" />
 
         <p className={estilos.catalogo}>
@@ -112,6 +138,7 @@ export default function HeroLabel() {
         <div className={estilos.cartel}>
           {/* el nombre como cartel de neon sobre una placa oscura */}
           <div className={estilos.placa}>
+            <span className={estilos.luz} aria-hidden="true" />
             <h1 id="hero-titulo" className={estilos.titulo} style={{ fontSize: tamTitulo }} aria-label={nombre}>
               <Neon texto={nombre} />
             </h1>

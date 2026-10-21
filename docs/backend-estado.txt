@@ -163,7 +163,9 @@ destacado.
 ============================================================
 5. CATEGORIAS
 ============================================================
-GET    /api/categorias        (publica) Lista todas.
+GET    /api/categorias        (publica) Lista todas. Cada una trae "total":
+                               cuantos productos publicados tiene (el sitio lo
+                               muestra sin tener que pedir un conteo aparte).
 GET    /api/categorias/:id    (publica) Detalle.
 POST   /api/categorias        (protegida) Crear.
 PUT    /api/categorias/:id    (protegida) Modificar.

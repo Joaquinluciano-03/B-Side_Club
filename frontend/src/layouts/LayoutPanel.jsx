@@ -3,7 +3,7 @@
 // desde un boton de menu en la barra de arriba.
 
 import { NavLink, Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   SquaresFour,
   Disc,
@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../lib/auth';
 import { get } from '../lib/api';
 import { etiquetaRol } from '../lib/formato';
+import { Cargando } from '../componentes/Estados';
 import estilos from './LayoutPanel.module.css';
 
 const SECCIONES = [
@@ -161,7 +162,11 @@ export default function LayoutPanel() {
       </aside>
 
       <div className={estilos.area}>
-        <Outlet />
+        {/* cada seccion del panel se baja aparte (App.jsx): mientras llega,
+            el lateral queda y el contenido muestra el disco de carga */}
+        <Suspense fallback={<Cargando />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   );

@@ -2,8 +2,16 @@
 
 const { prisma } = require('../config/db');
 
+// Cada categoria viene con "total": cuantos productos publicados tiene. El
+// sitio lo muestra en el hero, en la home y en los separadores del catalogo;
+// antes lo averiguaba con un pedido aparte por categoria, despues de recibir
+// esta lista (una cadena de pedidos que demoraba la carga).
 async function listar() {
-  return prisma.categoria.findMany({ orderBy: { nombre: 'asc' } });
+  const categorias = await prisma.categoria.findMany({
+    orderBy: { nombre: 'asc' },
+    include: { _count: { select: { productos: { where: { esActivo: true } } } } },
+  });
+  return categorias.map(({ _count, ...c }) => ({ ...c, total: _count.productos }));
 }
 
 async function obtenerPorId(id) {

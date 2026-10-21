@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { MotionConfig } from 'motion/react';
 import App from './App';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
@@ -24,12 +23,10 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          {/* reducedMotion="never": las animaciones de Motion se ven siempre,
-              aunque el sistema tenga "Efectos de animacion" apagado
-              (decision del proyecto, ver tokens.css) */}
-          <MotionConfig reducedMotion="never">
-            <App />
-          </MotionConfig>
+          {/* Motion (la libreria de animacion) no se importa aca: solo la
+              usan el catalogo y el panel, y asi no viaja en el paquete de la
+              home. Su configuracion (reducedMotion="never") va donde se usa */}
+          <App />
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>
