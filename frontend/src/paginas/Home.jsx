@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, WhatsappLogo } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useConteos } from '../lib/useConteos';
-import { useStoreInfo } from '../lib/useStoreInfo';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { linkWhatsApp } from '../lib/contacto';
 import CardProducto from '../componentes/CardProducto';
 import HeroLabel from '../componentes/home/HeroLabel';
@@ -145,8 +145,8 @@ function LadoB() {
 }
 
 function Cierre() {
-  const { info } = useStoreInfo();
-  const whatsapp = linkWhatsApp(info?.whatsapp, 'Hola B-Side Club! Estoy buscando un disco:');
+  const { info, nombre } = useDatosDelLocal();
+  const whatsapp = linkWhatsApp(info?.whatsapp, `Hola ${nombre}! Estoy buscando un disco:`);
 
   return (
     <section className={estilos.cierre} aria-labelledby="cierre-titulo">

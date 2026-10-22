@@ -5,6 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react';
+import Logotipo from '../componentes/Logotipo';
 import estilos from './LayoutAuth.module.css';
 
 export default function LayoutAuth({ titulo, bajada, children, pie }) {
@@ -21,7 +22,7 @@ export default function LayoutAuth({ titulo, bajada, children, pie }) {
       <main className={estilos.lado}>
         <div className={`${estilos.contenido} cascada`} style={{ '--cascada-inicio': '120ms' }}>
           <Link to="/" className={estilos.marca}>
-            B-SIDE <span>CLUB</span>
+            <Logotipo />
           </Link>
 
           <h1 className={estilos.titulo}>{titulo}</h1>

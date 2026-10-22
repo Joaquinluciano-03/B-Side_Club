@@ -19,6 +19,7 @@
   font-family: var(--display);
   font-size: var(--t-lg);
   line-height: 1;
+  text-transform: uppercase; /* el nombre viene de la base tal cual se cargo */
   color: var(--crema);
 }
 .marca span {

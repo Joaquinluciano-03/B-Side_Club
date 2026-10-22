@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, Link, useLocation, useNavigationType } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useAuth } from './lib/auth';
+import { useDatosDelLocal } from './lib/useStoreInfo';
 import { Cargando, Vacio } from './componentes/Estados';
 
 // La home y su layout van en el paquete principal: es por donde entra casi
@@ -134,6 +135,24 @@ function ManejoDelScroll() {
   return null;
 }
 
+// Titulo de la pestaña y descripcion para buscadores con los datos de la
+// base (nombre y barrio del local). index.html trae unos de respaldo, sin
+// barrio, porque es un archivo fijo que no puede consultar la base.
+function useMetadatosDelLocal() {
+  const { info, nombre, barrio } = useDatosDelLocal();
+  useEffect(() => {
+    document.title = `${nombre} · Disquería${barrio ? ` en ${barrio}` : ''}`;
+    const descripcion = [
+      `${nombre}, disquería${barrio ? ` en ${barrio}` : ''}.`,
+      info?.description,
+      'Vinilos, cassettes, CDs y equipos de audio, nuevos o usados con garantía de calidad.',
+    ]
+      .filter(Boolean)
+      .join(' ');
+    document.querySelector('meta[name="description"]')?.setAttribute('content', descripcion);
+  }, [nombre, barrio, info?.description]);
+}
+
 // Protege el panel. Mientras revalidamos el token no decidimos nada: si
 // mandaramos al login ahi, al refrescar el panel te echaria siempre.
 function SoloStaff({ children }) {
@@ -162,6 +181,7 @@ function SoloAdmin({ children }) {
 
 export default function App() {
   usePrecargarPaginas();
+  useMetadatosDelLocal();
 
   return (
     <>

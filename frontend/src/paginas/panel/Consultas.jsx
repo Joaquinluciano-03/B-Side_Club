@@ -13,6 +13,7 @@ import Modal from '../../componentes/Modal';
 import Segmentos from '../../componentes/Segmentos';
 import { useToast } from '../../lib/toast';
 import { linkWhatsApp } from '../../lib/contacto';
+import { useDatosDelLocal } from '../../lib/useStoreInfo';
 import {
   ESTADOS_CONSULTA,
   etiquetaConsulta,
@@ -33,6 +34,7 @@ const VALORES_FILTRO = FILTROS.map((f) => f.valor);
 
 export default function Consultas() {
   const toast = useToast();
+  const { nombre: nombreLocal } = useDatosDelLocal();
   const [params, setParams] = useSearchParams();
 
   // el filtro vive en la URL: el dashboard puede abrir la bandeja ya filtrada
@@ -185,7 +187,7 @@ export default function Consultas() {
                 </a>
                 {abierta.telefono && (
                   <a
-                    href={linkWhatsApp(abierta.telefono, `Hola ${abierta.nombre}! Te escribimos de B-Side Club por tu consulta: "${abierta.asunto}".`)}
+                    href={linkWhatsApp(abierta.telefono, `Hola ${abierta.nombre}! Te escribimos de ${nombreLocal} por tu consulta: "${abierta.asunto}".`)}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-secundario"

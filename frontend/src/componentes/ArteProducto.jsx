@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { urlImagen } from '../lib/api';
 import { separarNombre } from '../lib/formato';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import estilos from './ArteProducto.module.css';
 
 // colores de funda: la paleta del sitio, mas el crema del papel
@@ -50,6 +51,8 @@ export function formatoDe(categoria = '') {
 }
 
 function TapaGenerica({ producto, formato }) {
+  // sin artista, el pie de la funda lleva el nombre del local (de la base)
+  const { nombre: nombreLocal } = useDatosDelLocal();
   const { titulo, artista } = separarNombre(producto?.nombre);
   const fondo = colorDe(producto?.nombre || '');
   const tinta = tintaPara(fondo);
@@ -75,7 +78,7 @@ function TapaGenerica({ producto, formato }) {
   if (formato === 'equipo') {
     return (
       <div className={`${estilos.tapa} ${estilos.ficha}`} style={vars}>
-        <span className={estilos.fichaMarca}>B-Side Club · Revisado</span>
+        <span className={estilos.fichaMarca}>{nombreLocal} · Revisado</span>
         <span className={estilos.fichaTitulo}>{titulo}</span>
         {artista && <span className={estilos.fichaSub}>{artista}</span>}
       </div>
@@ -89,7 +92,7 @@ function TapaGenerica({ producto, formato }) {
       <span className={estilos.troquel} aria-hidden="true">
         <span className={formato === 'cd' ? estilos.troquelCd : estilos.troquelLabel} />
       </span>
-      <span className={estilos.fundaPie}>{artista || 'B-Side Club'}</span>
+      <span className={estilos.fundaPie}>{artista || nombreLocal}</span>
     </div>
   );
 }

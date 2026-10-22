@@ -14,7 +14,7 @@ import {
   X,
 } from '@phosphor-icons/react';
 import { get, post } from '../lib/api';
-import { useStoreInfo } from '../lib/useStoreInfo';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
 import { mensajeDeError, separarNombre } from '../lib/formato';
@@ -44,7 +44,7 @@ function Campo({ id, label, error, opcional, children }) {
 export default function Contacto() {
   const [params, setParams] = useSearchParams();
   const productoId = params.get('productoId');
-  const { info } = useStoreInfo();
+  const { info, nombre } = useDatosDelLocal();
   const horario = normalizarHorario(info?.horario);
   const hoy = horarioDeHoy(info?.horario);
 
@@ -129,7 +129,7 @@ export default function Contacto() {
 
   const whatsapp = linkWhatsApp(
     info?.whatsapp,
-    producto ? `Hola B-Side Club! Les consulto por "${producto.nombre}".` : 'Hola B-Side Club!'
+    producto ? `Hola ${nombre}! Les consulto por "${producto.nombre}".` : `Hola ${nombre}!`
   );
   const instagram = linkInstagram(info?.instagram);
 

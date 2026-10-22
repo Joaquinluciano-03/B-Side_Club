@@ -22,6 +22,7 @@ import { useAuth } from '../lib/auth';
 import { get } from '../lib/api';
 import { etiquetaRol } from '../lib/formato';
 import { Cargando } from '../componentes/Estados';
+import Logotipo from '../componentes/Logotipo';
 import estilos from './LayoutPanel.module.css';
 
 const SECCIONES = [
@@ -43,7 +44,7 @@ function Marca() {
       <img src="/logo-256.png" alt="" width="36" height="36" />
       <span>
         <span className={estilos.marcaNombre}>
-          B-SIDE <span>CLUB</span>
+          <Logotipo />
         </span>
         <span className={estilos.marcaSub}>Panel interno</span>
       </span>
