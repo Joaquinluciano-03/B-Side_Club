@@ -8,6 +8,15 @@
   overflow-x: auto;
   scrollbar-width: none;
 }
+/* en el celular, si no entran, bajan a otra linea en vez de deslizarse:
+   todas las opciones quedan a la vista y nada se arrastra con el dedo */
+@media (max-width: 640px) {
+  .segmentos {
+    flex-wrap: wrap;
+    overflow: visible;
+    border-radius: 18px;
+  }
+}
 .segmentos::-webkit-scrollbar {
   display: none;
 }

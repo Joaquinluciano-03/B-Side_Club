@@ -141,10 +141,11 @@
   color: var(--tinta-dim);
 }
 .volver {
-  margin-top: var(--e-6);
+  margin-top: var(--e-5);
   display: inline-flex;
   align-items: center;
   gap: var(--e-2);
+  min-height: 44px; /* que se pueda tocar comodo con el dedo */
   font-size: var(--t-sm);
   color: var(--tinta-tenue);
 }

@@ -94,8 +94,10 @@ export default function Usuarios() {
                         )}
                       </td>
                       <td style={{ color: 'var(--tinta-dim)' }}>{u.mail}</td>
-                      <td style={{ color: 'var(--tinta-dim)' }}>{u.telefono || '—'}</td>
-                      <td>
+                      <td data-etiqueta="Teléfono" style={{ color: 'var(--tinta-dim)' }}>
+                        {u.telefono || '—'}
+                      </td>
+                      <td data-etiqueta="Rol">
                         {esDueño ? (
                           <span className="badge badge-neutro">{etiquetaRol(u.rol)}</span>
                         ) : (

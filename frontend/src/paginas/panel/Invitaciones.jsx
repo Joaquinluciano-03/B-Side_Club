@@ -107,7 +107,7 @@ export default function Invitaciones() {
                   setEmail(e.target.value);
                   setErrorCampo(null);
                 }}
-                placeholder="nuevo@bsideclub.com"
+                placeholder="nombre@ejemplo.com"
               />
               {errorCampo && <div className="campo-error">{errorCampo}</div>}
             </div>
@@ -160,15 +160,17 @@ export default function Invitaciones() {
                 {invitaciones.map((inv) => (
                   <tr key={inv.id}>
                     <td style={{ fontWeight: 700 }}>{inv.email}</td>
-                    <td style={{ color: 'var(--tinta-dim)' }}>{etiquetaRol(inv.rol)}</td>
-                    <td>
+                    <td data-etiqueta="Rol" style={{ color: 'var(--tinta-dim)' }}>
+                      {etiquetaRol(inv.rol)}
+                    </td>
+                    <td data-etiqueta="Estado">
                       <span
                         className={`badge badge-${vencida(inv) ? 'revocada' : inv.estado === 'pendiente' ? 'pendiente' : inv.estado}`}
                       >
                         {vencida(inv) ? 'Vencida' : inv.estado}
                       </span>
                     </td>
-                    <td className="mono" style={{ whiteSpace: 'nowrap' }}>
+                    <td data-etiqueta="Vence" className="mono" style={{ whiteSpace: 'nowrap' }}>
                       {formatearFecha(inv.expiraEn)}
                     </td>
                     <td style={{ textAlign: 'right' }}>
