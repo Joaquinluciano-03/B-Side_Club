@@ -4,16 +4,17 @@
 
 import { Link } from 'react-router-dom';
 import { WhatsappLogo, InstagramLogo, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react';
-import { useStoreInfo } from '../lib/useStoreInfo';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
+import Logotipo from './Logotipo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
 import estilos from './Footer.module.css';
 
 export default function Footer() {
-  const { info } = useStoreInfo();
+  const { info, nombre, zona } = useDatosDelLocal();
   const horario = normalizarHorario(info?.horario);
   const hoy = horarioDeHoy(info?.horario);
-  const whatsapp = linkWhatsApp(info?.whatsapp, 'Hola B-Side Club, les escribo desde la web.');
+  const whatsapp = linkWhatsApp(info?.whatsapp, `Hola ${nombre}, les escribo desde la web.`);
   const instagram = linkInstagram(info?.instagram);
   const mapa = linkMapa(info?.direccion);
 
@@ -22,10 +23,10 @@ export default function Footer() {
       <div className={estilos.grilla}>
         <div className={estilos.local}>
           <Link to="/" className={estilos.marca}>
-            B-SIDE <span>CLUB</span>
+            <Logotipo />
           </Link>
           <p className={estilos.descripcion}>
-            {info?.description || 'Discos nuevos o usados con garantía de calidad. Chacarita, Buenos Aires.'}
+            {info?.description || `Discos nuevos o usados con garantía de calidad.${zona ? ` ${zona}.` : ''}`}
           </p>
           {hoy && (
             <p className={estilos.hoy}>
@@ -112,7 +113,7 @@ export default function Footer() {
 
       <div className={estilos.base}>
         <span>
-          © {new Date().getFullYear()} {info?.nombre || 'B-Side Club'}
+          © {new Date().getFullYear()} {nombre}
         </span>
         {/* el acceso del equipo: el login manda al panel (y si ya hay sesion,
             va directo). El header no lo muestra para no distraer al visitante */}

@@ -9,16 +9,20 @@
 // hay que cambiar la otra.
 
 import Modal from './Modal';
+import { useDatosDelLocal, partirNombre } from '../lib/useStoreInfo';
 
 export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, email, link }) {
-  const linkMuestra = link || 'https://bsideclub.ar/aceptar-invitacion?token=…';
+  // nombre y zona del local salen de la base, igual que en el mail real
+  const { nombre, zona } = useDatosDelLocal();
+  const { resto, ultima } = partirNombre(nombre);
+  const linkMuestra = link || `${window.location.origin}/aceptar-invitacion?token=…`;
 
   return (
     <Modal
       abierto={abierto}
       onCerrar={onCerrar}
       kicker="Plantilla del email"
-      titulo="Te invitaron al panel de B-Side Club"
+      titulo={`Te invitaron al panel de ${nombre}`}
       bajada={email ? `Así lo va a recibir ${email}` : 'Así lo recibe la persona invitada'}
       ancho={560}
     >
@@ -44,9 +48,10 @@ export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, em
               fontSize: 18,
               color: 'var(--crema)',
               lineHeight: 1.1,
+              textTransform: 'uppercase',
             }}
           >
-            B-SIDE <span style={{ color: 'var(--neon-cian)' }}>CLUB</span>
+            {resto} <span style={{ color: 'var(--neon-cian)' }}>{ultima}</span>
           </div>
           <div
             style={{
@@ -83,7 +88,7 @@ export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, em
               textWrap: 'pretty',
             }}
           >
-            {invitadoPor || 'El equipo'} te invitó a administrar el catálogo de B-Side Club. Creá tu
+            {invitadoPor || 'El equipo'} te invitó a administrar el catálogo de {nombre}. Creá tu
             cuenta con este link; vence en 7 días y sirve una sola vez.
           </div>
 
@@ -132,7 +137,7 @@ export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, em
         >
           SI NO ESPERABAS ESTE MAIL, IGNORALO.
           <br />
-          B-SIDE CLUB · BUENOS AIRES
+          {[nombre, zona].filter(Boolean).join(' · ').toUpperCase()}
         </div>
       </div>
 

@@ -49,6 +49,7 @@
   font-family: var(--display);
   font-size: 15px;
   line-height: 1;
+  text-transform: uppercase; /* el nombre viene de la base tal cual se cargo */
 }
 .marcaNombre span {
   color: var(--naranja);

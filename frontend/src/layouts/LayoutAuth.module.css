@@ -101,6 +101,7 @@
   margin-bottom: var(--e-7);
   font-family: var(--display);
   font-size: var(--t-md);
+  text-transform: uppercase; /* el nombre viene de la base tal cual se cargo */
   color: var(--tinta);
 }
 .marca span {

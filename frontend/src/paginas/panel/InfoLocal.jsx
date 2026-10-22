@@ -29,8 +29,8 @@ const estiloInputFila = {
 };
 
 const CAMPOS = [
-  { k: 'nombre', label: 'Nombre del local', req: true, ph: 'B-Side Club' },
-  { k: 'direccion', label: 'Dirección', req: true, ph: 'Av. Corrientes 1234, Chacarita' },
+  { k: 'nombre', label: 'Nombre del local', req: true, ph: 'Nombre del local' },
+  { k: 'direccion', label: 'Dirección', req: true, ph: 'Calle 1234, Barrio, Ciudad' },
   { k: 'telefono', label: 'Teléfono', ph: '11 5555-0142' },
   { k: 'email', label: 'Email', tipo: 'email', ph: 'hola@bsideclub.com' },
   { k: 'instagram', label: 'Instagram', ph: '@bsideclub' },
@@ -154,6 +154,12 @@ export default function InfoLocal() {
                     placeholder={c.ph}
                   />
                   {errores[c.k] && <div className="campo-error">{errores[c.k]}</div>}
+                  {c.k === 'direccion' && !errores.direccion && (
+                    <div className="campo-ayuda">
+                      Separada por comas: calle, barrio y ciudad. El barrio se usa en todo el sitio (el hero,
+                      Nosotros, el título de la pestaña y los mails).
+                    </div>
+                  )}
                   {c.k === 'whatsapp' && !errores.whatsapp && (
                     <div className="campo-ayuda">
                       Como lo escribirías en el celular. Si no tiene código de país, se toma Argentina (+54 9).
@@ -168,7 +174,7 @@ export default function InfoLocal() {
                   id="si-desc"
                   value={form.description}
                   onChange={(e) => campo('description', e.target.value)}
-                  placeholder="Disquería en Chacarita. Discos nuevos o usados con garantía de calidad."
+                  placeholder="Disquería de barrio. Discos nuevos o usados con garantía de calidad."
                   style={{ minHeight: 90 }}
                 />
                 <div className="campo-ayuda">Se muestra en el pie del sitio y en Nosotros.</div>

@@ -7,7 +7,7 @@ import { useParams, Link } from 'react-router-dom';
 import { CaretRight, WhatsappLogo, EnvelopeSimple, SealCheck, PencilSimple, Wrench } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { useStoreInfo } from '../lib/useStoreInfo';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { linkWhatsApp } from '../lib/contacto';
 import { formatoDe } from '../componentes/ArteProducto';
 import GaleriaProducto from '../componentes/GaleriaProducto';
@@ -66,7 +66,7 @@ function Esqueleto() {
 export default function DetalleProducto() {
   const { id } = useParams();
   const { esStaff } = useAuth();
-  const { info } = useStoreInfo();
+  const { info, nombre: nombreLocal } = useDatosDelLocal();
 
   const [producto, setProducto] = useState(null);
   const [error, setError] = useState(null);
@@ -125,7 +125,7 @@ export default function DetalleProducto() {
   const formato = formatoDe(producto.categoria?.nombre);
   const categoria = producto.categoria;
 
-  const mensaje = `Hola B-Side Club! Me interesa "${producto.nombre}" (${window.location.href}). ¿Sigue disponible?`;
+  const mensaje = `Hola ${nombreLocal}! Me interesa "${producto.nombre}" (${window.location.href}). ¿Sigue disponible?`;
   const whatsapp = linkWhatsApp(info?.whatsapp, mensaje);
   const formulario = `/contacto?productoId=${producto.id}`;
 

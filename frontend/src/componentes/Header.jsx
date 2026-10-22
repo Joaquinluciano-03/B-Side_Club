@@ -8,6 +8,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { List, X } from '@phosphor-icons/react';
 import BandaCategorias from './BandaCategorias';
 import Neon from './Neon';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import estilos from './Header.module.css';
 
 const NAV = [
@@ -21,6 +22,8 @@ const NAV = [
 const claseLink = ({ isActive }) => `${estilos.link} ${isActive ? estilos.activo : ''}`;
 
 export default function Header() {
+  // el nombre del cartel sale de la base (Info del local)
+  const { nombre } = useDatosDelLocal();
   const [abierto, setAbierto] = useState(false);
   const { pathname } = useLocation();
   const botonRef = useRef(null);
@@ -48,9 +51,9 @@ export default function Header() {
   return (
     <header className={estilos.header} data-oscuro>
       <div className={estilos.barra}>
-        <Link to="/" className={estilos.marca} aria-label="B-Side Club, ir al inicio">
+        <Link to="/" className={estilos.marca} aria-label={`${nombre}, ir al inicio`}>
           {/* el mismo cartel de neon que el titulo del hero */}
-          <Neon texto="B-Side Club" inicio={350} paso={70} />
+          <Neon texto={nombre} inicio={350} paso={70} />
         </Link>
 
         <nav className={estilos.nav} aria-label="Principal">

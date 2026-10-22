@@ -4,18 +4,20 @@
 
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight } from '@phosphor-icons/react';
-import { useStoreInfo } from '../lib/useStoreInfo';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkMapa } from '../lib/contacto';
 import Cassette from '../componentes/Cassette';
 import estilos from './Nosotros.module.css';
 
-const TEMAS = [
+// los temas del lado B. El barrio sale de la direccion cargada en la base
+// (Info del local): si el local se muda, la historia lo acompaña
+const temas = (barrio) => [
   {
     lado: 'B1',
     titulo: 'Empezó como un cajón',
     texto:
-      'Arrancamos vendiendo los duplicados de nuestra propia colección en una feria de Chacarita. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente probara los discos antes de comprar. Esa bandeja todavía está en el mostrador.',
+      `Arrancamos vendiendo los duplicados de nuestra propia colección en una feria ${barrio ? `de ${barrio}` : 'del barrio'}. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente probara los discos antes de comprar. Esa bandeja todavía está en el mostrador.`,
   },
   {
     lado: 'B2',
@@ -32,7 +34,7 @@ const TEMAS = [
 ];
 
 export default function Nosotros() {
-  const { info } = useStoreInfo();
+  const { info, barrio } = useDatosDelLocal();
   const horario = normalizarHorario(info?.horario);
   const hoy = horarioDeHoy(info?.horario);
 
@@ -45,12 +47,12 @@ export default function Nosotros() {
         <h1 className={estilos.titulo}>La historia</h1>
         <p className={estilos.bajada}>
           {info?.description ||
-            'Una disquería chica en Chacarita: discos nuevos o usados, todos con garantía de calidad.'}
+            `Una disquería chica${barrio ? ` en ${barrio}` : ''}: discos nuevos o usados, todos con garantía de calidad.`}
         </p>
       </header>
 
       <ol className={`${estilos.temas} cascada`} style={{ '--cascada-inicio': '260ms' }}>
-        {TEMAS.map((t) => (
+        {temas(barrio).map((t) => (
           <li key={t.lado} className={estilos.tema}>
             <span className={estilos.temaLado}>{t.lado}</span>
             <h2 className={estilos.temaTitulo}>{t.titulo}</h2>

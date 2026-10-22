@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { query } from '../../lib/api';
 import { useConteos } from '../../lib/useConteos';
-import { useStoreInfo } from '../../lib/useStoreInfo';
+import { useDatosDelLocal } from '../../lib/useStoreInfo';
 import { horarioDeHoy } from '../../lib/horario';
 import Neon from '../Neon';
 import estilos from './HeroLabel.module.css';
@@ -78,7 +78,8 @@ function usePausarFueraDePantalla() {
 export default function HeroLabel() {
   const navigate = useNavigate();
   const heroRef = usePausarFueraDePantalla();
-  const { info } = useStoreInfo();
+  // todo lo impreso en el label sale de la base (Info del local y categorias)
+  const { info, nombre, zona: barrio } = useDatosDelLocal();
   const { total, categorias: todas, cargando } = useConteos();
   // el lado A tiene lugar para tres formatos ademas de "recien llegados"
   const categorias = todas.slice(0, 3);
@@ -86,12 +87,8 @@ export default function HeroLabel() {
 
   const hoy = horarioDeHoy(info?.horario);
 
-  // todo lo impreso en el label sale de la base (store-info y categorias)
-  const nombre = info?.nombre || 'B-Side Club';
   // el tamaño se ajusta al largo del nombre para que entre en el label
   const tamTitulo = `${Math.min(11.2, 78 / (nombre.length * 0.78)).toFixed(2)}cqw`;
-  // "Jorge Newbery 3120, Chacarita, CABA" -> "Chacarita, CABA"
-  const barrio = info?.direccion?.split(',').slice(1).join(',').trim();
 
   const temas = [
     { lado: 'A1', nombre: 'Recién llegados', a: '/catalogo', dato: cantidad(total, 'título', 'títulos') },
