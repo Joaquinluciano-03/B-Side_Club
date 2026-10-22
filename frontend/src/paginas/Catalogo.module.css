@@ -47,9 +47,10 @@
   margin: 0 auto;
   padding: var(--e-4) var(--gutter) 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--e-5);
+  column-gap: var(--e-5);
 }
 
 /* buscador + boton de ofertas, juntos a la izquierda de los separadores */
@@ -147,9 +148,65 @@
   cursor: pointer;
 }
 
+/* selector de formato: solo en el celular (ver la media query de abajo) */
+.conSelector .separadores {
+  display: none;
+}
+.conSelector .selectorFormato {
+  display: flex;
+  flex: 0 1 360px;
+  margin-bottom: var(--e-3);
+}
+.selectorFormato {
+  display: none;
+  position: relative;
+  align-items: center;
+  gap: var(--e-3);
+  height: 48px;
+  padding: 0 var(--e-4);
+  border: 2px solid var(--tinta);
+  border-radius: var(--r-pildora);
+  background: var(--superficie);
+  color: var(--tinta);
+}
+.selectorFormato:focus-within {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+.selectorEtiqueta {
+  flex: none;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
+.selectorFormato select {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--tinta);
+  font-family: var(--cuerpo);
+  font-size: 16px; /* con menos, el iPhone agranda la pagina al tocarlo */
+  font-weight: 800;
+  cursor: pointer;
+}
+.selectorFormato svg {
+  flex: none;
+  pointer-events: none;
+}
+
 /* los separadores de batea: pestañas que asoman sobre la linea del cajon */
 .separadores {
   display: flex;
+  /* al lado del buscador si entran; si no, bajan a su propia fila (la barra
+     tiene flex-wrap). No se achican: ver conSelector */
+  flex: 0 0 auto;
   gap: var(--e-1);
   overflow-x: auto;
   scrollbar-width: none;
@@ -301,11 +358,15 @@
     align-self: stretch;
     margin-bottom: 0;
   }
-  /* los separadores llegan hasta el borde de la pantalla al deslizar */
+  /* en el celular: selector en vez de pestañas */
   .separadores {
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
-    scroll-padding-inline: var(--gutter);
+    display: none;
+  }
+  .selectorFormato {
+    display: flex;
+  }
+  .barraInterior {
+    padding-bottom: var(--e-3);
   }
 }
 

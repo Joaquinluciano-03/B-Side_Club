@@ -85,6 +85,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--e-2);
+  min-height: 44px; /* que se pueda tocar comodo con el dedo */
   font-weight: 700;
   color: var(--tinta);
   text-decoration: underline;

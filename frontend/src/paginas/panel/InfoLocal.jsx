@@ -32,8 +32,8 @@ const CAMPOS = [
   { k: 'nombre', label: 'Nombre del local', req: true, ph: 'Nombre del local' },
   { k: 'direccion', label: 'Dirección', req: true, ph: 'Calle 1234, Barrio, Ciudad' },
   { k: 'telefono', label: 'Teléfono', ph: '11 5555-0142' },
-  { k: 'email', label: 'Email', tipo: 'email', ph: 'hola@bsideclub.com' },
-  { k: 'instagram', label: 'Instagram', ph: '@bsideclub' },
+  { k: 'email', label: 'Email', tipo: 'email', ph: 'hola@tulocal.com' },
+  { k: 'instagram', label: 'Instagram', ph: '@tulocal' },
   { k: 'whatsapp', label: 'WhatsApp', ph: '5491155550142' },
 ];
 

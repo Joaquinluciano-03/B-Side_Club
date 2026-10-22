@@ -360,6 +360,7 @@ export default function Promociones() {
                       {/* el mono con tracking ancho hacia que esta columna se
                           comiera la fila entera y empujara las acciones afuera */}
                       <td
+                        data-etiqueta="Vigencia"
                         style={{
                           fontFamily: 'var(--mono)',
                           fontSize: 11,
@@ -376,7 +377,7 @@ export default function Promociones() {
                           'Sin fechas'
                         )}
                       </td>
-                      <td>
+                      <td data-etiqueta="Estado">
                         <span className={`badge badge-${vig.badge}`}>{vig.label}</span>
                       </td>
                       <td>

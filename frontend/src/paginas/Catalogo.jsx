@@ -3,9 +3,9 @@
 // Los filtros son separadores de batea, cada uno con su cantidad; el elegido
 // queda estirado y naranja (todo en Catalogo.module.css).
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MagnifyingGlass, X, SealPercent } from '@phosphor-icons/react';
+import { MagnifyingGlass, X, SealPercent, CaretDown } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useConteos } from '../lib/useConteos';
 import CardProducto from '../componentes/CardProducto';
@@ -104,6 +104,32 @@ export default function Catalogo() {
     setParams(nuevos);
   }
 
+  // Las pestañas no se deslizan nunca: si no entran al lado del buscador bajan
+  // a su propia fila (CSS), y si tampoco entran ahi (muchas categorias o una
+  // pantalla angosta) se cambian por el selector. En el celular siempre va el
+  // selector (CSS). Se mide el ancho natural de las pestañas cuando estan a la
+  // vista y se compara con el lugar que hay en la barra.
+  const barraRef = useRef(null);
+  const pestanasRef = useRef(null);
+  const [noEntran, setNoEntran] = useState(false);
+  useLayoutEffect(() => {
+    const barra = barraRef.current;
+    const pestanas = pestanasRef.current;
+    if (!barra || !pestanas) return;
+    let natural = 0;
+    const medir = () => {
+      if (pestanas.offsetParent !== null) natural = pestanas.scrollWidth;
+      const cs = getComputedStyle(barra);
+      const lugar = barra.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      setNoEntran(natural > lugar + 1);
+    };
+    medir();
+    document.fonts?.ready.then(medir);
+    const observador = new ResizeObserver(medir);
+    observador.observe(barra);
+    return () => observador.disconnect();
+  }, [categorias.length]);
+
   function alternarOfertas() {
     const nuevos = new URLSearchParams(params);
     if (soloOfertas) nuevos.delete('ofertas');
@@ -139,14 +165,14 @@ export default function Catalogo() {
 
       {/* barra de busqueda y separadores: queda pegada arriba al bajar */}
       <div className={estilos.barra}>
-        <div className={estilos.barraInterior}>
+        <div ref={barraRef} className={`${estilos.barraInterior} ${noEntran ? estilos.conSelector : ''}`}>
           <div className={estilos.herramientas}>
             <label className={estilos.buscador}>
               <MagnifyingGlass size={18} weight="bold" aria-hidden="true" />
               <span className="sr-only">Buscar en el catálogo</span>
               <input
                 type="search"
-                placeholder="Buscar artista, disco o sello"
+                placeholder="Artista, disco o sello"
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
                 autoComplete="off"
@@ -174,7 +200,23 @@ export default function Catalogo() {
             </button>
           </div>
 
-          <div className={estilos.separadores} role="tablist" aria-label="Formato">
+          {/* cuando las pestañas no entran (siempre en el celular) va este
+              selector nativo en su lugar: nada se desliza con el dedo */}
+          <label className={estilos.selectorFormato}>
+            <span className={estilos.selectorEtiqueta}>Formato</span>
+            <select value={categoriaId} onChange={(e) => cambiarCategoria(e.target.value)}>
+              <option value="">Todo{total !== null ? ` (${total})` : ''}</option>
+              {categorias.map((c) => (
+                <option key={c.id} value={String(c.id)}>
+                  {c.nombre}
+                  {c.total !== null && c.total !== undefined ? ` (${c.total})` : ''}
+                </option>
+              ))}
+            </select>
+            <CaretDown size={16} weight="bold" aria-hidden="true" />
+          </label>
+
+          <div ref={pestanasRef} className={estilos.separadores} role="tablist" aria-label="Formato">
             <Separador
               activo={!categoriaId}
               onClick={() => cambiarCategoria('')}
