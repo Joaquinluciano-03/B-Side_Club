@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import { MagnifyingGlass, X, SealPercent } from '@phosphor-icons/react';
 import { get, query } from '../lib/api';
 import { useConteos } from '../lib/useConteos';
 import CardProducto from '../componentes/CardProducto';
@@ -49,6 +49,8 @@ export default function Catalogo() {
   const categoriaId = params.get('categoriaId') || '';
   const page = Number(params.get('page')) || 1;
   const qUrl = params.get('q') || '';
+  // ?ofertas=1: solo los productos con descuento (se combina con el resto)
+  const soloOfertas = params.get('ofertas') === '1';
 
   // el input es estado local y la URL se actualiza recien con el debounce,
   // asi no se reescribe el historial en cada tecla
@@ -81,7 +83,7 @@ export default function Catalogo() {
     setDatos(null);
     setError(null);
 
-    get(`/productos${query({ q: qUrl, categoriaId, page, pageSize: 12 })}`)
+    get(`/productos${query({ q: qUrl, categoriaId, conDescuento: soloOfertas ? 'true' : undefined, page, pageSize: 12 })}`)
       .then((r) => {
         if (vigente) setDatos(r);
       })
@@ -92,12 +94,20 @@ export default function Catalogo() {
     return () => {
       vigente = false;
     };
-  }, [qUrl, categoriaId, page, intento]);
+  }, [qUrl, categoriaId, soloOfertas, page, intento]);
 
   function cambiarCategoria(id) {
     const nuevos = new URLSearchParams(params);
     if (id) nuevos.set('categoriaId', id);
     else nuevos.delete('categoriaId');
+    nuevos.delete('page');
+    setParams(nuevos);
+  }
+
+  function alternarOfertas() {
+    const nuevos = new URLSearchParams(params);
+    if (soloOfertas) nuevos.delete('ofertas');
+    else nuevos.set('ofertas', '1');
     nuevos.delete('page');
     setParams(nuevos);
   }
@@ -114,7 +124,7 @@ export default function Catalogo() {
     setParams(new URLSearchParams());
   }
 
-  const hayFiltros = Boolean(qUrl || categoriaId);
+  const hayFiltros = Boolean(qUrl || categoriaId || soloOfertas);
   const categoriaActual = categorias.find((c) => String(c.id) === categoriaId);
 
   return (
@@ -130,27 +140,39 @@ export default function Catalogo() {
       {/* barra de busqueda y separadores: queda pegada arriba al bajar */}
       <div className={estilos.barra}>
         <div className={estilos.barraInterior}>
-          <label className={estilos.buscador}>
-            <MagnifyingGlass size={18} weight="bold" aria-hidden="true" />
-            <span className="sr-only">Buscar en el catálogo</span>
-            <input
-              type="search"
-              placeholder="Buscar artista, disco o sello"
-              value={texto}
-              onChange={(e) => setTexto(e.target.value)}
-              autoComplete="off"
-            />
-            {texto && (
-              <button
-                type="button"
-                className={estilos.borrar}
-                onClick={() => setTexto('')}
-                aria-label="Borrar búsqueda"
-              >
-                <X size={14} weight="bold" />
-              </button>
-            )}
-          </label>
+          <div className={estilos.herramientas}>
+            <label className={estilos.buscador}>
+              <MagnifyingGlass size={18} weight="bold" aria-hidden="true" />
+              <span className="sr-only">Buscar en el catálogo</span>
+              <input
+                type="search"
+                placeholder="Buscar artista, disco o sello"
+                value={texto}
+                onChange={(e) => setTexto(e.target.value)}
+                autoComplete="off"
+              />
+              {texto && (
+                <button
+                  type="button"
+                  className={estilos.borrar}
+                  onClick={() => setTexto('')}
+                  aria-label="Borrar búsqueda"
+                >
+                  <X size={14} weight="bold" />
+                </button>
+              )}
+            </label>
+            {/* filtro de ofertas: se prende y se apaga, como el de una tienda */}
+            <button
+              type="button"
+              className={estilos.ofertas}
+              aria-pressed={soloOfertas}
+              onClick={alternarOfertas}
+            >
+              <SealPercent size={18} weight={soloOfertas ? 'fill' : 'regular'} aria-hidden="true" />
+              Ofertas
+            </button>
+          </div>
 
           <div className={estilos.separadores} role="tablist" aria-label="Formato">
             <Separador
@@ -178,6 +200,7 @@ export default function Catalogo() {
           <div className={estilos.resumen}>
             <span>
               {datos.total} {datos.total === 1 ? 'título' : 'títulos'}
+              {soloOfertas ? ' en oferta' : ''}
               {categoriaActual ? ` en ${categoriaActual.nombre}` : ''}
               {qUrl ? ` para "${qUrl}"` : ''}
             </span>
@@ -195,9 +218,17 @@ export default function Catalogo() {
           <SkeletonGrilla cantidad={8} />
         ) : datos.productos.length === 0 ? (
           <Vacio
-            titulo={hayFiltros ? 'No está en el cajón' : 'Todavía no hay discos'}
+            titulo={
+              soloOfertas && !qUrl && !categoriaId
+                ? 'No hay ofertas por ahora'
+                : hayFiltros
+                  ? 'No está en el cajón'
+                  : 'Todavía no hay discos'
+            }
             texto={
-              hayFiltros
+              soloOfertas && !qUrl && !categoriaId
+                ? 'Las ofertas cambian seguido: volvé a pasar en unos días o mirá todo el catálogo.'
+                : hayFiltros
                 ? 'No encontramos nada con esa búsqueda. Probá con el nombre del artista, o escribinos y lo salimos a buscar.'
                 : 'Todavía no hay productos cargados en el catálogo.'
             }
