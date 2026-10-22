@@ -1,25 +1,19 @@
 //traduce http a logica de negocio
 
-
 const authService = require('../services/auth.service');
-
-const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const v = require('../utils/validar');
 
 async function register(req, res, next) {
   try {
-    const { nombre, apellido, mail, telefono, password } = req.body;
+    const datos = {
+      nombre: v.texto(req.body.nombre, 'nombre', { requerido: true, max: 60 }),
+      apellido: v.texto(req.body.apellido, 'apellido', { requerido: true, max: 60 }),
+      mail: v.email(req.body.mail, 'mail', { requerido: true }),
+      telefono: v.telefono(req.body.telefono, 'telefono', { requerido: true }),
+      password: v.password(req.body.password),
+    };
 
-    if (!nombre || !apellido || !mail || !telefono || !password) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
-    }
-    if (!MAIL_REGEX.test(mail)) {
-      return res.status(400).json({ error: 'El mail no tiene un formato válido' });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
-    }
-
-    const resultado = await authService.register({ nombre, apellido, mail, telefono, password });
+    const resultado = await authService.register(datos);
     res.status(201).json(resultado);
   } catch (err) {
     next(err);
@@ -30,19 +24,25 @@ async function login(req, res, next) {
   try {
     const { mail, password } = req.body;
 
-    if (!mail || !password) {
+    // solo se chequea que sean textos, no la politica de contraseñas: una
+    // cuenta con clave vieja (mas corta) tiene que poder entrar para cambiarla
+    if (typeof mail !== 'string' || typeof password !== 'string' || !mail.trim() || !password) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
+    if (mail.length > 254 || password.length > 200) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
 
-    const resultado = await authService.login({ mail, password });
+    const resultado = await authService.login({ mail: mail.trim().toLowerCase(), password });
     res.json(resultado);
   } catch (err) {
     next(err);
   }
 }
 
-// el token es stateless: no hay nada que invalidar del lado del servidor.
-// el frontend es el que descarta el token guardado; esto solo confirma la accion.
+// el token es stateless: este dispositivo lo descarta. Para cerrar las
+// sesiones de los demas dispositivos alcanza con cambiar la contraseña, que
+// invalida los tokens anteriores (ver tokenVersion en auth.service.js).
 async function logout(req, res) {
   res.json({ mensaje: 'Sesion cerrada' });
 }
@@ -58,8 +58,18 @@ async function me(req, res, next) {
 
 async function actualizarMe(req, res, next) {
   try {
-    const { nombre, apellido, mail, telefono, password } = req.body;
-    const usuario = await authService.actualizarMe(req.user.id, { nombre, apellido, mail, telefono, password });
+    const b = req.body;
+    // los que no vienen quedan como estan (undefined); los que vienen se validan
+    const datos = {
+      nombre: b.nombre === undefined ? undefined : v.texto(b.nombre, 'nombre', { requerido: true, max: 60 }),
+      apellido: b.apellido === undefined ? undefined : v.texto(b.apellido, 'apellido', { requerido: true, max: 60 }),
+      mail: b.mail === undefined ? undefined : v.email(b.mail, 'mail', { requerido: true }),
+      telefono: b.telefono === undefined ? undefined : v.telefono(b.telefono),
+      password: v.password(b.password, { requerido: false }),
+      // la de ahora: hace falta para cambiar la contraseña o el mail
+      passwordActual: typeof b.passwordActual === 'string' ? b.passwordActual.slice(0, 200) : undefined,
+    };
+    const usuario = await authService.actualizarMe(req.user.id, datos);
     res.json(usuario);
   } catch (err) {
     next(err);
@@ -68,11 +78,7 @@ async function actualizarMe(req, res, next) {
 
 async function forgotPassword(req, res, next) {
   try {
-    const { mail } = req.body;
-
-    if (!mail) {
-      return res.status(400).json({ error: 'Falta el mail' });
-    }
+    const mail = v.email(req.body.mail, 'mail', { requerido: true });
 
     await authService.forgotPassword(mail);
     // respuesta identica exista o no el mail, para no filtrar que usuarios estan registrados
@@ -84,14 +90,8 @@ async function forgotPassword(req, res, next) {
 
 async function resetPassword(req, res, next) {
   try {
-    const { token, password } = req.body;
-
-    if (!token || !password) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
-    }
+    const token = v.texto(req.body.token, 'token', { requerido: true, max: 128 });
+    const password = v.password(req.body.password);
 
     await authService.resetPassword({ token, password });
     res.json({ mensaje: 'Contraseña actualizada' });

@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { prisma } = require('../config/db');
 const { enviarInvitacion } = require('../config/mailer');
+const { huella } = require('./auth.service');
 
 const DIAS_EXPIRACION = 7;
 
@@ -30,8 +31,9 @@ async function crear({ email, rol, invitadoPorId }) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiraEn = new Date(Date.now() + DIAS_EXPIRACION * 24 * 60 * 60 * 1000);
 
+  // en la base va la huella del token, no el token (ver huella en auth.service)
   const invitacion = await prisma.invitacion.create({
-    data: { email, rol, token, expiraEn, invitadoPorId },
+    data: { email, rol, token: huella(token), expiraEn, invitadoPorId },
   });
 
   const link = `${process.env.FRONTEND_URL}/aceptar-invitacion?token=${token}`;
@@ -69,7 +71,11 @@ async function crear({ email, rol, invitadoPorId }) {
 }
 
 async function aceptar({ token, nombre, apellido, telefono, password }) {
-  const invitacion = await prisma.invitacion.findUnique({ where: { token } });
+  // las invitaciones nuevas guardan la huella; las anteriores a este cambio,
+  // el token tal cual (se aceptan hasta que venzan)
+  const invitacion =
+    (await prisma.invitacion.findUnique({ where: { token: huella(token) } })) ||
+    (await prisma.invitacion.findUnique({ where: { token } }));
 
   if (!invitacion) {
     const error = new Error('Invitación no encontrada');
@@ -86,6 +92,14 @@ async function aceptar({ token, nombre, apellido, telefono, password }) {
   if (invitacion.expiraEn < new Date()) {
     const error = new Error('Esta invitación expiró');
     error.status = 410;
+    throw error;
+  }
+
+  // por si el mail ya se registro por otro lado mientras la invitacion esperaba
+  const yaExiste = await prisma.user.findUnique({ where: { mail: invitacion.email } });
+  if (yaExiste) {
+    const error = new Error('Ese email ya tiene una cuenta. Iniciá sesión.');
+    error.status = 409;
     throw error;
   }
 

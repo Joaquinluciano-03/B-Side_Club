@@ -29,14 +29,26 @@ async function obtenerPorId(id, { soloActivas = false } = {}) {
   return promocion;
 }
 
+// La imagen de una promo solo se carga subiendo un archivo (subirImagenPromocion).
+// Por el JSON se acepta dejar la que ya tenia o quitarla (null), nada mas: si
+// se aceptara cualquier URL, alguien podia apuntar la promo a un archivo de
+// otro producto y, al borrarla o cambiarle la imagen, borraria ese archivo
+// del storage. Y de paso tampoco se pueden meter links externos en la home.
+function imagenUrlPermitida(nueva, actual = null) {
+  if (nueva === null || nueva === actual) return nueva;
+  const error = new Error('La imagen de la promoción se carga subiendo un archivo.');
+  error.status = 400;
+  throw error;
+}
+
 async function crear(data) {
   return prisma.promocion.create({
     data: {
       titulo: data.titulo,
       descripcion: data.descripcion,
-      imagenUrl: data.imagenUrl,
-      fechaInicio: data.fechaInicio ? new Date(data.fechaInicio) : null,
-      fechaFin: data.fechaFin ? new Date(data.fechaFin) : null,
+      imagenUrl: imagenUrlPermitida(data.imagenUrl ?? null),
+      fechaInicio: data.fechaInicio ?? null,
+      fechaFin: data.fechaFin ?? null,
       activa: data.activa !== undefined ? data.activa : true,
     },
   });
@@ -44,27 +56,30 @@ async function crear(data) {
 
 // Lista blanca, igual que en productos: antes se pasaba el body completo a
 // Prisma y se podia mandar cualquier columna, incluido "id".
-const CAMPOS_EDITABLES = ['titulo', 'descripcion', 'imagenUrl', 'activa'];
+// (las fechas ya llegan como Date o null desde el controller)
+const CAMPOS_EDITABLES = ['titulo', 'descripcion', 'activa', 'fechaInicio', 'fechaFin'];
 
 async function actualizar(id, data) {
-  await obtenerPorId(id);
+  const actual = await obtenerPorId(id);
 
   const dataActualizada = {};
   for (const campo of CAMPOS_EDITABLES) {
     if (data[campo] !== undefined) dataActualizada[campo] = data[campo];
   }
-
-  // las fechas llegan como texto y van a la base como Date; vacio = sin fecha
-  for (const campo of ['fechaInicio', 'fechaFin']) {
-    if (data[campo] !== undefined) {
-      dataActualizada[campo] = data[campo] ? new Date(data[campo]) : null;
-    }
+  if (data.imagenUrl !== undefined) {
+    dataActualizada.imagenUrl = imagenUrlPermitida(data.imagenUrl, actual.imagenUrl);
   }
 
-  return prisma.promocion.update({
+  const actualizada = await prisma.promocion.update({
     where: { id: Number(id) },
     data: dataActualizada,
   });
+
+  // si le sacaron la imagen, el archivo tambien se va del storage
+  if (dataActualizada.imagenUrl === null && actual.imagenUrl) {
+    await borrarImagen(actual.imagenUrl);
+  }
+  return actualizada;
 }
 
 // Sube la imagen a Supabase Storage (mismo bucket que los productos) y la deja

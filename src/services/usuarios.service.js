@@ -20,7 +20,7 @@ async function listar() {
 }
 
 async function buscarOFallar(id) {
-  const usuario = await prisma.user.findUnique({ where: { id: Number(id) } });
+  const usuario = await prisma.user.findUnique({ where: { id } });
   if (!usuario) {
     const error = new Error('Usuario no encontrado');
     error.status = 404;
@@ -29,7 +29,7 @@ async function buscarOFallar(id) {
   return usuario;
 }
 
-async function actualizar(id, { nombre, apellido, mail, telefono, rol }) {
+async function actualizar(id, { nombre, apellido, mail, telefono, rol }, rolSolicitante) {
   const target = await buscarOFallar(id);
 
   // al super_admin (el dueño del local) no lo puede tocar nadie desde este endpoint
@@ -46,11 +46,20 @@ async function actualizar(id, { nombre, apellido, mail, telefono, rol }) {
     throw error;
   }
 
-  // un rol inventado llegaria a Prisma y saldria como error 500
-  if (rol !== undefined && !['administrador', 'vendedor'].includes(rol)) {
-    const error = new Error('Rol inválido, debe ser administrador o vendedor');
-    error.status = 400;
-    throw error;
+  // un administrador gestiona a los vendedores, no a sus pares: si no, podia
+  // bajarle el rol a otro administrador o cambiarle el mail y quedarse con su
+  // cuenta. Tampoco puede ascender a nadie a administrador.
+  if (rolSolicitante !== 'super_admin') {
+    if (target.rol === 'administrador') {
+      const error = new Error('Solo el dueño del local puede modificar administradores');
+      error.status = 403;
+      throw error;
+    }
+    if (rol === 'administrador') {
+      const error = new Error('Solo el dueño del local puede nombrar administradores');
+      error.status = 403;
+      throw error;
+    }
   }
 
   if (mail) {

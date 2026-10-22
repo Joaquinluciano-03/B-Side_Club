@@ -14,7 +14,6 @@ import { useToast } from '../../lib/toast';
 import { formatearFecha, etiquetaRol, mensajeDeError } from '../../lib/formato';
 
 const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ROLES = ['vendedor', 'administrador'];
 
 export default function Invitaciones() {
   const { usuario } = useAuth();
@@ -24,6 +23,8 @@ export default function Invitaciones() {
   const [error, setError] = useState(null);
   const [email, setEmail] = useState('');
   const [rol, setRol] = useState('vendedor');
+  // administradores solo los suma el dueño (el backend tambien lo exige)
+  const roles = usuario?.rol === 'super_admin' ? ['vendedor', 'administrador'] : ['vendedor'];
   const [errorCampo, setErrorCampo] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [aRevocar, setARevocar] = useState(null);
@@ -115,7 +116,7 @@ export default function Invitaciones() {
             <div className="campo" style={{ minWidth: 170 }}>
               <label htmlFor="inv-rol">Rol</label>
               <select id="inv-rol" value={rol} onChange={(e) => setRol(e.target.value)}>
-                {ROLES.map((r) => (
+                {roles.map((r) => (
                   <option key={r} value={r}>
                     {etiquetaRol(r)}
                   </option>

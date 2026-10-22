@@ -4,6 +4,8 @@
 //   - al super_admin no lo toca nadie
 //   - nadie puede asignar el rol super_admin
 //   - solo el super_admin puede eliminar a un administrador
+//   - solo el super_admin cambia roles (un administrador no puede ascender
+//     a nadie ni tocar a otro administrador)
 
 import { useEffect, useState } from 'react';
 import { get, put, del } from '../../lib/api';
@@ -84,6 +86,7 @@ export default function Usuarios() {
                   // el backend solo deja al super_admin eliminar administradores
                   const puedoBorrar =
                     !esDueño && !soyYo && (u.rol !== 'administrador' || soyDueño);
+                  const puedoCambiarRol = soyDueño && !esDueño;
 
                   return (
                     <tr key={u.id}>
@@ -98,7 +101,7 @@ export default function Usuarios() {
                         {u.telefono || '—'}
                       </td>
                       <td data-etiqueta="Rol">
-                        {esDueño ? (
+                        {!puedoCambiarRol ? (
                           <span className="badge badge-neutro">{etiquetaRol(u.rol)}</span>
                         ) : (
                           <select

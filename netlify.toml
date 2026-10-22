@@ -45,12 +45,29 @@
 
 # helmet pone los headers de las respuestas de la API; estos son para los
 # archivos estaticos del sitio, que no pasan por Express.
+#
+# Content-Security-Policy: le dice al navegador de donde puede cargar cosas el
+# sitio. Si alguien lograra meter codigo en la pagina, no podria traer
+# scripts de otro lado ni mandar datos afuera.
+#   - script-src: solo nuestros archivos y el script chico de index.html,
+#     habilitado por su hash (si se cambia ese script, recalcular el hash:
+#     sha256 en base64 del texto que queda entre <script> y </script>)
+#   - img-src: las fotos viven en Supabase Storage. Va el comodin
+#     *.supabase.co y no la direccion del proyecto, que es secreta en Netlify
+#     (el build falla si aparece en el codigo). blob: es la vista previa de
+#     las fotos elegidas en el panel antes de subirlas
+#   - connect-src 'self': la API esta en el mismo dominio (/api)
+#   - style-src 'unsafe-inline': React y motion ponen estilos en linea
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'sha256-QYktQWD6M+cubam+/FoEiKThvlsPGH3bKTBp84xDBKQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
 
 [[headers]]
   for = "/assets/*"
