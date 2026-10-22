@@ -1,7 +1,7 @@
-import { Routes, Route, Navigate, useLocation, useNavigationType } from 'react-router-dom';
+import { Routes, Route, Navigate, Link, useLocation, useNavigationType } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useAuth } from './lib/auth';
-import { Cargando } from './componentes/Estados';
+import { Cargando, Vacio } from './componentes/Estados';
 
 // La home y su layout van en el paquete principal: es por donde entra casi
 // todo el mundo. El resto de las paginas se bajan aparte, cuando hacen falta
@@ -145,6 +145,21 @@ function SoloStaff({ children }) {
   return children;
 }
 
+// Invitaciones y Equipo son solo para el dueño y los administradores. El menu
+// ya no las muestra a los vendedores, pero si alguien entra escribiendo la
+// direccion, mejor un mensaje claro que el error del servidor con "Reintentar".
+function SoloAdmin({ children }) {
+  const { puedeInvitar } = useAuth();
+  if (puedeInvitar) return children;
+  return (
+    <Vacio titulo="Esta sección es para administradores" texto="Pedile al dueño del local que te dé permisos si la necesitás.">
+      <Link to="/panel" className="btn btn-primario">
+        Volver al inicio del panel
+      </Link>
+    </Vacio>
+  );
+}
+
 export default function App() {
   usePrecargarPaginas();
 
@@ -189,8 +204,8 @@ export default function App() {
             <Route path="promociones" element={<PanelPromociones />} />
             <Route path="consultas" element={<PanelConsultas />} />
             <Route path="info" element={<PanelInfoLocal />} />
-            <Route path="invitaciones" element={<PanelInvitaciones />} />
-            <Route path="usuarios" element={<PanelUsuarios />} />
+            <Route path="invitaciones" element={<SoloAdmin><PanelInvitaciones /></SoloAdmin>} />
+            <Route path="usuarios" element={<SoloAdmin><PanelUsuarios /></SoloAdmin>} />
             <Route path="perfil" element={<PanelPerfil />} />
           </Route>
 

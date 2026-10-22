@@ -161,13 +161,14 @@ export default function LayoutPanel() {
         </div>
       </aside>
 
-      <div className={estilos.area}>
+      {/* main: el contenido de cada seccion (los lectores de pantalla saltan directo aca) */}
+      <main className={estilos.area}>
         {/* cada seccion del panel se baja aparte (App.jsx): mientras llega,
             el lateral queda y el contenido muestra el disco de carga */}
         <Suspense fallback={<Cargando />}>
           <Outlet />
         </Suspense>
-      </div>
+      </main>
     </div>
   );
 }
