@@ -39,8 +39,8 @@ export default function Resetear() {
     setError(null);
     setErrorCampo(null);
 
-    if (password.length < 6) {
-      setErrorCampo('La contraseña necesita al menos 6 caracteres.');
+    if (password.length < 8) {
+      setErrorCampo('La contraseña necesita al menos 8 caracteres.');
       return;
     }
     if (password !== repetir) {
@@ -91,7 +91,7 @@ export default function Resetear() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
           />
-          <div className="campo-ayuda">Mínimo 6 caracteres.</div>
+          <div className="campo-ayuda">Mínimo 8 caracteres.</div>
         </div>
 
         <div className={`campo ${errorCampo ? 'con-error' : ''}`}>

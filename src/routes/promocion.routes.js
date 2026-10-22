@@ -5,6 +5,7 @@ const promocionController = require('../controllers/promocion');
 const { requireAuth, authOpcional } = require('../middlewares/auth');
 const { requireRol } = require('../middlewares/requireRol');
 const upload = require('../config/multer');
+const { validarImagen } = require('../middlewares/validarImagen');
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.post(
   requireAuth,
   requireRol(...rolesGestion),
   upload.single('imagen'),
+  validarImagen,
   promocionController.subirImagen
 );
 router.delete('/:id', requireAuth, requireRol(...rolesGestion), promocionController.eliminar);

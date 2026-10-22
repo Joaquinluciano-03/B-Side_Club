@@ -1,6 +1,6 @@
 // Datos personales del usuario logueado (PUT /api/auth/me).
 // La contraseña se manda solo si se escribio algo: si va vacia, el backend
-// no la toca.
+// no la toca. Cambiar la contraseña o el email pide la contraseña actual.
 
 import { useState } from 'react';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
@@ -21,10 +21,15 @@ export default function Perfil() {
     mail: usuario?.mail ?? '',
     telefono: usuario?.telefono ?? '',
   });
+  const [actual, setActual] = useState('');
   const [password, setPassword] = useState('');
   const [repetir, setRepetir] = useState('');
   const [errores, setErrores] = useState({});
   const [guardando, setGuardando] = useState(false);
+
+  // el mail es con el que se recupera la cuenta: cambiarlo tambien la pide
+  const cambiaMail = form.mail.trim().toLowerCase() !== (usuario?.mail ?? '').toLowerCase();
+  const pideActual = Boolean(password) || cambiaMail;
 
   function campo(k, v) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -39,8 +44,9 @@ export default function Perfil() {
     if (!form.apellido.trim()) e.apellido = 'Requerido.';
     if (!MAIL_REGEX.test(form.mail)) e.mail = 'Mail inválido.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (password && password.length < 6) e.password = 'Mínimo 6 caracteres.';
+    if (password && password.length < 8) e.password = 'Mínimo 8 caracteres.';
     if (password && password !== repetir) e.repetir = 'No coinciden.';
+    if (pideActual && !actual) e.actual = 'Escribí tu contraseña actual.';
     setErrores(e);
     if (Object.keys(e).length) return;
 
@@ -52,7 +58,9 @@ export default function Perfil() {
         mail: form.mail.trim(),
         telefono: form.telefono.trim(),
         ...(password ? { password } : {}),
+        ...(pideActual ? { passwordActual: actual } : {}),
       });
+      setActual('');
       setPassword('');
       setRepetir('');
       toast.exito(password ? 'Datos y contraseña actualizados.' : 'Datos actualizados.');
@@ -64,10 +72,10 @@ export default function Perfil() {
   }
 
   const campos = [
-    { k: 'nombre', label: 'Nombre' },
-    { k: 'apellido', label: 'Apellido' },
-    { k: 'mail', label: 'Email', tipo: 'email' },
-    { k: 'telefono', label: 'Teléfono', tipo: 'tel' },
+    { k: 'nombre', label: 'Nombre', auto: 'given-name' },
+    { k: 'apellido', label: 'Apellido', auto: 'family-name' },
+    { k: 'mail', label: 'Email', tipo: 'email', auto: 'username' },
+    { k: 'telefono', label: 'Teléfono', tipo: 'tel', auto: 'tel' },
   ];
 
   return (
@@ -94,6 +102,7 @@ export default function Perfil() {
                   <input
                     id={`pf-${c.k}`}
                     type={c.tipo || 'text'}
+                    autoComplete={c.auto}
                     value={form[c.k]}
                     onChange={(e) => campo(c.k, e.target.value)}
                   />
@@ -109,6 +118,24 @@ export default function Perfil() {
               Dejalo vacío si no querés cambiarla.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className={`campo ${errores.actual ? 'con-error' : ''}`}>
+                <label htmlFor="pf-actual">Contraseña actual</label>
+                <InputPassword
+                  id="pf-actual"
+                  value={actual}
+                  onChange={(e) => {
+                    setActual(e.target.value);
+                    if (errores.actual) setErrores((x) => ({ ...x, actual: null }));
+                  }}
+                  autoComplete="current-password"
+                />
+                {errores.actual ? (
+                  <div className="campo-error">{errores.actual}</div>
+                ) : (
+                  <div className="campo-ayuda">Hace falta para cambiar la contraseña o el email.</div>
+                )}
+              </div>
+
               <div className={`campo ${errores.password ? 'con-error' : ''}`}>
                 <label htmlFor="pf-pass">Contraseña nueva</label>
                 <InputPassword

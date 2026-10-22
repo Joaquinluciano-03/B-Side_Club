@@ -12,9 +12,13 @@ export function linkWhatsApp(numero, mensaje) {
   return `https://wa.me/${digitos}${texto}`;
 }
 
+// solo letras, numeros, punto y guion bajo (lo que acepta Instagram): asi un
+// valor raro cargado en la base no arma un link a otra parte
 export function linkInstagram(usuario) {
   if (!usuario) return null;
-  return `https://instagram.com/${String(usuario).trim().replace(/^@/, '')}`;
+  const limpio = String(usuario).trim().replace(/^@/, '');
+  if (!/^[A-Za-z0-9._]{1,30}$/.test(limpio)) return null;
+  return `https://instagram.com/${limpio}`;
 }
 
 export function arrobaInstagram(usuario) {

@@ -45,7 +45,7 @@ export default function AceptarInvitacion() {
     if (!form.nombre.trim()) e.nombre = 'Requerido.';
     if (!form.apellido.trim()) e.apellido = 'Requerido.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (form.password.length < 6) e.password = 'Mínimo 6 caracteres.';
+    if (form.password.length < 8) e.password = 'Mínimo 8 caracteres.';
     setErrores(e);
     if (Object.keys(e).length) return;
 
@@ -113,7 +113,7 @@ export default function AceptarInvitacion() {
             />
             {errores[c.k] && <div className="campo-error">{errores[c.k]}</div>}
             {c.k === 'password' && !errores.password && (
-              <div className="campo-ayuda">Mínimo 6 caracteres.</div>
+              <div className="campo-ayuda">Mínimo 8 caracteres.</div>
             )}
           </div>
         ))}

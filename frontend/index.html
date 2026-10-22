@@ -39,17 +39,11 @@
          seria bajarlo de mas (y el navegador avisa que no se uso).
          La direccion de Supabase no se escribe aca: SUPABASE_URL esta marcada
          como secreta en Netlify y el build falla si aparece en el codigo. -->
-    <script>
-      if (location.pathname === '/' || location.pathname === '/login') {
-        for (const archivo of ['/surcos.svg', '/imperfecciones.svg']) {
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.as = 'image';
-          link.href = archivo;
-          document.head.appendChild(link);
-        }
-      }
-    </script>
+    <!-- en una sola linea a proposito: la Content-Security-Policy de
+         netlify.toml lo habilita por su hash, y con saltos de linea el hash
+         cambiaria segun la maquina (CRLF en Windows, LF en el repo). Si se
+         toca, hay que recalcular el hash (ver netlify.toml). -->
+    <script>if(location.pathname==="/"||location.pathname==="/login"){for(const a of["/surcos.svg","/imperfecciones.svg"]){const l=document.createElement("link");l.rel="preload";l.as="image";l.href=a;document.head.appendChild(l)}}</script>
   </head>
   <body>
     <div id="root"></div>

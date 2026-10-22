@@ -57,7 +57,10 @@ export function AuthProvider({ children }) {
   }
 
   async function actualizarPerfil(datos) {
-    const u = await put('/auth/me', datos);
+    // con contraseña nueva el backend invalida los tokens anteriores y manda
+    // uno nuevo: hay que guardarlo, si no la proxima llamada cierra la sesion
+    const { token, ...u } = await put('/auth/me', datos);
+    if (token) guardarToken(token);
     setUsuario(u);
     return u;
   }

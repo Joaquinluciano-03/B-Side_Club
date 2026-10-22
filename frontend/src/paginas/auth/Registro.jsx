@@ -37,7 +37,7 @@ export default function Registro() {
     if (!form.mail.trim()) e.mail = 'Requerido.';
     else if (!MAIL_REGEX.test(form.mail)) e.mail = 'Falta el dominio del email.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (form.password.length < 6) e.password = 'Mínimo 6 caracteres.';
+    if (form.password.length < 8) e.password = 'Mínimo 8 caracteres.';
     setErrores(e);
     return Object.keys(e).length === 0;
   }
@@ -98,7 +98,7 @@ export default function Registro() {
             />
             {errores[c.k] && <div className="campo-error">{errores[c.k]}</div>}
             {c.k === 'password' && !errores.password && (
-              <div className="campo-ayuda">Mínimo 6 caracteres.</div>
+              <div className="campo-ayuda">Mínimo 8 caracteres.</div>
             )}
           </div>
         ))}

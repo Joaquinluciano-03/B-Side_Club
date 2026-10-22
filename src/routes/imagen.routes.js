@@ -3,6 +3,7 @@
 const { Router } = require('express');
 const imagenController = require('../controllers/imagen');
 const upload = require('../config/multer');
+const { validarImagen } = require('../middlewares/validarImagen');
 const { requireAuth } = require('../middlewares/auth');
 const { requireRol } = require('../middlewares/requireRol');
 
@@ -16,6 +17,7 @@ router.post(
   requireAuth,
   requireRol(...rolesGestion),
   upload.array('imagenes', 5),
+  validarImagen,
   imagenController.agregar
 );
 

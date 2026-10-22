@@ -1,8 +1,7 @@
 // traduce http a logica de negocio
 
 const invitacionService = require('../services/invitacion.service');
-
-const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const v = require('../utils/validar');
 
 // roles que se pueden dar por invitacion. super_admin queda afuera a proposito:
 // es el dueño del local, hay uno solo y sale del registro inicial. Sin esta
@@ -12,16 +11,13 @@ const ROLES_INVITABLES = ['administrador', 'vendedor'];
 
 async function crear(req, res, next) {
   try {
-    const { email, rol } = req.body;
+    const email = v.email(req.body.email, 'email', { requerido: true });
+    const rol = v.opcion(req.body.rol, 'rol', ROLES_INVITABLES, { requerido: true });
 
-    if (!email || !rol) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
-    }
-    if (!MAIL_REGEX.test(email)) {
-      return res.status(400).json({ error: 'El mail no tiene un formato válido' });
-    }
-    if (!ROLES_INVITABLES.includes(rol)) {
-      return res.status(400).json({ error: `Rol inválido, debe ser uno de: ${ROLES_INVITABLES.join(', ')}` });
+    // solo el dueño suma administradores: si no, un administrador podia
+    // invitar a otros con su mismo poder (y ellos a mas)
+    if (rol === 'administrador' && req.user.rol !== 'super_admin') {
+      return res.status(403).json({ error: 'Solo el dueño del local puede invitar administradores.' });
     }
 
     const resultado = await invitacionService.crear({
@@ -29,7 +25,6 @@ async function crear(req, res, next) {
       rol,
       invitadoPorId: req.user.id,
     });
-
     res.status(201).json(resultado);
   } catch (err) {
     next(err);
@@ -38,16 +33,15 @@ async function crear(req, res, next) {
 
 async function aceptar(req, res, next) {
   try {
-    const { token, nombre, apellido, telefono, password } = req.body;
+    const datos = {
+      token: v.texto(req.body.token, 'token', { requerido: true, max: 128 }),
+      nombre: v.texto(req.body.nombre, 'nombre', { requerido: true, max: 60 }),
+      apellido: v.texto(req.body.apellido, 'apellido', { requerido: true, max: 60 }),
+      telefono: v.telefono(req.body.telefono, 'telefono', { requerido: true }),
+      password: v.password(req.body.password),
+    };
 
-    if (!token || !nombre || !apellido || !telefono || !password) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
-    }
-
-    const resultado = await invitacionService.aceptar({ token, nombre, apellido, telefono, password });
+    const resultado = await invitacionService.aceptar(datos);
     res.status(201).json(resultado);
   } catch (err) {
     next(err);
@@ -65,7 +59,7 @@ async function listar(req, res, next) {
 
 async function revocar(req, res, next) {
   try {
-    await invitacionService.revocar(req.params.id);
+    await invitacionService.revocar(v.id(req.params.id));
     res.json({ mensaje: 'Invitación revocada' });
   } catch (err) {
     next(err);
