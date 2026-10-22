@@ -22,6 +22,11 @@
   flex-wrap: wrap;
   margin-bottom: var(--e-7);
 }
+.verTodos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-3) var(--e-6);
+}
 .verTodo {
   display: inline-flex;
   align-items: center;

@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigationType } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useAuth } from './lib/auth';
 import { Cargando } from './componentes/Estados';
 
@@ -53,13 +53,84 @@ function usePrecargarPaginas() {
   }, []);
 }
 
-// Al cambiar de ruta el navegador conserva el scroll, y se siente roto cuando
-// entras a un producto y aparecés a mitad de la ficha.
-function ScrollAlTope() {
-  const { pathname } = useLocation();
+// Scroll entre paginas:
+// - al entrar a una pagina nueva (un link) se arranca arriba; si no, entrabas
+//   a un producto y aparecias a mitad de la ficha
+// - al volver con Atras (o Adelante) se vuelve a donde estabas: bajabas por
+//   el catalogo, abrias un disco, volvias y aparecias arriba de todo
+// El navegador no lo puede hacer solo porque el contenido llega despues
+// (pedidos a la API): se recuerda la posicion de cada entrada del historial y
+// al volver se reintenta hasta que la pagina tiene alto suficiente.
+const posiciones = new Map();
+
+function ManejoDelScroll() {
+  const location = useLocation();
+  const tipo = useNavigationType();
+  const rutaAnterior = useRef(location.pathname);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  }, []);
+
+  // recuerda donde esta parado el usuario en esta entrada del historial.
+  // useLayoutEffect y no useEffect: al cambiar de pagina el contenido nuevo
+  // es mas corto y el navegador acomoda el scroll; si el listener viejo
+  // seguia puesto, guardaba esa posicion acomodada en la pagina anterior
+  useLayoutEffect(() => {
+    let cuadro = 0;
+    const alScrollear = () => {
+      cancelAnimationFrame(cuadro);
+      cuadro = requestAnimationFrame(() => posiciones.set(location.key, window.scrollY));
+    };
+    window.addEventListener('scroll', alScrollear, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', alScrollear);
+      cancelAnimationFrame(cuadro);
+    };
+  }, [location.key]);
+
+  useLayoutEffect(() => {
+    const cambioDePagina = rutaAnterior.current !== location.pathname;
+    rutaAnterior.current = location.pathname;
+    const guardada = posiciones.get(location.key);
+
+    if (tipo === 'POP' && guardada) {
+      // reintenta hasta llegar (o 6 s: la lista puede tardar en llegar de la
+      // API); si el usuario scrollea o toca una tecla, para y lo deja ahi
+      const limite = performance.now() + 6000;
+      let cuadro = 0;
+      let parar = false;
+      const cortar = () => (parar = true);
+      // ademas de llegar, espera a que la pagina deje de crecer: si arriba
+      // termina de cargar algo (una grilla que pasa de 4 a 8 discos), el
+      // navegador corre el scroll para compensar y te dejaba mas abajo
+      let alto = 0;
+      let quietoDesde = performance.now();
+      const intentar = () => {
+        if (parar) return;
+        window.scrollTo(0, guardada);
+        const altoAhora = document.documentElement.scrollHeight;
+        if (altoAhora !== alto) {
+          alto = altoAhora;
+          quietoDesde = performance.now();
+        }
+        const llego = Math.abs(window.scrollY - guardada) <= 2;
+        const estable = performance.now() - quietoDesde > 600;
+        if (!(llego && estable) && performance.now() < limite) cuadro = requestAnimationFrame(intentar);
+      };
+      window.addEventListener('wheel', cortar, { passive: true, once: true });
+      window.addEventListener('touchstart', cortar, { passive: true, once: true });
+      window.addEventListener('keydown', cortar, { once: true });
+      intentar();
+      return () => {
+        cancelAnimationFrame(cuadro);
+        window.removeEventListener('wheel', cortar);
+        window.removeEventListener('touchstart', cortar);
+        window.removeEventListener('keydown', cortar);
+      };
+    }
+    if (cambioDePagina) window.scrollTo(0, 0);
+  }, [location.key]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 
@@ -79,7 +150,7 @@ export default function App() {
 
   return (
     <>
-      <ScrollAlTope />
+      <ManejoDelScroll />
       {/* mientras baja el codigo de una pagina (solo la primera vez que se
           entra; las publicas ya vienen precargadas). Las paginas del sitio
           tienen su propio Suspense en LayoutPublico, asi el header queda */}

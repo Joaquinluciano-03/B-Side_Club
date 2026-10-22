@@ -76,7 +76,6 @@ export default function DetalleProducto() {
     let vigente = true;
     setProducto(null);
     setError(null);
-    window.scrollTo(0, 0);
 
     get(`/productos/${id}`)
       .then((p) => {

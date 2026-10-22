@@ -36,16 +36,18 @@ const PROMESAS = [
 
 function Elegidos() {
   const [destacados, setDestacados] = useState(null);
+  const [cantidadOfertas, setCantidadOfertas] = useState(0);
   const { total } = useConteos();
 
   // las ofertas (productos con descuento) primero y despues los destacados,
   // sin repetir los que son las dos cosas; hasta 8 en total
   useEffect(() => {
     const pedir = (filtro) =>
-      get(`/productos${query({ ...filtro, pageSize: 8 })}`)
-        .then((r) => r.productos)
-        .catch(() => []);
-    Promise.all([pedir({ conDescuento: 'true' }), pedir({ destacado: 'true' })]).then(([ofertas, elegidos]) => {
+      get(`/productos${query({ ...filtro, pageSize: 8 })}`).catch(() => ({ productos: [], total: 0 }));
+    Promise.all([pedir({ conDescuento: 'true' }), pedir({ destacado: 'true' })]).then(([rOfertas, rElegidos]) => {
+      const ofertas = rOfertas.productos;
+      const elegidos = rElegidos.productos;
+      setCantidadOfertas(rOfertas.total ?? ofertas.length);
       const vistos = new Set();
       const lista = [...ofertas, ...elegidos].filter((p) => !vistos.has(p.id) && vistos.add(p.id));
       setDestacados(lista.slice(0, 8));
@@ -61,10 +63,19 @@ function Elegidos() {
         <h2 id="elegidos-titulo" className={estilos.h2}>
           Destacados y ofertas
         </h2>
-        <Link to="/catalogo" className={estilos.verTodo}>
-          {total !== null ? `Ver los ${total} títulos` : 'Ver el catálogo'}
-          <ArrowRight size={16} weight="bold" aria-hidden="true" />
-        </Link>
+        <div className={estilos.verTodos}>
+          {/* las ofertas tienen su propio filtro en el catalogo */}
+          {cantidadOfertas > 0 && (
+            <Link to="/catalogo?ofertas=1" className={estilos.verTodo}>
+              {cantidadOfertas === 1 ? 'Ver la oferta' : `Ver las ${cantidadOfertas} ofertas`}
+              <ArrowRight size={16} weight="bold" aria-hidden="true" />
+            </Link>
+          )}
+          <Link to="/catalogo" className={estilos.verTodo}>
+            {total !== null ? `Ver los ${total} títulos` : 'Ver el catálogo'}
+            <ArrowRight size={16} weight="bold" aria-hidden="true" />
+          </Link>
+        </div>
       </div>
 
       {destacados === null ? (

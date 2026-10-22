@@ -52,10 +52,18 @@
   gap: var(--e-5);
 }
 
-.buscador {
-  flex: 0 1 380px;
+/* buscador + boton de ofertas, juntos a la izquierda de los separadores */
+.herramientas {
+  flex: 0 1 520px;
   align-self: center;
   margin-bottom: var(--e-4);
+  display: flex;
+  gap: var(--e-2);
+  min-width: 0;
+}
+.buscador {
+  flex: 1 1 auto;
+  min-width: 0;
   height: 48px;
   display: flex;
   align-items: center;
@@ -92,6 +100,40 @@
 }
 .buscador input::-webkit-search-cancel-button {
   display: none;
+}
+/* el filtro de ofertas: pildora blanca; prendido, naranja como las etiquetas
+   de descuento */
+.ofertas {
+  flex: none;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  background: #fff;
+  color: var(--tinta);
+  font-family: var(--cuerpo);
+  font-size: var(--t-sm);
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color var(--d-rapida) ease,
+    border-color var(--d-rapida) ease,
+    color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.ofertas:hover {
+  border-color: var(--naranja);
+}
+.ofertas:active {
+  transform: scale(0.97);
+}
+.ofertas[aria-pressed='true'] {
+  background: var(--naranja);
+  border-color: var(--tinta);
+  color: var(--tinta-sobre-naranja);
 }
 .borrar {
   width: 30px;
@@ -254,7 +296,7 @@
     gap: var(--e-3);
     padding-top: var(--e-3);
   }
-  .buscador {
+  .herramientas {
     flex: none;
     align-self: stretch;
     margin-bottom: 0;
