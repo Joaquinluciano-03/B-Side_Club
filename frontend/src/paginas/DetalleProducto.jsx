@@ -10,6 +10,7 @@ import { useAuth } from '../lib/auth';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { linkWhatsApp } from '../lib/contacto';
 import { formatoDe } from '../componentes/ArteProducto';
+import IconoCategoria from '../componentes/IconoCategoria';
 import GaleriaProducto from '../componentes/GaleriaProducto';
 import CardProducto from '../componentes/CardProducto';
 import Precio from '../componentes/Precio';
@@ -184,8 +185,15 @@ export default function DetalleProducto() {
         {/* ---------- la hoja de inspeccion ---------- */}
         <div className={`${estilos.hoja} cascada`} style={{ '--cascada-inicio': '160ms' }}>
           <p className={estilos.meta}>
-            {categoria?.nombre}
-            {producto.anio ? ` · ${producto.anio}` : ''}
+            {categoria && (
+              <span className={estilos.icono}>
+                <IconoCategoria categoria={categoria} />
+              </span>
+            )}
+            <span>
+              {categoria?.nombre}
+              {producto.anio ? ` · ${producto.anio}` : ''}
+            </span>
           </p>
           <h1 className={estilos.titulo}>{titulo}</h1>
           {artista && <p className={estilos.artista}>{artista}</p>}

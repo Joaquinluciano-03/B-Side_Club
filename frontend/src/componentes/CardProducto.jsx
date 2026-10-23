@@ -2,11 +2,13 @@
 // disco asoma un poco por el costado; al pasar el mouse (o con foco) se
 // desliza afuera, como cuando sacas un disco de la batea para mirarlo.
 // Abajo, sin caja: estado (solo si no es "disponible"), titulo, artista,
-// formato y año, y el precio (con el descuento, si tiene).
+// formato (con el icono de su categoria) y año, y el precio (con el
+// descuento, si tiene).
 
 import { Link } from 'react-router-dom';
 import ArteProducto, { ObjetoInterior } from './ArteProducto';
 import Precio from './Precio';
+import IconoCategoria from './IconoCategoria';
 import { etiquetaStock, esAConsultar, separarNombre } from '../lib/formato';
 import estilos from './CardProducto.module.css';
 
@@ -43,8 +45,15 @@ export default function CardProducto({ producto, prioridad = false }) {
         <h3 className={estilos.titulo}>{titulo}</h3>
         {artista && <p className={estilos.artista}>{artista}</p>}
         <p className={estilos.meta}>
-          {categoria?.nombre}
-          {anio ? ` · ${anio}` : ''}
+          {categoria && (
+            <span className={estilos.icono}>
+              <IconoCategoria categoria={categoria} />
+            </span>
+          )}
+          <span>
+            {categoria?.nombre}
+            {anio ? ` · ${anio}` : ''}
+          </span>
         </p>
         <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
           {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}

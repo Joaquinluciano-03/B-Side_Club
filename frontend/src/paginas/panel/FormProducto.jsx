@@ -18,6 +18,7 @@ import Confirmar from '../../componentes/Confirmar';
 import CardProducto from '../../componentes/CardProducto';
 import CamposDescuento, { errorDescuento } from '../../componentes/CamposDescuento';
 import { useToast } from '../../lib/toast';
+import { olvidarConteos } from '../../lib/useConteos';
 import { ESTADOS_STOCK, etiquetaStock, mensajeDeError, separarNombre } from '../../lib/formato';
 import estilos from './FormProducto.module.css';
 
@@ -182,6 +183,8 @@ export default function FormProducto() {
 
     setGuardando(true);
     try {
+      // las cantidades por categoria del sitio pueden cambiar (alta, baja, categoria)
+      olvidarConteos();
       if (editando) {
         await put(`/productos/${id}`, cuerpo);
         toast.exito('Cambios guardados.');

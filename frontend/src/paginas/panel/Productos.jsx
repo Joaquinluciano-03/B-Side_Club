@@ -17,6 +17,7 @@ import ArteProducto from '../../componentes/ArteProducto';
 import Precio from '../../componentes/Precio';
 import CamposDescuento, { errorDescuento } from '../../componentes/CamposDescuento';
 import { useToast } from '../../lib/toast';
+import { olvidarConteos } from '../../lib/useConteos';
 import { esAConsultar, etiquetaStock, mensajeDeError, separarNombre } from '../../lib/formato';
 import estilos from './Productos.module.css';
 
@@ -71,6 +72,7 @@ export default function Productos() {
     setDatos((d) => ({ ...d, productos: d.productos.map((x) => (x.id === p.id ? { ...x, ...cambios } : x)) }));
     try {
       await put(`/productos/${p.id}`, cambios);
+      olvidarConteos();
       if (mensaje) toast.exito(mensaje);
     } catch (err) {
       setDatos((d) => ({ ...d, productos: antes }));
@@ -112,6 +114,7 @@ export default function Productos() {
     setABorrar(null);
     try {
       await del(`/productos/${p.id}`);
+      olvidarConteos();
       toast.exito(`"${p.nombre}" se eliminó.`);
       setRecargar((r) => r + 1);
     } catch (err) {
