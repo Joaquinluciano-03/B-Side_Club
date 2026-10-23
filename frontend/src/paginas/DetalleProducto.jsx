@@ -184,19 +184,23 @@ export default function DetalleProducto() {
 
         {/* ---------- la hoja de inspeccion ---------- */}
         <div className={`${estilos.hoja} cascada`} style={{ '--cascada-inicio': '160ms' }}>
-          <p className={estilos.meta}>
+          {/* formato, titulo y artista; a la derecha, grande, el icono de la
+              categoria (como en la card del catalogo) */}
+          <div className={estilos.encabezado}>
+            <div className={estilos.encabezadoTexto}>
+              <p className={estilos.meta}>
+                {categoria?.nombre}
+                {producto.anio ? ` · ${producto.anio}` : ''}
+              </p>
+              <h1 className={estilos.titulo}>{titulo}</h1>
+              {artista && <p className={estilos.artista}>{artista}</p>}
+            </div>
             {categoria && (
               <span className={estilos.icono}>
                 <IconoCategoria categoria={categoria} />
               </span>
             )}
-            <span>
-              {categoria?.nombre}
-              {producto.anio ? ` · ${producto.anio}` : ''}
-            </span>
-          </p>
-          <h1 className={estilos.titulo}>{titulo}</h1>
-          {artista && <p className={estilos.artista}>{artista}</p>}
+          </div>
 
           <div className={estilos.precioFila}>
             <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''} ${vendido ? estilos.tachado : ''}`}>

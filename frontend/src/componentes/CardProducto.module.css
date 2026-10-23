@@ -54,21 +54,24 @@
 }
 
 /* ============ TEXTO ============ */
-/* el texto a la izquierda y el icono de la categoria a la derecha, en el
-   espacio que queda libre debajo del disco que asoma */
+/* el texto a la izquierda y el icono de la categoria a la derecha. El
+   bloque termina donde termina la funda (88% del ancho): el 12% de la
+   derecha es del disco que asoma, y el icono no tiene que pasarse de ahi */
 .pie {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(44px, 28%, 80px);
+  grid-template-columns: minmax(0, 1fr) clamp(34px, 22%, 52px);
   align-items: center;
-  column-gap: var(--e-3);
+  column-gap: var(--e-2);
+  padding-right: 12%;
 }
 
-/* en el celular las cards miden ~165px: el icono se achica para que el
-   formato y el "a consultar" no se partan en dos lineas */
+/* en el celular las cards miden ~165px: el icono se achica y el bloque usa
+   todo el ancho, para que el formato y el "a consultar" no se partan */
 @media (max-width: 640px) {
   .pie {
-    grid-template-columns: minmax(0, 1fr) 36px;
+    grid-template-columns: minmax(0, 1fr) 34px;
     column-gap: 6px;
+    padding-right: 0;
   }
 }
 
@@ -121,24 +124,15 @@
   text-transform: uppercase;
 }
 
-/* el dibujo llena la caja (fuera de aca ocupa el 72% de la suya) y se
-   inclina un poco cuando el disco sale de la funda */
+/* el dibujo llena la caja (fuera de aca ocupa el 72% de la suya). Quieto:
+   el movimiento de la card es el del disco que sale de la funda */
 .icono {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  transition: transform 420ms var(--ease-out);
 }
 .pie .icono > * {
   width: 100%;
-}
-@media (hover: hover) and (pointer: fine) {
-  .card:hover .icono {
-    transform: rotate(-10deg) scale(1.04);
-  }
-}
-.card:focus-visible .icono {
-  transform: rotate(-10deg) scale(1.04);
 }
 
 .precio {
