@@ -12,7 +12,7 @@ import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { linkWhatsApp } from '../lib/contacto';
 import CardProducto from '../componentes/CardProducto';
 import HeroLabel from '../componentes/home/HeroLabel';
-import { MotivoCategoria } from '../componentes/ArteProducto';
+import IconoCategoria from '../componentes/IconoCategoria';
 import BandaPromociones from '../componentes/BandaPromociones';
 import { SkeletonGrilla } from '../componentes/Estados';
 import estilos from './Home.module.css';
@@ -112,7 +112,7 @@ function Formatos() {
                 {c.total ?? ''} {c.total === 1 ? 'título' : 'títulos'}
               </span>
               <span className={estilos.filaMotivo} aria-hidden="true">
-                <MotivoCategoria categoria={c.nombre} color={COLORES_FORMATO[i % COLORES_FORMATO.length]} />
+                <IconoCategoria categoria={c} color={COLORES_FORMATO[i % COLORES_FORMATO.length]} />
               </span>
             </Link>
           </li>

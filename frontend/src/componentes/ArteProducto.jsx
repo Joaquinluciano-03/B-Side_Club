@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { urlImagen } from '../lib/api';
 import { separarNombre } from '../lib/formato';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
+import { iconoDe } from './IconoCategoria';
 import estilos from './ArteProducto.module.css';
 
 // colores de funda: la paleta del sitio, mas el crema del papel
@@ -40,14 +41,18 @@ function tintaPara(hex) {
   return lum > 0.5 ? '#141210' : '#F2ECE4';
 }
 
-/** Que objeto va adentro de la funda segun la categoria. */
-export function formatoDe(categoria = '') {
-  const c = categoria.toLowerCase();
-  if (c.includes('vinilo') || c.includes('lp')) return 'vinilo';
-  if (c.includes('cd')) return 'cd';
-  if (c.includes('cassette') || c.includes('casete')) return 'cassette';
-  if (c.includes('equipo')) return 'equipo';
-  return 'vinilo';
+/**
+ * Que objeto va adentro de la funda, segun el icono de la categoria (el
+ * elegido en el panel o el que sugiere su nombre). Todo lo que no es un disco
+ * ni una cinta (equipos, accesorios, libros, merch) lleva la ficha impresa.
+ * Acepta la categoria entera o solo su nombre.
+ */
+export function formatoDe(categoria) {
+  const icono = iconoDe(categoria);
+  if (icono === 'vinilo' || icono === 'simple' || icono === 'color') return 'vinilo';
+  if (icono === 'cd') return 'cd';
+  if (icono === 'cassette' || icono === 'vhs') return 'cassette';
+  return 'equipo';
 }
 
 function TapaGenerica({ producto, formato }) {
@@ -104,9 +109,8 @@ function TapaGenerica({ producto, formato }) {
  */
 export default function ArteProducto({ producto, categoria, prioridad = false, imagen }) {
   const [fallo, setFallo] = useState(false);
-  const nombreCategoria = categoria || producto?.categoria?.nombre || '';
   const portada = imagen || producto?.imagenes?.[0];
-  const formato = formatoDe(nombreCategoria);
+  const formato = formatoDe(categoria || producto?.categoria);
 
   if (portada && urlImagen(portada.url) && !fallo) {
     return (
@@ -132,7 +136,7 @@ export default function ArteProducto({ producto, categoria, prioridad = false, i
  * hace asomar y lo saca un poco al pasar el mouse. Los equipos no tienen.
  */
 export function ObjetoInterior({ producto, categoria }) {
-  const formato = formatoDe(categoria || producto?.categoria?.nombre || '');
+  const formato = formatoDe(categoria || producto?.categoria);
   if (formato === 'equipo') return null;
   const vars = { '--label': colorLabel(producto?.nombre || '') };
 
@@ -146,13 +150,4 @@ export function ObjetoInterior({ producto, categoria }) {
       aria-hidden="true"
     />
   );
-}
-
-/**
- * Solo el dibujo del formato, chico y sin texto. Lo usan las tarjetas "por
- * formato" de la home.
- */
-export function MotivoCategoria({ categoria, color = '#F26A1B' }) {
-  const formato = formatoDe(categoria);
-  return <span className={`${estilos.motivo} ${estilos['motivo_' + formato]}`} style={{ '--label': color }} />;
 }

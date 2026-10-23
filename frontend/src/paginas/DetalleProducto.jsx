@@ -122,7 +122,7 @@ export default function DetalleProducto() {
   const vendido = producto.estado_stock === 'vendido';
   const consultar = esAConsultar(producto.precio);
   const { titulo, artista } = separarNombre(producto.nombre);
-  const formato = formatoDe(producto.categoria?.nombre);
+  const formato = formatoDe(producto.categoria);
   const categoria = producto.categoria;
 
   const mensaje = `Hola ${nombreLocal}! Me interesa "${producto.nombre}" (${window.location.href}). ¿Sigue disponible?`;

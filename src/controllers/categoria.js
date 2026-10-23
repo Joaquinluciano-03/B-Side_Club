@@ -3,6 +3,14 @@
 const categoriaService = require('../services/categoria.service');
 const v = require('../utils/validar');
 
+// los iconos que sabe dibujar el sitio: tiene que coincidir con la lista de
+// frontend/src/componentes/IconoCategoria.jsx
+const ICONOS = [
+  'vinilo', 'simple', 'color', 'cd', 'cassette', 'vhs',
+  'bandeja', 'amplificador', 'perilla', 'parlante', 'auriculares', 'radio', 'microfono',
+  'aguja', 'cepillo', 'funda', 'caja', 'libro', 'poster', 'remera', 'regalo', 'etiqueta',
+];
+
 async function listar(req, res, next) {
   try {
     const categorias = await categoriaService.listar();
@@ -26,6 +34,7 @@ async function crear(req, res, next) {
     const categoria = await categoriaService.crear({
       nombre: v.texto(req.body.nombre, 'nombre', { requerido: true, max: 60 }),
       descripcion: v.texto(req.body.descripcion, 'descripcion', { max: 300, multilinea: true }),
+      icono: v.opcion(req.body.icono, 'icono', ICONOS),
     });
     res.status(201).json(categoria);
   } catch (err) {
@@ -35,11 +44,12 @@ async function crear(req, res, next) {
 
 async function actualizar(req, res, next) {
   try {
-    const { nombre, descripcion } = req.body;
+    const { nombre, descripcion, icono } = req.body;
     // los que no vienen quedan como estan (undefined); los que vienen se validan
     const categoria = await categoriaService.actualizar(v.id(req.params.id), {
       nombre: nombre === undefined ? undefined : v.texto(nombre, 'nombre', { requerido: true, max: 60 }),
       descripcion: descripcion === undefined ? undefined : v.texto(descripcion, 'descripcion', { max: 300, multilinea: true }),
+      icono: icono === undefined ? undefined : v.opcion(icono, 'icono', ICONOS),
     });
     res.json(categoria);
   } catch (err) {

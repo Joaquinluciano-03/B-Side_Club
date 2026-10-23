@@ -91,6 +91,9 @@ model Categoria {
   id          Int        @id @default(autoincrement())
   nombre      String
   descripcion String?
+  // dibujo que la representa en el sitio (ver frontend/src/componentes/
+  // IconoCategoria.jsx). null = el sitio lo deduce del nombre
+  icono       String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   productos   Producto[]

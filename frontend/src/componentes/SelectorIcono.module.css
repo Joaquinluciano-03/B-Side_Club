@@ -1,0 +1,86 @@
+.selector {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.grupo + .grupo {
+  margin-top: 14px;
+}
+
+.grupoNombre {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--tinta-dim);
+  margin-bottom: 8px;
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+/* cada opcion es la tarjeta entera: el radio queda debajo, invisible pero
+   con foco, asi el teclado funciona como en cualquier grupo de radios */
+.opcion {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  padding: 10px 4px 9px;
+  background: #fff;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-control);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .opcion:hover {
+    border-color: var(--borde-fuerte);
+  }
+  .opcion:hover .dibujo {
+    transform: rotate(-8deg);
+  }
+}
+
+.radio {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dibujo {
+  width: 52px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  transition: transform 260ms var(--ease-out);
+}
+
+.nombre {
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--tinta-dim);
+}
+
+.opcion:has(.radio:checked) {
+  border-color: var(--naranja);
+  background: #fff4ec;
+  box-shadow: 0 0 0 1px var(--naranja);
+}
+.opcion:has(.radio:checked) .nombre {
+  color: var(--tinta);
+  font-weight: 700;
+}
+.opcion:has(.radio:focus-visible) {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
