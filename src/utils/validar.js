@@ -154,8 +154,18 @@ function horario(valor) {
   });
 }
 
+// varios valores en un parametro: "Rock,Jazz" o el parametro repetido.
+// Cada uno pasa por "uno" (que valida y devuelve el valor limpio).
+function lista(valor, campo, uno, { max = 20 } = {}) {
+  if (vacio(valor)) return [];
+  const crudos = (Array.isArray(valor) ? valor : [valor]).flatMap((v) => (typeof v === 'string' ? v.split(',') : [v]));
+  if (crudos.length > max) throw error400(`El filtro "${campo}" admite hasta ${max} valores.`);
+  return [...new Set(crudos.map((v) => uno(v)).filter((v) => v !== null))];
+}
+
 module.exports = {
   error400,
+  lista,
   texto,
   email,
   telefono,

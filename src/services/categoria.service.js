@@ -24,15 +24,15 @@ async function obtenerPorId(id) {
   return categoria;
 }
 
-async function crear({ nombre, descripcion, icono }) {
-  return prisma.categoria.create({ data: { nombre, descripcion, icono } });
+async function crear({ nombre, descripcion, icono, unidad_singular, unidad_plural }) {
+  return prisma.categoria.create({ data: { nombre, descripcion, icono, unidad_singular, unidad_plural } });
 }
 
-async function actualizar(id, { nombre, descripcion, icono }) {
+async function actualizar(id, { nombre, descripcion, icono, unidad_singular, unidad_plural }) {
   await obtenerPorId(id);
   return prisma.categoria.update({
     where: { id },
-    data: { nombre, descripcion, icono },
+    data: { nombre, descripcion, icono, unidad_singular, unidad_plural },
   });
 }
 
