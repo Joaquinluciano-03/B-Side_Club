@@ -183,7 +183,7 @@ Controles 8px, cards y paneles 14px, pastillas (buscadores, filtros, CTAs de sec
 - **Precio con descuento** (`componentes/Precio.jsx`): el precio original tachado y apagado, el precio nuevo con el peso del precio normal y una etiqueta naranja con tinta en mono ("-15%" o "-$ 10.000"), como el precio marcado a mano en una batea. En la ficha se suma "Ahorrás $ X" en verde. Un producto "a consultar" no lleva descuento.
 
 ### Cards / Containers
-- **Card de producto:** funda al 88% del ancho con el objeto del formato detrás asomando 6%; al hover o foco el objeto sale 7% más y la funda se inclina -1.2°. Texto suelto debajo: estado (solo si no es "disponible"), título, artista, meta, precio.
+- **Card de producto:** funda al 88% del ancho con el objeto del formato detrás asomando 6%; al hover o foco el objeto sale 7% más y la funda se inclina -1.2°. El estado (solo si no es "disponible") va como sticker pegado en la esquina de la tapa, apenas girado, y viaja con la funda. Texto suelto debajo, con la misma estructura en todas: título (máximo 2 líneas), artista (1 línea), meta en mono y, a la derecha, el icono de la categoría alineado con el título y siempre del mismo tamaño. El precio va al pie: las cards de una fila miden lo mismo y los precios quedan alineados. El bloque de texto termina en el borde de la funda (88%), nunca bajo el disco que asoma.
 - **Tapa genérica:** funda de papel con trama, troquel redondo con el label, título condensado arriba y artista en mono abajo.
 
 ### Iconos de categoría
