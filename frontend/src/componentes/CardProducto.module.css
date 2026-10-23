@@ -54,11 +54,28 @@
 }
 
 /* ============ TEXTO ============ */
+/* el texto a la izquierda y el icono de la categoria a la derecha, en el
+   espacio que queda libre debajo del disco que asoma */
+.pie {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(44px, 28%, 80px);
+  align-items: center;
+  column-gap: var(--e-3);
+}
+
+/* en el celular las cards miden ~165px: el icono se achica para que el
+   formato y el "a consultar" no se partan en dos lineas */
+@media (max-width: 640px) {
+  .pie {
+    grid-template-columns: minmax(0, 1fr) 36px;
+    column-gap: 6px;
+  }
+}
+
 .texto {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-right: 12%; /* alineado con el borde de la funda */
   min-width: 0;
 }
 
@@ -95,9 +112,6 @@
 }
 
 .meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   margin: var(--e-1) 0 0;
   font-family: var(--mono);
   font-stretch: 87.5%;
@@ -107,13 +121,24 @@
   text-transform: uppercase;
 }
 
-/* el icono de la categoria: el dibujo ocupa el 72% de esta caja */
+/* el dibujo llena la caja (fuera de aca ocupa el 72% de la suya) y se
+   inclina un poco cuando el disco sale de la funda */
 .icono {
-  flex: none;
-  width: 26px;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+  transition: transform 420ms var(--ease-out);
+}
+.pie .icono > * {
+  width: 100%;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .icono {
+    transform: rotate(-10deg) scale(1.04);
+  }
+}
+.card:focus-visible .icono {
+  transform: rotate(-10deg) scale(1.04);
 }
 
 .precio {

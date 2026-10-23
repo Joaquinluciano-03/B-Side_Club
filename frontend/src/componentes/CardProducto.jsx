@@ -2,8 +2,8 @@
 // disco asoma un poco por el costado; al pasar el mouse (o con foco) se
 // desliza afuera, como cuando sacas un disco de la batea para mirarlo.
 // Abajo, sin caja: estado (solo si no es "disponible"), titulo, artista,
-// formato (con el icono de su categoria) y año, y el precio (con el
-// descuento, si tiene).
+// formato y año, y el precio (con el descuento, si tiene). A la derecha de
+// todo eso, grande, el icono de su categoria.
 
 import { Link } from 'react-router-dom';
 import ArteProducto, { ObjetoInterior } from './ArteProducto';
@@ -31,33 +31,34 @@ export default function CardProducto({ producto, prioridad = false }) {
         </div>
       </div>
 
-      <div className={estilos.texto}>
-        {(mostrarEstado || esActivo === false) && (
-          <div className={estilos.estados}>
-            {/* inactivo: solo lo ve el staff con sesion iniciada */}
-            {esActivo === false && <span className="badge badge-neutro">Oculto al público</span>}
-            {mostrarEstado && (
-              <span className={`badge badge-${estado_stock}`}>{etiquetaStock(estado_stock)}</span>
-            )}
-          </div>
-        )}
-
-        <h3 className={estilos.titulo}>{titulo}</h3>
-        {artista && <p className={estilos.artista}>{artista}</p>}
-        <p className={estilos.meta}>
-          {categoria && (
-            <span className={estilos.icono}>
-              <IconoCategoria categoria={categoria} />
-            </span>
+      <div className={estilos.pie}>
+        <div className={estilos.texto}>
+          {(mostrarEstado || esActivo === false) && (
+            <div className={estilos.estados}>
+              {/* inactivo: solo lo ve el staff con sesion iniciada */}
+              {esActivo === false && <span className="badge badge-neutro">Oculto al público</span>}
+              {mostrarEstado && (
+                <span className={`badge badge-${estado_stock}`}>{etiquetaStock(estado_stock)}</span>
+              )}
+            </div>
           )}
-          <span>
+
+          <h3 className={estilos.titulo}>{titulo}</h3>
+          {artista && <p className={estilos.artista}>{artista}</p>}
+          <p className={estilos.meta}>
             {categoria?.nombre}
             {anio ? ` · ${anio}` : ''}
+          </p>
+          <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
+            {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}
+          </p>
+        </div>
+        {/* decorativo: el nombre de la categoria ya esta escrito en la meta */}
+        {categoria && (
+          <span className={estilos.icono}>
+            <IconoCategoria categoria={categoria} />
           </span>
-        </p>
-        <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
-          {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}
-        </p>
+        )}
       </div>
     </Link>
   );

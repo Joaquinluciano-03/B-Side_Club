@@ -365,6 +365,13 @@
   .selectorFormato {
     display: flex;
   }
+  /* la barra va en columna: el flex-basis de 360px de .conSelector (pensado
+     para la fila de escritorio) aca seria el ALTO. Pasaba al achicar la
+     ventana con la pagina abierta: el selector quedaba de 360px de alto */
+  .barraInterior .selectorFormato {
+    flex: none;
+    margin-bottom: 0;
+  }
   .barraInterior {
     padding-bottom: var(--e-3);
   }
