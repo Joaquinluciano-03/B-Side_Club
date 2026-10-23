@@ -136,6 +136,99 @@
   border-color: var(--tinta);
   color: var(--tinta-sobre-naranja);
 }
+/* el boton de filtros usa la pildora de ofertas; con filtros activos lleva
+   el borde en tinta y un contador naranja */
+.conFiltros {
+  border-color: var(--tinta);
+}
+.contador {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--r-pildora);
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* los filtros elegidos, arriba de los resultados: cada uno se saca con su x */
+.activos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2);
+  margin-bottom: var(--e-5);
+}
+.activo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--tinta);
+  border-radius: var(--r-pildora);
+  background: var(--superficie);
+  color: var(--tinta);
+  font-family: var(--cuerpo);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.activo:hover {
+  background: #fff;
+}
+.activo:active {
+  transform: scale(0.97);
+}
+
+/* el selector de formato y el boton de filtros del celular: en escritorio
+   el contenedor no existe para el layout (display: contents) */
+.filaFormato {
+  display: contents;
+}
+.filtrosAbajo {
+  display: none;
+}
+@media (max-width: 760px) {
+  .filaFormato {
+    display: flex;
+    gap: var(--e-2);
+  }
+  .barraInterior .filaFormato .selectorFormato {
+    flex: 1;
+    min-width: 0;
+  }
+  .filtrosArriba {
+    display: none;
+  }
+  .filtrosAbajo {
+    display: inline-flex;
+  }
+}
+@media (max-width: 400px) {
+  .ofertas {
+    padding: 0 14px;
+  }
+  /* la palabra "Formato" sigue para el lector de pantalla; a la vista, el
+     lugar es para el valor elegido ("Accesorios (6)") */
+  .selectorEtiqueta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 .borrar {
   width: 30px;
   height: 30px;
@@ -349,6 +442,9 @@
   }
   .barraInterior {
     flex-direction: column;
+    /* una sola columna: con wrap, el ancho de cada fila lo ponia su contenido
+       y la fila del selector con el boton de filtros estiraba toda la barra */
+    flex-wrap: nowrap;
     align-items: stretch;
     gap: var(--e-3);
     padding-top: var(--e-3);

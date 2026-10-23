@@ -1,0 +1,267 @@
+/* ============ LA HOJA ============
+   Un <dialog> modal. En escritorio es una hoja que entra desde la derecha;
+   en el celular sube desde abajo. Entra con la curva de cajon y sale mas
+   rapido (lo que se va no hace esperar). Sin soporte de @starting-style
+   simplemente aparece. */
+.panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(420px, 100vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: 2px solid var(--tinta);
+  background: var(--humo);
+  color: var(--tinta);
+  box-shadow: -18px 0 40px rgba(16, 15, 14, 0.22);
+  translate: 0 0;
+  transition:
+    translate 240ms var(--ease-out),
+    overlay 240ms allow-discrete,
+    display 240ms allow-discrete;
+}
+.panel:not([open]) {
+  translate: 100% 0;
+}
+.panel[open] {
+  transition-duration: 340ms;
+  transition-timing-function: var(--ease-drawer);
+}
+@starting-style {
+  .panel[open] {
+    translate: 100% 0;
+  }
+}
+
+.panel::backdrop {
+  background: rgba(12, 11, 10, 0.5);
+  opacity: 1;
+  transition:
+    opacity 240ms ease,
+    overlay 240ms allow-discrete,
+    display 240ms allow-discrete;
+}
+.panel:not([open])::backdrop {
+  opacity: 0;
+}
+@starting-style {
+  .panel[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* con la hoja abierta la pagina de atras no se desplaza */
+:global(html):has(.panel[open]) {
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .panel {
+    inset: auto 0 0 0;
+    width: 100vw;
+    height: auto;
+    max-height: 88dvh;
+    border-left: none;
+    border-top: 2px solid var(--tinta);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -18px 40px rgba(16, 15, 14, 0.22);
+  }
+  .panel:not([open]) {
+    translate: 0 100%;
+  }
+  @starting-style {
+    .panel[open] {
+      translate: 0 100%;
+    }
+  }
+}
+
+.hoja {
+  height: 100%;
+  max-height: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.cabecera {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: var(--e-5) var(--e-5) var(--e-4);
+  border-bottom: 2px solid var(--tinta);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-xl);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.cerrar {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--tinta);
+  cursor: pointer;
+  transition:
+    border-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.cerrar:hover {
+  border-color: var(--tinta);
+}
+.cerrar:active {
+  transform: scale(0.94);
+}
+
+/* lo que se desplaza es el medio; cabecera y pie quedan fijos */
+.cuerpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--e-2) var(--e-5) var(--e-5);
+}
+
+.nota {
+  margin: var(--e-5) 0;
+  color: var(--tinta-dim);
+}
+
+/* ============ SECCIONES ============ */
+.seccion {
+  margin: 0;
+  padding: var(--e-5) 0 0;
+  border: none;
+  min-width: 0;
+}
+.seccion + .seccion {
+  margin-top: var(--e-4);
+  border-top: 1px solid var(--borde);
+}
+.seccionTitulo {
+  float: left; /* asi el legend respeta el padding del fieldset */
+  width: 100%;
+  margin-bottom: var(--e-3);
+  font-weight: 800;
+  font-size: var(--t-sm);
+}
+.seccionTitulo + * {
+  clear: both;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+}
+/* pildora blanca; elegida, naranja con tinta (como el boton de ofertas) */
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  background: #fff;
+  color: var(--tinta);
+  font-family: var(--cuerpo);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--d-rapida) ease,
+    border-color var(--d-rapida) ease,
+    transform var(--d-presion) var(--ease-out);
+}
+.chip:hover {
+  border-color: var(--naranja);
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip[aria-pressed='true'] {
+  background: var(--naranja);
+  border-color: var(--tinta);
+  color: var(--tinta-sobre-naranja);
+}
+.chipCantidad {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-tenue);
+}
+.chip[aria-pressed='true'] .chipCantidad {
+  color: var(--tinta-sobre-naranja);
+}
+
+/* ============ PRECIO ============ */
+.precios {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e-3);
+}
+.precioCampo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 14px;
+  background: #fff;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--r-control);
+  color: var(--tinta-tenue);
+  transition:
+    border-color var(--d-rapida) ease,
+    box-shadow var(--d-rapida) ease;
+}
+.precioCampo:focus-within {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.18);
+}
+/* el campo lo dibuja el contenedor, con el "$" adentro */
+.precioCampo input,
+.precioCampo input:focus,
+.precioCampo input:focus-visible {
+  flex: 1;
+  min-width: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  padding-left: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============ PIE ============ */
+.pie {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: var(--e-4) var(--e-5) calc(var(--e-4) + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--tinta);
+  background: var(--superficie);
+}
+.pie :global(.btn-primario) {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+.pie :global(.btn-enlace:disabled) {
+  opacity: 0.45;
+  cursor: default;
+}

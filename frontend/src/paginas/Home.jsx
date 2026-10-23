@@ -13,6 +13,7 @@ import { linkWhatsApp } from '../lib/contacto';
 import CardProducto from '../componentes/CardProducto';
 import HeroLabel from '../componentes/home/HeroLabel';
 import IconoCategoria from '../componentes/IconoCategoria';
+import { cantidadCon } from '../lib/unidades';
 import BandaPromociones from '../componentes/BandaPromociones';
 import { SkeletonGrilla } from '../componentes/Estados';
 import estilos from './Home.module.css';
@@ -109,7 +110,7 @@ function Formatos() {
               <span className={estilos.filaNombre}>{c.nombre}</span>
               <span className={estilos.filaDescripcion}>{c.descripcion}</span>
               <span className={estilos.filaCantidad}>
-                {c.total ?? ''} {c.total === 1 ? 'título' : 'títulos'}
+                {cantidadCon(c.total, c)}
               </span>
               <span className={estilos.filaMotivo} aria-hidden="true">
                 <IconoCategoria categoria={c} color={COLORES_FORMATO[i % COLORES_FORMATO.length]} />

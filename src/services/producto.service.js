@@ -51,6 +51,19 @@ function normalizarDescuento(tipo, valor, precio) {
   return { descuento_tipo: tipo, descuento_valor: numero };
 }
 
+// El precio con el descuento aplicado, igual que lo muestra el sitio
+// (frontend/src/lib/formato.js, calcularDescuento): se guarda en precio_final
+// para poder filtrar el catalogo por el precio que ve la gente.
+function precioFinal(precio, tipo, valor) {
+  if (precio === null || precio === undefined || precio === '') return null;
+  const p = Number(precio);
+  const v = Number(valor);
+  if (!tipo || !Number.isFinite(v) || v <= 0) return p;
+  if (tipo === 'porcentaje' && v < 100) return Math.round(p * (1 - v / 100));
+  if (tipo === 'monto' && v < p) return Math.round(p - v);
+  return p;
+}
+
 async function validarCategoria(categoriaId) {
   const categoria = await prisma.categoria.findUnique({ where: { id: categoriaId } });
   if (!categoria) {
@@ -60,17 +73,22 @@ async function validarCategoria(categoriaId) {
   }
 }
 
-async function listar({ categoriaId, destacado, conDescuento, q, esActivo, page, pageSize } = {}, { esAdmin = false } = {}) {
-  const where = {};
+// lo que filtra "donde se esta mirando": categoria, ofertas, busqueda y, para
+// el publico, solo los activos. Lo comparten el listado y los filtros.
+function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, { esAdmin = false } = {}) {
+  const where = { AND: [] };
   if (categoriaId) where.categoriaId = Number(categoriaId);
   if (destacado !== undefined) where.destacado = destacado === 'true';
   // conDescuento=true: solo los que tienen un descuento cargado (las ofertas)
   if (conDescuento === 'true') where.descuento_tipo = { not: null };
   if (q) {
-    where.OR = [
-      { nombre: { contains: q, mode: 'insensitive' } },
-      { descripcion: { contains: q, mode: 'insensitive' } },
-    ];
+    where.AND.push({
+      OR: [
+        { nombre: { contains: q, mode: 'insensitive' } },
+        { descripcion: { contains: q, mode: 'insensitive' } },
+        { genero: { contains: q, mode: 'insensitive' } },
+      ],
+    });
   }
 
   // el publico solo ve productos activos, sin excepcion; el panel admin puede
@@ -80,6 +98,32 @@ async function listar({ categoriaId, destacado, conDescuento, q, esActivo, page,
   } else {
     where.esActivo = true;
   }
+  return where;
+}
+
+// los filtros del catalogo (todos opcionales; dentro de cada uno, cualquiera
+// de los valores elegidos; entre filtros distintos, todos a la vez)
+function aplicarFiltros(where, { generos, condiciones, disponibilidad, precioMin, precioMax, decadas } = {}) {
+  if (generos?.length) where.genero = { in: generos };
+  if (condiciones?.length) where.condicion = { in: condiciones };
+  if (disponibilidad?.length) where.estado_stock = { in: disponibilidad };
+  if (precioMin !== undefined || precioMax !== undefined) {
+    // con rango de precio, los "a consultar" (sin precio) quedan afuera
+    where.precio_final = {
+      not: null,
+      ...(precioMin !== undefined && { gte: precioMin }),
+      ...(precioMax !== undefined && { lte: precioMax }),
+    };
+  }
+  if (decadas?.length) {
+    where.AND.push({ OR: decadas.map((d) => ({ anio: { gte: d, lte: d + 9 } })) });
+  }
+  return where;
+}
+
+async function listar(filtros = {}, opciones = {}) {
+  const { page, pageSize } = filtros;
+  const where = aplicarFiltros(filtroBase(filtros, opciones), filtros);
 
   const pageNum = Math.max(1, Number(page) || 1);
   const pageSizeNum = Math.min(PAGE_SIZE_MAX, Math.max(1, Number(pageSize) || PAGE_SIZE_DEFAULT));
@@ -101,6 +145,53 @@ async function listar({ categoriaId, destacado, conDescuento, q, esActivo, page,
     pageSize: pageSizeNum,
     total,
     totalPages: Math.max(1, Math.ceil(total / pageSizeNum)),
+  };
+}
+
+// Que filtros tienen sentido para lo que se esta mirando (categoria, ofertas,
+// busqueda), con cuantos productos tiene cada opcion. El catalogo muestra
+// solo los que tienen mas de una opcion: en Equipos no aparece "genero"
+// porque ningun equipo tiene. No dependen de los filtros ya elegidos, asi
+// las opciones no desaparecen mientras se eligen.
+async function filtrosDisponibles(base = {}, opciones = {}) {
+  const where = filtroBase(base, opciones);
+  // opcional: los productos sin ese dato (un equipo no tiene genero) no cuentan
+  const contar = async (campo, { opcional = true } = {}) => {
+    const filas = await prisma.producto.groupBy({
+      by: [campo],
+      where: opcional ? { ...where, [campo]: { not: null } } : where,
+      _count: { _all: true },
+    });
+    return filas
+      .map((f) => ({ valor: f[campo], total: f._count._all }))
+      .sort((a, b) => b.total - a.total || String(a.valor).localeCompare(String(b.valor), 'es'));
+  };
+
+  const [generos, condiciones, disponibilidad, anios, precios] = await Promise.all([
+    contar('genero'),
+    contar('condicion'),
+    contar('estado_stock', { opcional: false }),
+    prisma.producto.groupBy({ by: ['anio'], where, _count: { _all: true } }),
+    prisma.producto.aggregate({ where: { ...where, precio_final: { not: null } }, _min: { precio_final: true }, _max: { precio_final: true } }),
+  ]);
+
+  const porDecada = {};
+  for (const f of anios) {
+    const d = Math.floor(f.anio / 10) * 10;
+    porDecada[d] = (porDecada[d] || 0) + f._count._all;
+  }
+
+  return {
+    generos,
+    condiciones,
+    disponibilidad,
+    decadas: Object.entries(porDecada)
+      .map(([d, total]) => ({ valor: Number(d), total }))
+      .sort((a, b) => a.valor - b.valor),
+    precio: {
+      min: precios._min.precio_final === null ? null : Number(precios._min.precio_final),
+      max: precios._max.precio_final === null ? null : Number(precios._max.precio_final),
+    },
   };
 }
 
@@ -126,15 +217,18 @@ async function crear(data) {
   await validarCategoria(categoriaId);
   const precio = data.precio !== undefined ? data.precio : null;
 
+  const descuento = normalizarDescuento(data.descuento_tipo, data.descuento_valor, precio);
   return prisma.producto.create({
     data: {
       nombre: data.nombre,
       anio: aNumero(data.anio, 'anio'),
       precio,
-      ...normalizarDescuento(data.descuento_tipo, data.descuento_valor, precio),
+      ...descuento,
+      precio_final: precioFinal(precio, descuento.descuento_tipo, descuento.descuento_valor),
       stock: aNumero(data.stock, 'stock'),
       estado_stock: data.estado_stock || 'disponible',
       condicion: data.condicion,
+      genero: data.genero ?? null,
       destacado: data.destacado || false,
       descripcion: data.descripcion,
       categoriaId,
@@ -150,6 +244,7 @@ const CAMPOS_EDITABLES = [
   'precio',
   'estado_stock',
   'condicion',
+  'genero',
   'destacado',
   'esActivo',
   'descripcion',
@@ -194,6 +289,10 @@ async function actualizar(id, data) {
     await validarCategoria(dataActualizada.categoriaId);
   }
 
+  // el precio final se recalcula siempre con lo que va a quedar guardado
+  const quedan = { ...actual, ...dataActualizada };
+  dataActualizada.precio_final = precioFinal(quedan.precio, quedan.descuento_tipo, quedan.descuento_valor);
+
   return prisma.producto.update({
     where: { id: Number(id) },
     data: dataActualizada,
@@ -211,4 +310,4 @@ async function eliminar(id) {
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+module.exports = { listar, filtrosDisponibles, obtenerPorId, crear, actualizar, eliminar, precioFinal };

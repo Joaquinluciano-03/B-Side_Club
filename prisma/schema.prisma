@@ -88,15 +88,19 @@ model Invitacion {
 }
 
 model Categoria {
-  id          Int        @id @default(autoincrement())
-  nombre      String
-  descripcion String?
+  id              Int        @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
   // dibujo que la representa en el sitio (ver frontend/src/componentes/
   // IconoCategoria.jsx). null = el sitio lo deduce del nombre
-  icono       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  productos   Producto[]
+  icono           String?
+  // como se cuentan sus productos en el sitio ("4 títulos", "1 equipo").
+  // null = "título" / "títulos"
+  unidad_singular String?
+  unidad_plural   String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  productos       Producto[]
 }
 
 model StoreInfo {
@@ -120,9 +124,13 @@ model Producto {
   // fijo en pesos. Los dos van juntos: o estan los dos, o ninguno
   descuento_tipo  TipoDescuento?
   descuento_valor Decimal?
+  // precio con el descuento aplicado: lo calcula el backend al guardar (ver
+  // producto.service) y es el que usa el filtro por rango de precio del catalogo
+  precio_final    Decimal?
   stock           Int
   estado_stock    Stock          @default(disponible)
   condicion       String? // el estado varia mucho segun el tipo de producto (vinilo, cassette, equipo)
+  genero          String? // genero musical (Rock nacional, Jazz...); null en equipos y accesorios
   destacado       Boolean        @default(false)
   esActivo        Boolean        @default(true)
   descripcion     String
