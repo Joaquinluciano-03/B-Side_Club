@@ -12,6 +12,7 @@ import Confirmar from '../../componentes/Confirmar';
 import IconoCategoria, { iconoSugerido } from '../../componentes/IconoCategoria';
 import SelectorIcono from '../../componentes/SelectorIcono';
 import { useToast } from '../../lib/toast';
+import { olvidarConteos } from '../../lib/useConteos';
 import { mensajeDeError } from '../../lib/formato';
 
 export default function Categorias() {
@@ -67,6 +68,8 @@ export default function Categorias() {
         await put(`/categorias/${editando}`, cuerpo);
         toast.exito('Cambios guardados.');
       }
+      // el sitio tiene las categorias en memoria: asi se ve el cambio al volver
+      olvidarConteos();
 
       setEditando(null);
       setRecargar((r) => r + 1);
@@ -82,6 +85,7 @@ export default function Categorias() {
     setABorrar(null);
     try {
       await del(`/categorias/${c.id}`);
+      olvidarConteos();
       toast.exito(`"${c.nombre}" se eliminó.`);
       setRecargar((r) => r + 1);
     } catch (err) {
