@@ -106,12 +106,11 @@ export function query(params) {
 }
 
 // Las imagenes se guardan en Supabase Storage, asi que la base ya tiene la
-// URL completa y no hay nada que armar. Se deja la funcion igual porque
-// todavia puede haber filas viejas con rutas relativas (las del seed, por
-// ejemplo) y asi no revientan.
+// URL completa y no hay nada que armar. Se deja la funcion igual por si queda
+// alguna fila vieja con una ruta relativa: asi no revienta.
 export function urlImagen(url) {
   if (!url) return null;
-  // las imagenes de relleno del seed viejo (placehold.co) no son fotos: se
+  // las imagenes de relleno de los primeros datos de prueba (placehold.co) no son fotos: se
   // tratan como "sin imagen" y el sitio dibuja la tapa generica del formato
   if (url.includes('placehold.co')) return null;
   // rutas relativas a /uploads son de cuando las fotos se guardaban en el

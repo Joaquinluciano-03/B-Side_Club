@@ -350,7 +350,7 @@ export default function FormProducto() {
                     id="p-titulo"
                     value={form.titulo}
                     onChange={(e) => campo('titulo', e.target.value)}
-                    placeholder="The Dark Side of the Moon"
+                    placeholder="Nombre del disco o del equipo"
                     aria-invalid={Boolean(errores.titulo)}
                   />
                   {errores.titulo && <div className="campo-error">{errores.titulo}</div>}
@@ -361,7 +361,7 @@ export default function FormProducto() {
                     id="p-artista"
                     value={form.artista}
                     onChange={(e) => campo('artista', e.target.value)}
-                    placeholder="Pink Floyd"
+                    placeholder="Artista, banda o marca"
                   />
                   <div className="campo-ayuda">En equipos, la marca o el tipo (Technics, bandeja).</div>
                 </div>

@@ -1,7 +1,10 @@
 # Créditos de las imágenes de productos
 
-Imágenes cargadas como datos de ejemplo del catálogo (TPO). El número al
-principio del archivo es el id del producto en la base.
+De dónde salió cada foto del catálogo de ejemplo y con qué licencia. Las
+imágenes viven solo en el bucket "productos" de Supabase Storage (la base
+guarda su URL); en el repo no hay copias. "Archivo" es el nombre que tienen en
+el bucket. Varias fotos de Wikimedia Commons son CC BY o CC BY-SA, que piden
+nombrar al autor mientras se usen: por eso este archivo se mantiene.
 
 ## Tapas de discos
 
@@ -28,19 +31,15 @@ identificar el disco que se ofrece.
 
 ## Equipos (Wikimedia Commons, licencias libres)
 
-Recortadas a 600×600.
-
 | Archivo | Foto | Autor | Licencia |
 |---|---|---|---|
 | 30-technics-sl-1200mk2.jpg | [Technics SL-1200MK2 turntable](https://commons.wikimedia.org/wiki/File:Technics_SL-1200MK2_turntable.jpg) | Adrian DuMay | CC BY 2.0 |
 | 31-walkman-wm-2.jpg | [Sony Walkman WM-2](https://commons.wikimedia.org/wiki/File:Sony_Walkman_WM-2.jpg) | Esa Sorjonen | Atribución |
 | 32-marantz-2270.jpg | [Marantz 2270 receiver](https://commons.wikimedia.org/wiki/File:Marantz_2270_receiver.jpeg) | Ron Clausen | CC BY-SA 4.0 |
 
-## Segunda tanda (prisma/productosExtra.js)
+## Segunda tanda
 
-Los archivos `extra-*` son los 50 productos de la segunda tanda. Están también
-en el bucket "productos" de Supabase con el mismo nombre (ver
-prisma/cargarProductosExtra.js).
+Los archivos `extra-*` son los 50 productos que se sumaron después.
 
 ### Tapas de discos (Cover Art Archive, por release group)
 
@@ -102,12 +101,3 @@ prisma/cargarProductosExtra.js).
 | extra-slipmat-de-pano-estampado-accesorio-para-bandeja.jpg | [Tresor Nightclub Berlin DJ Gear Slipmat BW](https://commons.wikimedia.org/wiki/File:Tresor_Nightclub_Berlin_DJ_Gear_Slipmat_BW.jpg) | Angie Linder | CC BY-SA 2.0 |
 | extra-fundas-internas-antiestaticas-pack-x-25.jpg | [LP Sleeve](https://commons.wikimedia.org/wiki/File:LP_Sleeve.jpg) | J.P.Lon | CC BY-SA 3.0 |
 
-## Sin imagen (a propósito)
-
-No existe una tapa o foto real que corresponda, así que el sitio muestra la
-tapa genérica del formato:
-
-- 33 Speed of Life: compilado casero del local.
-- 35 "Vida", Vox Dei (1971): Vox Dei no tiene un disco con ese nombre; el de 1971 es "La Biblia".
-- 37 "Continuous", Buddy Holly y 38 "Ok Corazón", Massacre: no figuran en ningún catálogo.
-- 39 Parlantes 3 vías: no es un modelo concreto.
