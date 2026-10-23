@@ -130,7 +130,9 @@ model Producto {
   stock           Int
   estado_stock    Stock          @default(disponible)
   condicion       String? // el estado varia mucho segun el tipo de producto (vinilo, cassette, equipo)
-  genero          String? // genero musical (Rock nacional, Jazz...); null en equipos y accesorios
+  // genero musical, de la lista de generos (null en equipos y accesorios)
+  generoId        Int?
+  genero          Genero?        @relation(fields: [generoId], references: [id])
   destacado       Boolean        @default(false)
   esActivo        Boolean        @default(true)
   descripcion     String
@@ -143,6 +145,17 @@ model Producto {
 
   @@index([nombre]) // busqueda de publicaciones por nombre
   @@index([esActivo, destacado]) // listado publico: activos, y destacados de la home
+}
+
+// Generos musicales: una lista cerrada que se administra desde el panel, asi
+// todos los productos usan el mismo texto ("Rock nacional", nunca "rock
+// nacional") y el filtro del catalogo no muestra opciones repetidas. Un
+// genero solo se puede borrar si ningun producto lo usa.
+model Genero {
+  id        Int        @id @default(autoincrement())
+  nombre    String     @unique
+  createdAt DateTime   @default(now())
+  productos Producto[]
 }
 
 model Imagen {

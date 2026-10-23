@@ -1,0 +1,17 @@
+/* el select (o el campo del genero nuevo) se estira; los botones, a su ancho */
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+.fila + .fila {
+  margin-top: var(--e-2);
+}
+.fila > select,
+.fila > input {
+  flex: 1;
+  min-width: 0;
+}
+.fila > :global(.btn) {
+  flex: none;
+}

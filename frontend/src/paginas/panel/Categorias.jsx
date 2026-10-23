@@ -13,6 +13,7 @@ import { Cargando, ErrorCarga, Vacio } from '../../componentes/Estados';
 import Confirmar from '../../componentes/Confirmar';
 import IconoCategoria, { iconoSugerido } from '../../componentes/IconoCategoria';
 import SelectorIcono from '../../componentes/SelectorIcono';
+import SeccionGeneros from './SeccionGeneros';
 import { UNIDAD_POR_DEFECTO, cantidadCon, pluralSugerido, unidadDe } from '../../lib/unidades';
 import { useToast } from '../../lib/toast';
 import { olvidarConteos } from '../../lib/useConteos';
@@ -296,6 +297,8 @@ export default function Categorias() {
           onConfirmar={borrar}
           onCancelar={() => setABorrar(null)}
         />
+
+        <SeccionGeneros />
       </CuerpoPanel>
     </>
   );

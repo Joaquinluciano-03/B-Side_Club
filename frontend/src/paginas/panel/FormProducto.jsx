@@ -17,6 +17,7 @@ import { Cargando } from '../../componentes/Estados';
 import Confirmar from '../../componentes/Confirmar';
 import CardProducto from '../../componentes/CardProducto';
 import CamposDescuento, { errorDescuento } from '../../componentes/CamposDescuento';
+import SelectorGenero from '../../componentes/SelectorGenero';
 import { useToast } from '../../lib/toast';
 import { olvidarConteos } from '../../lib/useConteos';
 import { ESTADOS_STOCK, etiquetaStock, mensajeDeError, separarNombre } from '../../lib/formato';
@@ -30,7 +31,7 @@ const VACIO = {
   stock: '1',
   estado_stock: 'disponible',
   condicion: '',
-  genero: '',
+  generoId: '', // '' = sin genero
   descripcion: '',
   categoriaId: '',
   destacado: false,
@@ -41,13 +42,6 @@ const VACIO = {
 
 const MAX_IMAGENES = 5;
 const MAX_MB = 5;
-
-// sugerencias para "genero": las mas comunes en una disqueria, mas las que
-// ya usa el catalogo (se suman al cargar). Escribir otro tambien vale.
-const GENEROS = [
-  'Rock nacional', 'Rock', 'Pop', 'Punk y post-punk', 'Metal', 'Blues', 'Jazz', 'Soul y R&B',
-  'Hip hop', 'Electrónica', 'Folk', 'Folklore', 'Tango', 'Cumbia', 'Reggae', 'Clásica',
-];
 
 // sugerencias para "condicion": la escala Goldmine (la que entiende la ficha
 // publica) y las que se usan para equipos
@@ -112,14 +106,6 @@ export default function FormProducto() {
       .catch(() => setCategorias([]));
   }, []);
 
-  // los generos que ya se usan, para sugerirlos y que no aparezcan "Rock" y "rock"
-  const [generos, setGeneros] = useState(GENEROS);
-  useEffect(() => {
-    get('/productos/filtros')
-      .then((f) => setGeneros((base) => [...new Set([...f.generos.map((g) => g.valor), ...base])]))
-      .catch(() => {});
-  }, []);
-
   useEffect(() => {
     if (!editando) return;
     get(`/productos/${id}`)
@@ -134,7 +120,7 @@ export default function FormProducto() {
           stock: String(p.stock ?? 0),
           estado_stock: p.estado_stock ?? 'disponible',
           condicion: p.condicion ?? '',
-          genero: p.genero ?? '',
+          generoId: p.generoId ? String(p.generoId) : '',
           descripcion: p.descripcion ?? '',
           categoriaId: String(p.categoriaId ?? ''),
           destacado: Boolean(p.destacado),
@@ -192,7 +178,7 @@ export default function FormProducto() {
       stock: Number(form.stock),
       estado_stock: form.estado_stock,
       condicion: form.condicion.trim() || null,
-      genero: form.genero.trim() || null,
+      generoId: form.generoId ? Number(form.generoId) : null,
       descripcion: form.descripcion.trim(),
       categoriaId: Number(form.categoriaId),
       destacado: form.destacado,
@@ -416,22 +402,7 @@ export default function FormProducto() {
                   {errores.anio && <div className="campo-error">{errores.anio}</div>}
                 </div>
               </div>
-              <div className="campo">
-                <label htmlFor="p-genero">Género</label>
-                <input
-                  id="p-genero"
-                  list="generos"
-                  value={form.genero}
-                  onChange={(e) => campo('genero', e.target.value)}
-                  placeholder="Rock nacional"
-                />
-                <datalist id="generos">
-                  {generos.map((g) => (
-                    <option key={g} value={g} />
-                  ))}
-                </datalist>
-                <div className="campo-ayuda">Para filtrar el catálogo. En equipos y accesorios dejalo vacío.</div>
-              </div>
+              <SelectorGenero valor={form.generoId} onChange={(id) => campo('generoId', id)} />
             </fieldset>
 
             <fieldset className={estilos.bloque}>
