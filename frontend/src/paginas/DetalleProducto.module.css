@@ -52,9 +52,6 @@
   min-width: 0;
 }
 .meta {
-  display: flex;
-  align-items: center;
-  gap: var(--e-2);
   margin: 0 0 var(--e-3);
   font-family: var(--mono);
   font-stretch: 87.5%;
@@ -63,13 +60,25 @@
   text-transform: uppercase;
   color: var(--tinta-tenue);
 }
-/* el icono de la categoria: el dibujo ocupa el 72% de esta caja */
+/* formato, titulo y artista a la izquierda; el icono de la categoria a la
+   derecha, del alto del bloque */
+.encabezado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(72px, 9vw, 120px);
+  align-items: center;
+  column-gap: var(--e-5);
+}
+.encabezadoTexto {
+  min-width: 0;
+}
+/* el dibujo llena la caja (fuera de aca ocupa el 72% de la suya) */
 .icono {
-  flex: none;
-  width: 36px;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+}
+.encabezado .icono > * {
+  width: 100%;
 }
 .titulo {
   margin: 0;
