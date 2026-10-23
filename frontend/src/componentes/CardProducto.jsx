@@ -1,9 +1,15 @@
 // Card del catalogo: la tapa como una funda con el disco adentro. Quieta, el
 // disco asoma un poco por el costado; al pasar el mouse (o con foco) se
 // desliza afuera, como cuando sacas un disco de la batea para mirarlo.
-// Abajo, sin caja: estado (solo si no es "disponible"), titulo, artista,
-// formato y año, y el precio (con el descuento, si tiene). A la derecha de
-// todo eso, grande, el icono de su categoria.
+//
+// Todas las cards de una fila tienen la misma estructura, para que se lean
+// parejas:
+//   - el estado (si no es "disponible") va como sticker pegado en la tapa, no
+//     en el texto: asi los titulos arrancan todos a la misma altura
+//   - titulo, artista y formato a la izquierda; el icono de la categoria a la
+//     derecha, siempre del mismo tamaño y alineado con el titulo
+//   - el precio al pie: las cards de una fila miden lo mismo (las estira la
+//     grilla) y el precio queda alineado entre todas
 
 import { Link } from 'react-router-dom';
 import ArteProducto, { ObjetoInterior } from './ArteProducto';
@@ -28,13 +34,8 @@ export default function CardProducto({ producto, prioridad = false }) {
         <ObjetoInterior producto={producto} />
         <div className={estilos.funda}>
           <ArteProducto producto={producto} prioridad={prioridad} />
-        </div>
-      </div>
-
-      <div className={estilos.pie}>
-        <div className={estilos.texto}>
           {(mostrarEstado || esActivo === false) && (
-            <div className={estilos.estados}>
+            <div className={estilos.stickers}>
               {/* inactivo: solo lo ve el staff con sesion iniciada */}
               {esActivo === false && <span className="badge badge-neutro">Oculto al público</span>}
               {mostrarEstado && (
@@ -42,23 +43,30 @@ export default function CardProducto({ producto, prioridad = false }) {
               )}
             </div>
           )}
-
-          <h3 className={estilos.titulo}>{titulo}</h3>
-          {artista && <p className={estilos.artista}>{artista}</p>}
-          <p className={estilos.meta}>
-            {categoria?.nombre}
-            {anio ? ` · ${anio}` : ''}
-          </p>
-          <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
-            {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}
-          </p>
         </div>
-        {/* decorativo: el nombre de la categoria ya esta escrito en la meta */}
-        {categoria && (
-          <span className={estilos.icono}>
-            <IconoCategoria categoria={categoria} />
-          </span>
-        )}
+      </div>
+
+      <div className={estilos.pie}>
+        <div className={estilos.encabezado}>
+          <div className={estilos.texto}>
+            <h3 className={estilos.titulo}>{titulo}</h3>
+            {artista && <p className={estilos.artista}>{artista}</p>}
+            <p className={estilos.meta}>
+              {categoria?.nombre}
+              {anio ? ` · ${anio}` : ''}
+            </p>
+          </div>
+          {/* decorativo: el nombre de la categoria ya esta escrito en la meta */}
+          {categoria && (
+            <span className={estilos.icono}>
+              <IconoCategoria categoria={categoria} />
+            </span>
+          )}
+        </div>
+
+        <p className={`${estilos.precio} ${consultar ? estilos.consultar : ''}`}>
+          {consultar ? 'A consultar' : <Precio producto={producto} variante="card" />}
+        </p>
       </div>
     </Link>
   );
