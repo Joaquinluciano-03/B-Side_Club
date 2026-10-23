@@ -4,6 +4,7 @@
 
 const bcrypt = require("bcrypt");
 const { prisma } = require("../src/config/db");
+const { productosExtra, archivoFoto } = require("./productosExtra");
 
 const superAdminData = {
   nombre: "Admin",
@@ -20,6 +21,7 @@ const categoriasData = [
   { clave: "cassettes", nombre: "Cassettes", icono: "cassette", descripcion: "Originales y compilados del local" },
   { clave: "cds", nombre: "CDs", icono: "cd", descripcion: "Ediciones originales con librito" },
   { clave: "equipos", nombre: "Equipos", icono: "perilla", descripcion: "Bandejas, amplificadores y portátiles revisados" },
+  { clave: "accesorios", nombre: "Accesorios", icono: "auriculares", descripcion: "Púas, auriculares y todo para cuidar tus discos" },
 ];
 
 // Las fotos del seed ya estan subidas al bucket "productos" de Supabase Storage
@@ -137,6 +139,28 @@ async function main() {
       },
     });
     productosPorTitulo[p.titulo] = producto.id;
+  }
+
+  // segunda tanda: 50 productos mas (prisma/productosExtra.js), mismo formato
+  console.log("Creando la segunda tanda de productos...");
+  for (const p of productosExtra) {
+    const archivo = archivoFoto(p);
+    await prisma.producto.create({
+      data: {
+        nombre: `${p.titulo} — ${p.artista}`,
+        anio: p.anio,
+        precio: p.precio,
+        ...(p.descuento && { descuento_tipo: p.descuento.tipo, descuento_valor: p.descuento.valor }),
+        stock: p.stock,
+        estado_stock: p.estado_stock,
+        condicion: p.condicion,
+        destacado: p.destacado,
+        esActivo: true,
+        descripcion: `Sello: ${p.sello}. ${p.descripcion}`,
+        categoriaId: categoriasPorClave[p.categoria],
+        ...(archivo && { imagenes: { create: [{ url: urlFoto(`/productos/${archivo}`), alt: `${p.titulo} — ${p.artista}`, orden: 0 }] } }),
+      },
+    });
   }
 
   console.log("Creando info del local...");
