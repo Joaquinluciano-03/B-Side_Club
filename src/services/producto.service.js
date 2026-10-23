@@ -64,6 +64,17 @@ function precioFinal(precio, tipo, valor) {
   return p;
 }
 
+// el genero tiene que ser uno de la lista (tabla Genero)
+async function validarGenero(generoId) {
+  if (generoId === null || generoId === undefined) return;
+  const genero = await prisma.genero.findUnique({ where: { id: generoId } });
+  if (!genero) {
+    const error = new Error('El género indicado no existe');
+    error.status = 400;
+    throw error;
+  }
+}
+
 async function validarCategoria(categoriaId) {
   const categoria = await prisma.categoria.findUnique({ where: { id: categoriaId } });
   if (!categoria) {
@@ -86,7 +97,7 @@ function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, 
       OR: [
         { nombre: { contains: q, mode: 'insensitive' } },
         { descripcion: { contains: q, mode: 'insensitive' } },
-        { genero: { contains: q, mode: 'insensitive' } },
+        { genero: { nombre: { contains: q, mode: 'insensitive' } } },
       ],
     });
   }
@@ -104,7 +115,8 @@ function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, 
 // los filtros del catalogo (todos opcionales; dentro de cada uno, cualquiera
 // de los valores elegidos; entre filtros distintos, todos a la vez)
 function aplicarFiltros(where, { generos, condiciones, disponibilidad, precioMin, precioMax, decadas } = {}) {
-  if (generos?.length) where.genero = { in: generos };
+  // los generos llegan por nombre (asi quedan legibles en la URL)
+  if (generos?.length) where.genero = { nombre: { in: generos } };
   if (condiciones?.length) where.condicion = { in: condiciones };
   if (disponibilidad?.length) where.estado_stock = { in: disponibilidad };
   if (precioMin !== undefined || precioMax !== undefined) {
@@ -131,7 +143,7 @@ async function listar(filtros = {}, opciones = {}) {
   const [productos, total] = await Promise.all([
     prisma.producto.findMany({
       where,
-      include: { categoria: true, imagenes: { orderBy: { orden: 'asc' } } },
+      include: { categoria: true, genero: true, imagenes: { orderBy: { orden: 'asc' } } },
       orderBy: { createdAt: 'desc' },
       skip: (pageNum - 1) * pageSizeNum,
       take: pageSizeNum,
@@ -167,13 +179,19 @@ async function filtrosDisponibles(base = {}, opciones = {}) {
       .sort((a, b) => b.total - a.total || String(a.valor).localeCompare(String(b.valor), 'es'));
   };
 
-  const [generos, condiciones, disponibilidad, anios, precios] = await Promise.all([
-    contar('genero'),
+  const [porGenero, condiciones, disponibilidad, anios, precios, listaGeneros] = await Promise.all([
+    contar('generoId'),
     contar('condicion'),
     contar('estado_stock', { opcional: false }),
     prisma.producto.groupBy({ by: ['anio'], where, _count: { _all: true } }),
     prisma.producto.aggregate({ where: { ...where, precio_final: { not: null } }, _min: { precio_final: true }, _max: { precio_final: true } }),
+    prisma.genero.findMany({ select: { id: true, nombre: true } }),
   ]);
+  // el filtro trabaja con nombres (son los que van en la URL)
+  const nombreDe = new Map(listaGeneros.map((g) => [g.id, g.nombre]));
+  const generos = porGenero
+    .map((g) => ({ valor: nombreDe.get(g.valor), total: g.total }))
+    .filter((g) => g.valor);
 
   const porDecada = {};
   for (const f of anios) {
@@ -202,7 +220,7 @@ async function filtrosDisponibles(base = {}, opciones = {}) {
 async function obtenerPorId(id, { soloActivos = false } = {}) {
   const producto = await prisma.producto.findUnique({
     where: { id: Number(id) },
-    include: { categoria: true, imagenes: { orderBy: { orden: 'asc' } } },
+    include: { categoria: true, genero: true, imagenes: { orderBy: { orden: 'asc' } } },
   });
   if (!producto || (soloActivos && !producto.esActivo)) {
     const error = new Error('Producto no encontrado');
@@ -215,6 +233,7 @@ async function obtenerPorId(id, { soloActivos = false } = {}) {
 async function crear(data) {
   const categoriaId = aNumero(data.categoriaId, 'categoriaId');
   await validarCategoria(categoriaId);
+  await validarGenero(data.generoId);
   const precio = data.precio !== undefined ? data.precio : null;
 
   const descuento = normalizarDescuento(data.descuento_tipo, data.descuento_valor, precio);
@@ -228,7 +247,7 @@ async function crear(data) {
       stock: aNumero(data.stock, 'stock'),
       estado_stock: data.estado_stock || 'disponible',
       condicion: data.condicion,
-      genero: data.genero ?? null,
+      generoId: data.generoId ?? null,
       destacado: data.destacado || false,
       descripcion: data.descripcion,
       categoriaId,
@@ -244,7 +263,7 @@ const CAMPOS_EDITABLES = [
   'precio',
   'estado_stock',
   'condicion',
-  'genero',
+  'generoId',
   'destacado',
   'esActivo',
   'descripcion',
@@ -285,6 +304,8 @@ async function actualizar(id, data) {
 
   // si cambia de categoria avisamos con un 400 claro, en vez de dejar que
   // la foreign key falle contra la base y salga como error interno
+  if (dataActualizada.generoId) await validarGenero(dataActualizada.generoId);
+
   if (dataActualizada.categoriaId !== undefined) {
     await validarCategoria(dataActualizada.categoriaId);
   }

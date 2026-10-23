@@ -24,7 +24,8 @@ function datosDelProducto(b, { parcial = false } = {}) {
     stock: si('stock', (x) => v.entero(x, 'stock', { requerido: true, min: 0, max: 100000 })),
     estado_stock: si('estado_stock', (x) => v.opcion(x, 'estado_stock', ESTADOS_STOCK, { requerido: parcial })),
     condicion: si('condicion', (x) => v.texto(x, 'condicion', { max: 60 })),
-    genero: si('genero', (x) => v.texto(x, 'genero', { max: 40 })),
+    // de la lista de generos; vacio o null = sin genero
+    generoId: si('generoId', (x) => v.entero(x, 'generoId', { min: 1, max: 2147483647 })),
     destacado: v.booleano(b.destacado, 'destacado'),
     esActivo: v.booleano(b.esActivo, 'esActivo'),
     descripcion: si('descripcion', (x) => v.texto(x, 'descripcion', { requerido: true, max: 4000, multilinea: true })),
