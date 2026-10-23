@@ -3,7 +3,7 @@
 //   arreglo (la que vale):  [{ label: 'Martes', value: '13 a 23 hs' }, ...]
 //   objeto (forma vieja):   { martes: '13 a 23 hs', ... }
 //
-// El seed guarda el arreglo y el panel guardaba el objeto. Recorrer el arreglo
+// Hoy el panel guarda el arreglo; antes guardaba el objeto. Recorrer el arreglo
 // con Object.entries() era lo que mostraba "0: [object Object]" en el footer.
 // Todo el que lea el horario pasa por aca y recibe siempre el arreglo.
 
