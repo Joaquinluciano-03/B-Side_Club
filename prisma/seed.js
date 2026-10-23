@@ -16,10 +16,10 @@ const superAdminData = {
 // "clave" es solo para relacionar cada producto con su categoria aca abajo,
 // no se guarda en la base (Categoria no tiene slug).
 const categoriasData = [
-  { clave: "vinilos", nombre: "Vinilos", descripcion: 'LPs de 12", nuevos o usados con garantía de calidad' },
-  { clave: "cassettes", nombre: "Cassettes", descripcion: "Originales y compilados del local" },
-  { clave: "cds", nombre: "CDs", descripcion: "Ediciones originales con librito" },
-  { clave: "equipos", nombre: "Equipos", descripcion: "Bandejas, amplificadores y portátiles revisados" },
+  { clave: "vinilos", nombre: "Vinilos", icono: "vinilo", descripcion: 'LPs de 12", nuevos o usados con garantía de calidad' },
+  { clave: "cassettes", nombre: "Cassettes", icono: "cassette", descripcion: "Originales y compilados del local" },
+  { clave: "cds", nombre: "CDs", icono: "cd", descripcion: "Ediciones originales con librito" },
+  { clave: "equipos", nombre: "Equipos", icono: "perilla", descripcion: "Bandejas, amplificadores y portátiles revisados" },
 ];
 
 // Las fotos del seed ya estan subidas al bucket "productos" de Supabase Storage
@@ -108,7 +108,7 @@ async function main() {
   const categoriasPorClave = {};
   for (const c of categoriasData) {
     const categoria = await prisma.categoria.create({
-      data: { nombre: c.nombre, descripcion: c.descripcion },
+      data: { nombre: c.nombre, descripcion: c.descripcion, icono: c.icono },
     });
     categoriasPorClave[c.clave] = categoria.id;
   }

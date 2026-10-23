@@ -1,12 +1,16 @@
 // Categorias: alta, edicion y baja en la misma pantalla (son pocas y cortas,
 // no justifican una ruta aparte).
 // El backend rechaza con 409 borrar una categoria que tenga productos.
+// Cada categoria lleva un icono (SelectorIcono). Al crearla se sugiere uno
+// segun el nombre que se va escribiendo, hasta que se elige otro a mano.
 
 import { useEffect, useState } from 'react';
 import { get, post, put, del } from '../../lib/api';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
 import { Cargando, ErrorCarga, Vacio } from '../../componentes/Estados';
 import Confirmar from '../../componentes/Confirmar';
+import IconoCategoria, { iconoSugerido } from '../../componentes/IconoCategoria';
+import SelectorIcono from '../../componentes/SelectorIcono';
 import { useToast } from '../../lib/toast';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -15,7 +19,9 @@ export default function Categorias() {
   const [categorias, setCategorias] = useState(null);
   const [error, setError] = useState(null);
   const [editando, setEditando] = useState(null); // null | 'nueva' | id
-  const [form, setForm] = useState({ nombre: '', descripcion: '' });
+  const [form, setForm] = useState({ nombre: '', descripcion: '', icono: null });
+  // true cuando el icono lo eligio la persona: desde ahi el nombre ya no lo cambia
+  const [iconoElegido, setIconoElegido] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [aBorrar, setABorrar] = useState(null);
   const [aviso, setAviso] = useState(null);
@@ -30,13 +36,15 @@ export default function Categorias() {
 
   function abrirNueva() {
     setEditando('nueva');
-    setForm({ nombre: '', descripcion: '' });
+    setForm({ nombre: '', descripcion: '', icono: null });
+    setIconoElegido(false);
     setAviso(null);
   }
 
   function abrirEdicion(c) {
     setEditando(c.id);
-    setForm({ nombre: c.nombre, descripcion: c.descripcion || '' });
+    setForm({ nombre: c.nombre, descripcion: c.descripcion || '', icono: c.icono ?? iconoSugerido(c.nombre) });
+    setIconoElegido(Boolean(c.icono));
     setAviso(null);
   }
 
@@ -50,6 +58,7 @@ export default function Categorias() {
       const cuerpo = {
         nombre: form.nombre.trim(),
         descripcion: form.descripcion.trim() || null,
+        icono: form.icono,
       };
       if (editando === 'nueva') {
         await post('/categorias', cuerpo);
@@ -104,7 +113,7 @@ export default function Categorias() {
         {aviso && <div className={`aviso aviso-${aviso.tipo}`}>{aviso.texto}</div>}
 
         {editando !== null && (
-          <form onSubmit={guardar} className="card" style={{ marginBottom: 18, maxWidth: 520 }}>
+          <form onSubmit={guardar} className="card" style={{ marginBottom: 18, maxWidth: 760 }}>
             <div className="etiqueta">{editando === 'nueva' ? 'Nueva categoría' : 'Editar categoría'}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div className="campo">
@@ -112,7 +121,10 @@ export default function Categorias() {
                 <input
                   id="cat-nombre"
                   value={form.nombre}
-                  onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
+                  onChange={(e) => {
+                    const nombre = e.target.value;
+                    setForm((f) => ({ ...f, nombre, icono: iconoElegido ? f.icono : iconoSugerido(nombre) }));
+                  }}
                   placeholder="Vinilos"
                   autoFocus
                 />
@@ -126,6 +138,13 @@ export default function Categorias() {
                   placeholder='LPs de 12", nuevos o usados con garantía de calidad'
                 />
               </div>
+              <SelectorIcono
+                valor={form.icono}
+                onChange={(icono) => {
+                  setForm((f) => ({ ...f, icono }));
+                  setIconoElegido(true);
+                }}
+              />
               <div style={{ display: 'flex', gap: 10 }}>
                 <button type="submit" className="btn btn-primario btn-chico" disabled={guardando}>
                   {guardando ? 'Guardando…' : 'Guardar'}
@@ -157,6 +176,9 @@ export default function Categorias() {
             <table className="tabla">
               <thead>
                 <tr>
+                  <th style={{ width: 56 }}>
+                    <span className="sr-only">Icono</span>
+                  </th>
                   <th>Nombre</th>
                   <th>Descripción</th>
                   <th style={{ textAlign: 'right' }}>Acciones</th>
@@ -165,6 +187,11 @@ export default function Categorias() {
               <tbody>
                 {categorias.map((c) => (
                   <tr key={c.id}>
+                    <td style={{ paddingTop: 6, paddingBottom: 6 }}>
+                      <span style={{ display: 'grid', placeItems: 'center', width: 44, height: 44 }}>
+                        <IconoCategoria categoria={c} />
+                      </span>
+                    </td>
                     <td style={{ fontWeight: 700 }}>{c.nombre}</td>
                     <td style={{ color: 'var(--tinta-dim)' }}>{c.descripcion || '—'}</td>
                     <td>

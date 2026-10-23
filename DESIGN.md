@@ -186,6 +186,9 @@ Controles 8px, cards y paneles 14px, pastillas (buscadores, filtros, CTAs de sec
 - **Card de producto:** funda al 88% del ancho con el objeto del formato detrás asomando 6%; al hover o foco el objeto sale 7% más y la funda se inclina -1.2°. Texto suelto debajo: estado (solo si no es "disponible"), título, artista, meta, precio.
 - **Tapa genérica:** funda de papel con trama, troquel redondo con el label, título condensado arriba y artista en mono abajo.
 
+### Iconos de categoría
+`componentes/IconoCategoria.jsx`: 22 objetos de disquería (formatos, equipos, accesorios y merch) dibujados con la paleta de las tapas genéricas: cuerpos carbón, metal, crema del papel y un solo color de acento que llega por `color`. Vinilo, CD, cassette y perilla son CSS; el resto, SVG en un cuadro de 100. El local elige el icono al crear la categoría (grilla de radios en el panel, sugerido por el nombre mientras se escribe); sin elección, se deduce del nombre. El icono también decide la tapa genérica: disco, cinta o ficha impresa.
+
 ### Inputs / Fields
 Label en Martian Mono arriba, campo blanco con borde gris, foco con borde naranja y halo naranja suave. Error en rojo debajo y el foco salta al primer campo con error. Buscadores en pastilla con lupa.
 
