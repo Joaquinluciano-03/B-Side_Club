@@ -31,8 +31,50 @@
   line-height: 1.5;
   text-wrap: pretty;
 }
+.bajadaCantidad {
+  color: var(--tinta);
+  font-weight: 800;
+}
+/* con una categoria elegida: su icono al lado del nombre, en un circulo como
+   los separadores de la Home, y arriba "Catalogo" chiquito para no perder
+   donde se esta */
+.cabeceraCategoria {
+  display: flex;
+  align-items: center;
+  gap: var(--e-5);
+  min-width: 0;
+}
+.cabeceraIcono {
+  flex: none;
+  width: clamp(64px, 7vw, 88px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--superficie);
+  box-shadow:
+    inset 0 0 0 2px var(--tinta),
+    0 6px 16px rgba(25, 28, 29, 0.12);
+}
+.cabeceraIcono > * {
+  width: 70%;
+}
+.antetitulo {
+  margin: 0 0 var(--e-2);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
 
 /* ============ BARRA (pegada arriba) ============ */
+/* el testigo: 1px justo arriba de la barra para saber cuando se pega */
+.testigo {
+  height: 1px;
+  margin-bottom: -1px;
+}
 .barra {
   position: sticky;
   top: var(--alto-header); /* debajo del header */
@@ -41,6 +83,11 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 2px solid var(--tinta);
+  transition: box-shadow var(--d-media) ease;
+}
+/* pegada arriba: una sombra la separa de las cards que pasan por debajo */
+.barra[data-pegada] {
+  box-shadow: 0 10px 24px -8px rgba(25, 28, 29, 0.28);
 }
 .barraInterior {
   max-width: var(--ancho);
@@ -301,24 +348,22 @@
      tiene flex-wrap). No se achican: ver conSelector */
   flex: 0 0 auto;
   gap: var(--e-1);
-  overflow-x: auto;
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
+  /* Recorta (abajo, lo que sobra del fondo de las pestañas) pero sin ser una
+     caja con scroll: con overflow auto la rueda del mouse movia las
+     pestañas hacia arriba y quedaban corridas. Nunca hace falta deslizarlas:
+     si no entran, van al selector (ver conSelector) */
+  overflow: clip;
   margin-bottom: -2px; /* se apoyan sobre el borde de la barra */
-  /* el scroll horizontal (para mobile) tambien recorta arriba: este aire es
-     el lugar donde se estira la pestaña al pasar el mouse. El margen
-     negativo lo compensa, asi la barra queda del mismo alto */
+  /* el recorte tambien es arriba: este aire es el lugar donde se estira la
+     pestaña al pasar el mouse. El margen negativo lo compensa, asi la barra
+     queda del mismo alto */
   padding-top: 10px;
   margin-top: -10px;
-}
-.separadores::-webkit-scrollbar {
-  display: none;
 }
 
 .separador {
   position: relative;
   flex: none;
-  scroll-snap-align: start;
   display: inline-flex;
   align-items: baseline;
   gap: var(--e-2);
@@ -406,9 +451,9 @@
 
 .resumen {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
-  gap: var(--e-4);
+  align-items: center;
+  gap: var(--e-3) var(--e-4);
   flex-wrap: wrap;
   margin-bottom: var(--e-6);
   font-family: var(--mono);
@@ -416,6 +461,35 @@
   font-size: 12px;
   letter-spacing: 0.06em;
   color: var(--tinta-tenue);
+}
+/* ordenar: un selector chico, del mismo tono mono que el resumen */
+.orden {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  color: var(--tinta-tenue);
+}
+.orden select {
+  appearance: none;
+  min-height: 36px;
+  padding: 0 30px 0 var(--e-3);
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--r-pildora);
+  background: var(--superficie);
+  color: var(--tinta);
+  font: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.orden select:hover {
+  border-color: var(--tinta);
+}
+.orden svg {
+  position: absolute;
+  right: 11px;
+  pointer-events: none;
+  color: var(--tinta);
 }
 
 /* las cards entran escalonadas (40ms entre una y otra) */

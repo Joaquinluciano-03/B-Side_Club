@@ -1,4 +1,6 @@
-/* El Lado B: la pagina entera sobre carbon, con la trama clara */
+/* El Lado B: la pagina entera sobre carbon, con la trama clara. Tres partes,
+   un movimiento cada una: el cassette sonando, la caratula que se despliega
+   y la visita que entra suave. */
 .pagina {
   flex: 1;
   width: 100%;
@@ -9,7 +11,7 @@
 }
 
 .cabecera,
-.temas,
+.caratula,
 .visita {
   max-width: var(--ancho);
   margin-inline: auto;
@@ -31,7 +33,7 @@
 }
 /* el cassette arriba a la derecha, sobre la bajada. Va fuera de la grilla
    para no empujar el titulo hacia abajo (la cabecera queda del mismo alto) */
-.cassette {
+.deck {
   position: absolute;
   top: var(--e-7);
   right: var(--gutter);
@@ -53,6 +55,22 @@
   line-height: 0.9;
   text-transform: uppercase;
 }
+/* el titulo no entra entero con la cascada: entran sus letras, de a una */
+.cabecera > .titulo {
+  animation: none;
+}
+.letraTitulo {
+  display: inline-block;
+  animation: letra-entra 800ms var(--ease-out) backwards;
+  animation-delay: calc(140ms + var(--n) * 45ms);
+}
+@keyframes letra-entra {
+  from {
+    opacity: 0;
+    translate: 0 0.45em;
+    rotate: 6deg;
+  }
+}
 .bajada {
   grid-area: bajada;
   margin: 0;
@@ -62,46 +80,137 @@
   color: var(--crema-dim);
 }
 
-/* ============ TEMAS DEL LADO B ============ */
-.temas {
-  list-style: none;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
+/* ============ LA CARATULA DEL CASSETTE ============
+   La tarjeta de papel plegada que viene en la cajita: a la izquierda el lomo
+   (lo que se lee en el estante) y a la derecha el frente con la lista de
+   temas. Mismo papel que la etiqueta del cassette de la cabecera: crema,
+   franja naranja arriba y renglones finitos. La tarjeta va apenas
+   inclinada, como apoyada sobre la mesa. */
+.caratula {
+  --papel: #efe6d8;
+  --papel-sombra: #e2d6c1;
   padding-bottom: var(--seccion);
 }
-.tema {
+.tarjeta {
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: var(--e-5) var(--e-7);
+  grid-template-columns: 76px minmax(0, 1fr);
+  max-width: 1080px;
+  rotate: -0.6deg;
+  /* la profundidad para que el frente se despliegue en 3D */
+  perspective: 2200px;
+  color: var(--tinta);
+}
+
+/* el lomo: papel un poco mas oscuro (esta del lado del pliegue), con el
+   nombre de abajo hacia arriba, como en el estante */
+.lomo {
+  display: grid;
+  place-items: center;
+  padding: var(--e-5) 0;
+  border-radius: 6px 0 0 6px;
+  background:
+    linear-gradient(var(--naranja), var(--naranja)) 0 0 / 100% 10px no-repeat,
+    var(--papel-sombra);
+  box-shadow:
+    inset -8px 0 10px -6px rgba(20, 18, 16, 0.28),
+    0 20px 40px rgba(0, 0, 0, 0.45);
+}
+.lomoTexto {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-3);
+  font-family: var(--display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lomoPunto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--naranja);
+}
+
+/* el frente: renglones finitos y la franja naranja con el titulo. Se
+   despliega desde el lomo (la bisagra es su borde izquierdo) */
+.frente {
+  border-radius: 0 6px 6px 0;
+  background:
+    repeating-linear-gradient(transparent 0 31px, rgba(20, 18, 16, 0.06) 31px 32px),
+    var(--papel);
+  box-shadow:
+    inset 8px 0 10px -8px rgba(20, 18, 16, 0.25),
+    0 20px 40px rgba(0, 0, 0, 0.45);
+  transform-origin: 0 50%;
+  overflow: hidden;
+}
+.frenteBanda {
+  display: flex;
   align-items: baseline;
-  padding: var(--e-7) 0;
-  border-top: 1px solid var(--borde-oscuro-2);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--e-2) var(--e-5);
+  padding: var(--e-4) var(--e-7);
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
 }
-.tema:last-child {
-  border-bottom: 1px solid var(--borde-oscuro-2);
-}
-.temaLado {
-  font-family: var(--mono);
-  font-stretch: 87.5%;
-  font-size: var(--t-sm);
-  color: var(--naranja);
-}
-.temaTitulo {
+.frenteTitulo {
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
   font-size: var(--t-xl);
   line-height: 1;
   text-transform: uppercase;
+}
+.frenteSub {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.temas {
+  list-style: none;
+  margin: 0;
+  padding: var(--e-3) var(--e-7) var(--e-6);
+}
+.tema {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 0.9fr) minmax(0, 1.5fr);
+  gap: var(--e-3) var(--e-6);
+  align-items: baseline;
+  padding: var(--e-6) 0;
+}
+.tema + .tema {
+  border-top: 1px dashed rgba(20, 18, 16, 0.28);
+}
+/* el numero del tema, como se escribe en la caratula */
+.temaLado {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--teja);
+}
+.temaTitulo {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-lg);
+  line-height: 1.05;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 .temaTexto {
   margin: 0;
-  max-width: 56ch;
+  max-width: 58ch;
   font-size: var(--t-md);
   line-height: 1.65;
-  color: var(--crema-dim);
+  color: var(--tinta-cuerpo);
   text-wrap: pretty;
 }
 
@@ -151,6 +260,14 @@
   align-items: center;
   gap: var(--e-2);
 }
+.cta svg {
+  transition: translate var(--d-rapida) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover svg {
+    translate: 3px 0;
+  }
+}
 
 .horario {
   margin: 0;
@@ -174,28 +291,71 @@
 .horario dd {
   margin: 0;
 }
+/* la fila de hoy, en naranja y con un punto en el margen izquierdo */
 .esHoy {
+  position: relative;
   color: var(--naranja);
 }
+.esHoy::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--naranja);
+}
 
+/* ============ RESPONSIVE ============ */
 @media (max-width: 860px) {
   .cabecera {
     grid-template-columns: 1fr;
-    grid-template-areas: 'cassette' 'lado' 'titulo' 'bajada';
+    grid-template-areas: 'deck' 'lado' 'titulo' 'bajada';
     position: static;
     padding-top: var(--e-8);
   }
   /* en pantallas angostas va en la grilla, arriba de todo y a la derecha */
-  .cassette {
+  .deck {
     position: static;
-    grid-area: cassette;
+    grid-area: deck;
     justify-self: end;
     width: min(240px, 62vw);
     margin-bottom: var(--e-4);
   }
+  /* la caratula se para: el lomo queda arriba como una franja y el frente
+     se despliega hacia abajo (la bisagra pasa a ser su borde de arriba) */
+  .tarjeta {
+    grid-template-columns: 1fr;
+    rotate: none;
+  }
+  .lomo {
+    padding: var(--e-3) var(--e-4);
+    border-radius: 6px 6px 0 0;
+    background:
+      linear-gradient(var(--naranja), var(--naranja)) 0 0 / 10px 100% no-repeat,
+      var(--papel-sombra);
+    box-shadow:
+      inset 0 -8px 10px -6px rgba(20, 18, 16, 0.28),
+      0 20px 40px rgba(0, 0, 0, 0.45);
+  }
+  .lomoTexto {
+    writing-mode: horizontal-tb;
+    rotate: none;
+    font-size: 15px;
+  }
+  .frente {
+    border-radius: 0 0 6px 6px;
+    transform-origin: 50% 0;
+  }
+  .frenteBanda,
+  .temas {
+    padding-inline: var(--e-5);
+  }
   .tema {
     grid-template-columns: 1fr;
-    gap: var(--e-3);
+    gap: var(--e-2);
   }
   .visita {
     grid-template-columns: 1fr;
@@ -203,13 +363,59 @@
   }
 }
 
-/* entrada de la visita: despues de los temas */
-@keyframes visita-entra {
+/* ============ ENTRADAS (data-visto, ver lib/useEnPantalla) ============ */
+@keyframes sube {
   from {
     opacity: 0;
-    translate: 0 24px;
+    translate: 0 22px;
   }
 }
-.visita {
-  animation: visita-entra 800ms var(--ease-out) 520ms backwards;
+/* el frente llega plegado detras del lomo y se abre, frenando al final;
+   sin el fade no se veria el instante en que esta de canto */
+@keyframes se-despliega {
+  from {
+    opacity: 0;
+    transform: rotateY(-95deg);
+  }
+  30% {
+    opacity: 1;
+  }
+}
+@keyframes se-despliega-abajo {
+  from {
+    opacity: 0;
+    transform: rotateX(95deg);
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+/* --- caratula: el lomo aparece, el frente se despliega y despues los temas --- */
+.caratula[data-entrada]:not([data-visto]) :is(.lomo, .frente, .tema) {
+  opacity: 0;
+}
+.caratula[data-visto] .lomo {
+  animation: sube 600ms var(--ease-out) backwards;
+}
+.caratula[data-visto] .frente {
+  animation: se-despliega 1.2s var(--ease-out) 250ms backwards;
+}
+.caratula[data-visto] .tema {
+  animation: sube 700ms var(--ease-out) backwards;
+  animation-delay: calc(1000ms + var(--i, 0) * 130ms);
+}
+@media (max-width: 860px) {
+  .caratula[data-visto] .frente {
+    animation-name: se-despliega-abajo;
+  }
+}
+
+/* --- visita: titulo y datos (globales .revela y .entra) y el horario --- */
+.visita[data-entrada]:not([data-visto]) .horario > div {
+  opacity: 0;
+}
+.visita[data-visto] .horario > div {
+  animation: sube 600ms var(--ease-out) backwards;
+  animation-delay: calc(250ms + var(--i, 0) * 60ms);
 }

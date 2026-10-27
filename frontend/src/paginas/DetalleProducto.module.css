@@ -265,6 +265,11 @@
   line-height: 1;
   text-transform: uppercase;
 }
+/* en el celular el titulo ocupa casi todo: el link no se parte en dos */
+.relacionadosCabecera > a {
+  flex: none;
+  white-space: nowrap;
+}
 
 /* ============ ESQUELETO ============ */
 .esqueletoTapa {

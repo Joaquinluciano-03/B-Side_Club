@@ -598,3 +598,56 @@ dialog:not([open])::backdrop {
 .cascada > :nth-child(8) { animation-delay: calc(var(--cascada-inicio, 0ms) + 490ms); }
 .cascada > :nth-child(9) { animation-delay: calc(var(--cascada-inicio, 0ms) + 560ms); }
 .cascada > :nth-child(n + 10) { animation-delay: calc(var(--cascada-inicio, 0ms) + 630ms); }
+
+/* ============ ENTRADAS AL HACER SCROLL ============
+   Lo mismo que la cascada, pero cuando la seccion llega a pantalla y no al
+   cargar (lib/useEnPantalla.js pone data-visto). El contenedor lleva
+   data-entrada; adentro:
+   - .entra: sube y aparece.
+   - .revela > span: el texto sube desde atras de una linea, como un disco
+     que sale de la batea. <span class="revela"><span>Texto</span></span>
+   --i ordena la cascada (80 ms por paso) y --retraso corre todo el grupo.
+   No anidar contenedores con data-entrada: el de afuera destaparia al de
+   adentro antes de tiempo. */
+@keyframes revela-sube {
+  from {
+    translate: 0 110%;
+  }
+}
+
+[data-entrada]:not([data-visto]) .entra {
+  opacity: 0;
+}
+[data-visto] .entra {
+  animation: entrada-subir 700ms var(--ease-out) backwards;
+  animation-delay: calc(var(--retraso, 0ms) + var(--i, 0) * 80ms);
+}
+
+/* el padding deja lugar a los acentos y el margen negativo lo devuelve */
+.revela {
+  display: block;
+  overflow: clip;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+}
+.revela > span {
+  display: block;
+}
+[data-entrada]:not([data-visto]) .revela > span {
+  translate: 0 110%;
+}
+[data-visto] .revela > span {
+  animation: revela-sube 900ms var(--ease-out) backwards;
+  animation-delay: calc(var(--retraso, 0ms) + var(--i, 0) * 90ms);
+}
+
+/* ============ MIENTRAS SE SCROLLEA ============
+   Con la rueda, el mouse queda quieto y el contenido pasa por debajo: cada
+   fila o card que cruzaba el cursor disparaba su hover (brillos, sombras,
+   colores) y habia que redibujarlo en medio del scroll, que se sentia a
+   tirones. Mientras la pagina se desliza (Lenis pone lenis-scrolling en
+   <html>, ver lib/scrollSuave.js) el contenido no reacciona al mouse; al
+   frenar, los hovers vuelven solos. El header queda afuera: no se mueve. */
+html.lenis-scrolling main {
+  pointer-events: none;
+}

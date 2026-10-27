@@ -133,8 +133,17 @@ function aplicarFiltros(where, { generos, condiciones, disponibilidad, precioMin
   return where;
 }
 
+// como se ordena el catalogo. Los "a consultar" (sin precio) van al final al
+// ordenar por precio, y el id desempata para que la paginacion sea estable
+const ORDENES = {
+  recientes: [{ createdAt: 'desc' }, { id: 'desc' }],
+  'precio-asc': [{ precio_final: { sort: 'asc', nulls: 'last' } }, { id: 'desc' }],
+  'precio-desc': [{ precio_final: { sort: 'desc', nulls: 'last' } }, { id: 'desc' }],
+  nombre: [{ nombre: 'asc' }, { id: 'desc' }],
+};
+
 async function listar(filtros = {}, opciones = {}) {
-  const { page, pageSize } = filtros;
+  const { page, pageSize, orden } = filtros;
   const where = aplicarFiltros(filtroBase(filtros, opciones), filtros);
 
   const pageNum = Math.max(1, Number(page) || 1);
@@ -144,7 +153,7 @@ async function listar(filtros = {}, opciones = {}) {
     prisma.producto.findMany({
       where,
       include: { categoria: true, genero: true, imagenes: { orderBy: { orden: 'asc' } } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: ORDENES[orden] || ORDENES.recientes,
       skip: (pageNum - 1) * pageSizeNum,
       take: pageSizeNum,
     }),

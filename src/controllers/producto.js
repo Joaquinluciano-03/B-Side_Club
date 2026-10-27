@@ -6,6 +6,8 @@ const v = require('../utils/validar');
 const ESTADOS_STOCK = ['disponible', 'ultima_unidad', 'reservado', 'a_consultar', 'vendido'];
 const TIPOS_DESCUENTO = ['porcentaje', 'monto'];
 const SI_NO = ['true', 'false'];
+// como se puede ordenar el catalogo (ver ORDENES en producto.service)
+const ORDENES = ['recientes', 'precio-asc', 'precio-desc', 'nombre'];
 const ANIO_MAX = () => new Date().getFullYear() + 1;
 
 // Valida cada campo que vino. Con parcial (edicion) los que no vienen quedan
@@ -81,6 +83,7 @@ async function listar(req, res, next) {
       ...filtrosCatalogo(q),
       page: v.entero(q.page, 'page', { min: 1, max: 10000 }) ?? undefined,
       pageSize: v.entero(q.pageSize, 'pageSize', { min: 1, max: 60 }) ?? undefined,
+      orden: v.opcion(q.orden, 'orden', ORDENES) ?? undefined,
     };
     const resultado = await productoService.listar(filtros, { esAdmin: Boolean(req.user) });
     res.json(resultado);

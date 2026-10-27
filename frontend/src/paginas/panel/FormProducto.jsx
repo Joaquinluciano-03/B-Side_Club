@@ -21,6 +21,7 @@ import SelectorGenero from '../../componentes/SelectorGenero';
 import { useToast } from '../../lib/toast';
 import { olvidarConteos } from '../../lib/useConteos';
 import { ESTADOS_STOCK, etiquetaStock, mensajeDeError, separarNombre } from '../../lib/formato';
+import { comprimirImagenes } from '../../lib/comprimirImagen';
 import estilos from './FormProducto.module.css';
 
 const VACIO = {
@@ -218,10 +219,12 @@ export default function FormProducto() {
     }
   }
 
-  // filtra lo elegido y avisa si no se puede subir. El backend acepta hasta 5
-  // por tanda y 5 MB cada una: avisamos antes de gastar el pedido y que vuelva
-  // un 400. "yaHay" cuenta las pendientes, que despues van en la misma tanda.
-  function revisarArchivos(lista, yaHay = 0) {
+  // filtra lo elegido, lo comprime (lib/comprimirImagen) y avisa si no se
+  // puede subir. El backend acepta hasta 5 por tanda y 5 MB cada una:
+  // avisamos antes de gastar el pedido y que vuelva un 400. El peso se mira
+  // despues de comprimir: una foto de celular de 8 MB entra sin problema.
+  // "yaHay" cuenta las pendientes, que despues van en la misma tanda.
+  async function revisarArchivos(lista, yaHay = 0) {
     const archivos = Array.from(lista || []).filter((a) => a.type.startsWith('image/'));
     if (!archivos.length) {
       if (lista?.length) toast.error('Solo se pueden subir imágenes.');
@@ -231,21 +234,22 @@ export default function FormProducto() {
       toast.error(`Se pueden subir hasta ${MAX_IMAGENES} imágenes por vez.`);
       return null;
     }
-    const pesada = archivos.find((a) => a.size > MAX_MB * 1024 * 1024);
+    const comprimidas = await comprimirImagenes(archivos);
+    const pesada = comprimidas.find((a) => a.size > MAX_MB * 1024 * 1024);
     if (pesada) {
       toast.error(`"${pesada.name}" supera los ${MAX_MB} MB.`);
       return null;
     }
-    return archivos;
+    return comprimidas;
   }
 
   // editando se suben en el momento; creando quedan pendientes hasta guardar
-  function elegirFotos(lista) {
+  async function elegirFotos(lista) {
     if (editando) {
       subirImagenes(lista);
       return;
     }
-    const archivos = revisarArchivos(lista, pendientes.length);
+    const archivos = await revisarArchivos(lista, pendientes.length);
     if (!archivos) return;
     setPendientes((prev) => [...prev, ...archivos.map((archivo) => ({ archivo, url: URL.createObjectURL(archivo) }))]);
   }
@@ -261,13 +265,17 @@ export default function FormProducto() {
   }
 
   async function subirImagenes(lista) {
-    const archivos = revisarArchivos(lista);
-    if (!archivos) return;
+    // "subiendo" ya durante la compresion: con fotos grandes tarda un momento
+    setSubiendo(true);
+    const archivos = await revisarArchivos(lista);
+    if (!archivos) {
+      setSubiendo(false);
+      return;
+    }
 
     const fd = new FormData();
     archivos.forEach((a) => fd.append('imagenes', a));
 
-    setSubiendo(true);
     try {
       const nuevas = await api(`/productos/${id}/imagenes`, { method: 'POST', body: fd });
       setImagenes((prev) => [...prev, ...nuevas]);

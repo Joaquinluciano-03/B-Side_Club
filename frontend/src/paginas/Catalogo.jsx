@@ -25,6 +25,8 @@ import {
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../componentes/Estados';
 import { mensajeDeError } from '../lib/formato';
 import { cantidadCon } from '../lib/unidades';
+import { irAlScroll } from '../lib/scrollSuave';
+import IconoCategoria from '../componentes/IconoCategoria';
 import estilos from './Catalogo.module.css';
 
 // La busqueda dispara un pedido por tecla si no se la frena, y el backend
@@ -38,6 +40,19 @@ function useDebounce(valor, ms = 350) {
   }, [valor, ms]);
   return debounced;
 }
+
+// el total de todo el catalogo mezcla discos, equipos y accesorios: se cuenta
+// en "productos", no en la unidad de una categoria
+const SIN_CATEGORIA = { unidad_singular: 'producto', unidad_plural: 'productos' };
+
+// como se puede ordenar (el backend acepta los mismos valores en ?orden=)
+const ORDENES = [
+  { valor: 'recientes', label: 'Más nuevos' },
+  { valor: 'precio-asc', label: 'Menor precio' },
+  { valor: 'precio-desc', label: 'Mayor precio' },
+  { valor: 'nombre', label: 'A–Z' },
+];
+const POR_PAGINA = 12;
 
 function Separador({ activo, onClick, nombre, cantidad }) {
   return (
@@ -62,6 +77,7 @@ export default function Catalogo() {
   const categoriaId = params.get('categoriaId') || '';
   const page = Number(params.get('page')) || 1;
   const qUrl = params.get('q') || '';
+  const orden = params.get('orden') || 'recientes';
   // ?ofertas=1: solo los productos con descuento (se combina con el resto)
   const soloOfertas = params.get('ofertas') === '1';
   // genero, estado, disponibilidad, decada y precio (ver lib/filtrosCatalogo)
@@ -110,7 +126,9 @@ export default function Catalogo() {
     setDatos(null);
     setError(null);
 
-    get(`/productos${query({ ...base, ...filtrosAQuery(filtros), page, pageSize: 12 })}`)
+    get(
+      `/productos${query({ ...base, ...filtrosAQuery(filtros), orden: orden === 'recientes' ? undefined : orden, page, pageSize: POR_PAGINA })}`
+    )
       .then((r) => {
         if (vigente) setDatos(r);
       })
@@ -121,7 +139,7 @@ export default function Catalogo() {
     return () => {
       vigente = false;
     };
-  }, [base, filtros, page, intento]);
+  }, [base, filtros, orden, page, intento]);
 
   useEffect(() => {
     let vigente = true;
@@ -184,6 +202,47 @@ export default function Catalogo() {
     return () => observador.disconnect();
   }, [categorias.length]);
 
+  // un link viejo puede traer una categoria que ya no existe: sin esto no
+  // quedaba ninguna pestaña marcada y la grilla salia vacia. Se vuelve a
+  // "Todo" sin sumar un paso al historial
+  useEffect(() => {
+    if (!categoriaId || categorias.length === 0) return;
+    if (categorias.some((c) => String(c.id) === categoriaId)) return;
+    const nuevos = new URLSearchParams(params);
+    nuevos.delete('categoriaId');
+    nuevos.delete('page');
+    setParams(nuevos, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoriaId, categorias]);
+
+  function cambiarOrden(valor) {
+    const nuevos = new URLSearchParams(params);
+    if (valor === 'recientes') nuevos.delete('orden');
+    else nuevos.set('orden', valor);
+    nuevos.delete('page');
+    setParams(nuevos);
+  }
+
+  // La barra pegada: cuando queda fija arriba lleva una sombra, para
+  // separarse de las cards que pasan por debajo. Un elemento de 1px justo
+  // arriba de la barra avisa cuando paso por debajo del header (a la altura
+  // a la que se pega la barra: su "top" en el CSS)
+  const testigoRef = useRef(null);
+  const refBarra = useRef(null);
+  const [pegada, setPegada] = useState(false);
+  useEffect(() => {
+    const testigo = testigoRef.current;
+    const barra = refBarra.current;
+    if (!testigo || !barra || !('IntersectionObserver' in window)) return;
+    const arriba = parseFloat(getComputedStyle(barra).top) || 0;
+    const obs = new IntersectionObserver(
+      ([e]) => setPegada(!e.isIntersecting && e.boundingClientRect.top < arriba + 1),
+      { rootMargin: `-${arriba + 1}px 0px 0px 0px` }
+    );
+    obs.observe(testigo);
+    return () => obs.disconnect();
+  }, []);
+
   function alternarOfertas() {
     const nuevos = new URLSearchParams(params);
     if (soloOfertas) nuevos.delete('ofertas');
@@ -196,7 +255,7 @@ export default function Catalogo() {
     const nuevos = new URLSearchParams(params);
     nuevos.set('page', String(n));
     setParams(nuevos);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    irAlScroll(0, { suave: true });
   }
 
   function limpiar() {
@@ -229,16 +288,42 @@ export default function Catalogo() {
 
   return (
     <main className={estilos.pagina}>
-      <header className={`${estilos.cabecera} cascada`}>
-        <h1 className={estilos.titulo}>Catálogo</h1>
+      {/* La cabecera acompaña a la pestaña elegida: con una categoria muestra
+          su icono, su descripcion y su cantidad en su propia unidad. La key
+          hace que vuelva a entrar (la cascada) al cambiar de categoria */}
+      <header key={categoriaActual?.id ?? 'todo'} className={`${estilos.cabecera} cascada`}>
+        {categoriaActual ? (
+          <div className={estilos.cabeceraCategoria}>
+            <span className={estilos.cabeceraIcono} aria-hidden="true">
+              <IconoCategoria categoria={categoriaActual} />
+            </span>
+            <div>
+              <p className={estilos.antetitulo}>Catálogo</p>
+              <h1 className={estilos.titulo}>{categoriaActual.nombre}</h1>
+            </div>
+          </div>
+        ) : (
+          <h1 className={estilos.titulo}>Catálogo</h1>
+        )}
         <p className={estilos.bajada}>
-          {total !== null ? `${total} títulos` : 'Discos'} nuevos o usados, todos con garantía de
-          calidad. Si no está, escribinos y lo buscamos.
+          {categoriaActual ? (
+            <>
+              {categoriaActual.descripcion ? `${categoriaActual.descripcion}. ` : ''}
+              <strong className={estilos.bajadaCantidad}>{cantidadCon(categoriaActual.total, categoriaActual)}</strong>{' '}
+              en el cajón, todos con garantía de calidad.
+            </>
+          ) : (
+            <>
+              {total !== null ? `${cantidadCon(total, SIN_CATEGORIA)} nuevos o usados` : 'Discos nuevos o usados'}, todos
+              con garantía de calidad. Si no está, escribinos y lo buscamos.
+            </>
+          )}
         </p>
       </header>
 
       {/* barra de busqueda y separadores: queda pegada arriba al bajar */}
-      <div className={estilos.barra}>
+      <div ref={testigoRef} className={estilos.testigo} aria-hidden="true" />
+      <div ref={refBarra} className={estilos.barra} data-pegada={pegada || undefined}>
         <div ref={barraRef} className={`${estilos.barraInterior} ${noEntran ? estilos.conSelector : ''}`}>
           <div className={estilos.herramientas}>
             <label className={estilos.buscador}>
@@ -361,20 +446,34 @@ export default function Catalogo() {
           </div>
         )}
 
-        {/* sin filtros, la cantidad ya esta en el separador "Todo" */}
-        {hayFiltros && datos && datos.productos.length > 0 && (
+        {/* que se esta viendo (desde-hasta de cuantos) y como se ordena */}
+        {datos && datos.productos.length > 0 && (
           <div className={estilos.resumen}>
             <span>
-              {cantidadCon(datos.total, categoriaActual)}
+              {(datos.page - 1) * datos.pageSize + 1}–{(datos.page - 1) * datos.pageSize + datos.productos.length} de{' '}
+              {cantidadCon(datos.total, categoriaActual || SIN_CATEGORIA)}
               {soloOfertas ? ' en oferta' : ''}
-              {categoriaActual ? ` en ${categoriaActual.nombre}` : ''}
               {qUrl ? ` para "${qUrl}"` : ''}
+              {hayFiltros && (
+                <>
+                  {' · '}
+                  <button className="btn-enlace" onClick={limpiar}>
+                    Ver todo el catálogo
+                  </button>
+                </>
+              )}
             </span>
-            {hayFiltros && (
-              <button className="btn-enlace" onClick={limpiar}>
-                Ver todo el catálogo
-              </button>
-            )}
+            <label className={estilos.orden}>
+              <span>Ordenar</span>
+              <select value={orden} onChange={(e) => cambiarOrden(e.target.value)}>
+                {ORDENES.map((o) => (
+                  <option key={o.valor} value={o.valor}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+              <CaretDown size={14} weight="bold" aria-hidden="true" />
+            </label>
           </div>
         )}
 

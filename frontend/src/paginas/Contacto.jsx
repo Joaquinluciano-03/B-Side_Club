@@ -18,6 +18,7 @@ import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
 import { mensajeDeError, separarNombre } from '../lib/formato';
+import { irAlScroll } from '../lib/scrollSuave';
 import estilos from './Contacto.module.css';
 
 const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -115,7 +116,7 @@ export default function Contacto() {
         productoId: producto ? producto.id : undefined,
       });
       setEnviado(true);
-      window.scrollTo(0, 0);
+      irAlScroll(0);
     } catch (err) {
       setErrorGeneral(
         err.status === 429

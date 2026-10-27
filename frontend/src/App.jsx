@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useAuth } from './lib/auth';
 import { useDatosDelLocal } from './lib/useStoreInfo';
 import { Cargando, Vacio } from './componentes/Estados';
+import { irAlScroll } from './lib/scrollSuave';
 
 // La home y su layout van en el paquete principal: es por donde entra casi
 // todo el mundo. El resto de las paginas se bajan aparte, cuando hacen falta
@@ -109,7 +110,7 @@ function ManejoDelScroll() {
       let quietoDesde = performance.now();
       const intentar = () => {
         if (parar) return;
-        window.scrollTo(0, guardada);
+        irAlScroll(guardada);
         const altoAhora = document.documentElement.scrollHeight;
         if (altoAhora !== alto) {
           alto = altoAhora;
@@ -130,7 +131,7 @@ function ManejoDelScroll() {
         window.removeEventListener('keydown', cortar);
       };
     }
-    if (cambioDePagina) window.scrollTo(0, 0);
+    if (cambioDePagina) irAlScroll(0);
   }, [location.key]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }

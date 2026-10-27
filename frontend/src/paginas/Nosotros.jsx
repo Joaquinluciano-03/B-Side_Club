@@ -1,13 +1,21 @@
-// Nosotros: el Lado B. Toda la pagina va en carbon; la historia del local
-// son los temas del lado B (B1, B2, B3). Los datos de contacto y el horario
-// salen de GET /api/store-info, que el panel puede editar.
+// Nosotros: el Lado B. Toda la pagina va en carbon y son tres partes, cada
+// una con un solo movimiento:
+//   1. la cabecera, con el cassette sonando (la cinta avanza con el scroll);
+//   2. la caratula del cassette (la tarjeta de papel plegada que viene en la
+//      cajita): la historia del local son los temas del lado B (B1, B2, B3).
+//      Cuando llega a pantalla, el frente se despliega desde el lomo;
+//   3. la visita: direccion, horario y como escribirnos.
+// Los datos de contacto y el horario salen de GET /api/store-info, que el
+// panel puede editar.
 
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight } from '@phosphor-icons/react';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { normalizarHorario, horarioDeHoy } from '../lib/horario';
 import { linkMapa } from '../lib/contacto';
+import { useEnPantalla } from '../lib/useEnPantalla';
 import Cassette from '../componentes/Cassette';
+import PorLetras from '../componentes/PorLetras';
 import estilos from './Nosotros.module.css';
 
 // los temas del lado B. El barrio sale de la direccion cargada en la base
@@ -34,58 +42,100 @@ const temas = (barrio) => [
 ];
 
 export default function Nosotros() {
-  const { info, barrio } = useDatosDelLocal();
+  const { info, nombre, barrio } = useDatosDelLocal();
   const horario = normalizarHorario(info?.horario);
   const hoy = horarioDeHoy(info?.horario);
+  const refCaratula = useEnPantalla();
+  const refVisita = useEnPantalla();
+  const lista = temas(barrio);
 
   return (
     <main className={estilos.pagina} data-oscuro>
       <header className={`${estilos.cabecera} cascada`}>
         <p className={estilos.lado}>Lado B</p>
         {/* arriba a la derecha, un cassette sonando (el lado B) */}
-        <Cassette className={estilos.cassette} />
-        <h1 className={estilos.titulo}>La historia</h1>
+        <div className={estilos.deck} aria-hidden="true">
+          <Cassette alScroll />
+        </div>
+        <h1 className={estilos.titulo}>
+          <PorLetras texto="La historia" claseLetra={estilos.letraTitulo} />
+        </h1>
         <p className={estilos.bajada}>
           {info?.description ||
             `Una disquería chica${barrio ? ` en ${barrio}` : ''}: discos nuevos o usados, todos con garantía de calidad.`}
         </p>
       </header>
 
-      <ol className={`${estilos.temas} cascada`} style={{ '--cascada-inicio': '260ms' }}>
-        {temas(barrio).map((t) => (
-          <li key={t.lado} className={estilos.tema}>
-            <span className={estilos.temaLado}>{t.lado}</span>
-            <h2 className={estilos.temaTitulo}>{t.titulo}</h2>
-            <p className={estilos.temaTexto}>{t.texto}</p>
-          </li>
-        ))}
-      </ol>
+      {/* La caratula del cassette: el lomo (con el nombre, como se lee en el
+          estante) y el frente con la lista de temas. Es del mismo papel que
+          la etiqueta del cassette de arriba: crema, franja naranja y
+          renglones */}
+      <section ref={refCaratula} data-entrada className={estilos.caratula} aria-labelledby="caratula-titulo">
+        <div className={estilos.tarjeta}>
+          <div className={estilos.lomo} aria-hidden="true">
+            <span className={estilos.lomoTexto}>
+              {nombre} <span className={estilos.lomoPunto} /> Lado B <span className={estilos.lomoPunto} /> C90
+            </span>
+          </div>
+          <div className={estilos.frente}>
+            <div className={estilos.frenteBanda}>
+              <h2 id="caratula-titulo" className={estilos.frenteTitulo}>
+                Lista de temas
+              </h2>
+              <span className={estilos.frenteSub}>Lado B · Mix de la casa</span>
+            </div>
+            <ol className={estilos.temas}>
+              {lista.map((t, i) => (
+                <li key={t.lado} className={estilos.tema} style={{ '--i': i }}>
+                  <span className={estilos.temaLado}>{t.lado}</span>
+                  <h3 className={estilos.temaTitulo}>{t.titulo}</h3>
+                  <p className={estilos.temaTexto}>{t.texto}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
 
-      <section className={estilos.visita} aria-labelledby="visita-titulo">
+      <section ref={refVisita} data-entrada className={estilos.visita} aria-labelledby="visita-titulo">
         <div>
           <h2 id="visita-titulo" className={estilos.visitaTitulo}>
-            Pasá a visitarnos
+            <span className="revela">
+              <span>Pasá a visitarnos</span>
+            </span>
           </h2>
           {info?.direccion && (
-            <a href={linkMapa(info.direccion)} target="_blank" rel="noreferrer" className={estilos.direccion}>
+            <a
+              href={linkMapa(info.direccion)}
+              target="_blank"
+              rel="noreferrer"
+              className={`${estilos.direccion} entra`}
+              style={{ '--i': 1 }}
+            >
               <MapPin size={22} weight="duotone" aria-hidden="true" />
               {info.direccion}
             </a>
           )}
           {hoy && (
-            <p className={estilos.hoy}>
+            <p className={`${estilos.hoy} entra`} style={{ '--i': 2 }}>
               Hoy abrimos <strong>{hoy.value}</strong>
             </p>
           )}
-          <Link to="/contacto" className={`btn btn-primario ${estilos.cta}`}>
-            Escribinos <ArrowRight size={16} weight="bold" />
-          </Link>
+          <div className="entra" style={{ '--i': 3 }}>
+            <Link to="/contacto" className={`btn btn-primario ${estilos.cta}`}>
+              Escribinos <ArrowRight size={16} weight="bold" />
+            </Link>
+          </div>
         </div>
 
         {horario.length > 0 && (
           <dl className={estilos.horario}>
-            {horario.map((fila) => (
-              <div key={fila.label} className={fila.label === hoy?.label ? estilos.esHoy : undefined}>
+            {horario.map((fila, i) => (
+              <div
+                key={fila.label}
+                className={fila.label === hoy?.label ? estilos.esHoy : undefined}
+                style={{ '--i': i }}
+              >
                 <dt>{fila.label}</dt>
                 <dd>{fila.value}</dd>
               </div>

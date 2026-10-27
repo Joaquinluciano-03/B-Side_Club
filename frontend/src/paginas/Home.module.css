@@ -52,24 +52,186 @@
   gap: var(--e-7) var(--e-5);
 }
 
-/* ============ FORMATOS: separadores en filas ============ */
+/* ============ FORMATOS: un cartel de neon en dos colores ============
+   Los dos colores del logo, repartidos como en un cartel de verdad:
+   - el borde son dos tubos paralelos: rosa afuera y cian, mas fino, adentro.
+     Se encienden uno despues del otro y titilan cada uno a su ritmo;
+   - el titulo alterna rosa y cian por palabra, como el logo;
+   - las filas tambien alternan: cada una usa su color (--acento) en la
+     cantidad, el aro del icono y todo el hover;
+   - la pared refleja rosa desde arriba a la izquierda y cian desde abajo a
+     la derecha, como si cada tubo iluminara su lado. */
 .formatos {
   max-width: var(--ancho);
   margin: 0 auto;
   padding: var(--e-8) var(--gutter) var(--seccion);
 }
+.formatosMarco {
+  --marco: var(--e-6); /* margen interno a los costados */
+  --grosor: 4px; /* el grosor del tubo de afuera */
+  --separacion: 10px; /* entre el tubo de afuera y el de adentro */
+  /* donde termina el tubo de adentro, medido desde el borde del panel */
+  --interior: calc(var(--grosor) + var(--separacion) + 2px);
+  --rosa: #ff4fa3;
+  --rosa-nucleo: #ffd0e6;
+  --cian: #35d0e8;
+  --cian-nucleo: #d2f8ff;
+  position: relative;
+  padding: calc(var(--e-7) + var(--grosor) + var(--separacion)) var(--marco)
+    calc(var(--e-4) + var(--grosor) + var(--separacion));
+  border-radius: var(--r-card);
+  background:
+    radial-gradient(70% 45% at 15% 0%, rgba(255, 79, 163, 0.13), transparent 70%),
+    radial-gradient(70% 45% at 85% 100%, rgba(53, 208, 232, 0.1), transparent 70%),
+    radial-gradient(rgba(242, 236, 228, 0.045) 1px, transparent 1.4px) 0 0 / 9px 9px,
+    #121114;
+  box-shadow: 0 18px 40px rgba(16, 15, 14, 0.22);
+  color: var(--crema);
+}
+
+/* Los tubos: nucleo casi blanco, halo del color y resplandor amplio, hacia
+   afuera y hacia adentro. Cada tubo son dos capas: la de afuera (.neonTubo,
+   .neonTuboInterior) se enciende al verse y la de adentro (.neonLuz, que
+   lleva el dibujo) titila cada tanto. Las dos animaciones son de opacidad y
+   van en elementos distintos: en el mismo elemento no pueden ir a la GPU y
+   se recalculaban en cada cuadro del scroll. Apagados se ve el vidrio. */
+.neonTubo,
+.neonTuboInterior,
+.neonLuz {
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.neonTubo,
+.neonTuboInterior {
+  z-index: 2;
+}
+.neonTubo {
+  inset: 0;
+}
+.neonTuboInterior {
+  inset: calc(var(--grosor) + var(--separacion));
+  border-radius: calc(var(--r-card) - var(--grosor) - var(--separacion) / 2);
+}
+.neonLuz {
+  inset: 0;
+}
+.neonTubo > .neonLuz {
+  border: var(--grosor) solid var(--rosa-nucleo);
+  box-shadow:
+    0 0 2px #fff,
+    0 0 6px var(--rosa),
+    0 0 14px var(--rosa),
+    0 0 32px rgba(255, 79, 163, 0.6),
+    0 0 64px rgba(255, 79, 163, 0.28),
+    inset 0 0 6px var(--rosa),
+    inset 0 0 16px rgba(255, 79, 163, 0.3);
+}
+.neonTuboInterior > .neonLuz {
+  border: 2px solid var(--cian-nucleo);
+  box-shadow:
+    0 0 2px #fff,
+    0 0 5px var(--cian),
+    0 0 12px var(--cian),
+    0 0 26px rgba(53, 208, 232, 0.45),
+    inset 0 0 5px var(--cian),
+    inset 0 0 18px rgba(53, 208, 232, 0.22);
+}
+.formatosMarco[data-entrada]:not([data-visto]) :is(.neonTubo, .neonTuboInterior) {
+  opacity: 0.14;
+}
+/* primero el rosa, despues el cian; despues titilan a destiempo (duraciones
+   distintas: casi nunca coinciden) */
+.formatosMarco[data-visto] .neonTubo {
+  animation: neon-enciende 1.3s linear 150ms backwards;
+}
+.formatosMarco[data-visto] .neonTuboInterior {
+  animation: neon-enciende 1.3s linear 700ms backwards;
+}
+.formatosMarco[data-visto] .neonTubo > .neonLuz {
+  animation: neon-flojo 6.5s linear 3.5s infinite;
+}
+.formatosMarco[data-visto] .neonTuboInterior > .neonLuz {
+  animation: neon-flojo 8.3s linear 5.6s infinite;
+}
+/* el cartel del titulo (componentes/Neon) arranca a encenderse al montar:
+   aca se lo frena hasta que el panel llega a pantalla. Pausada, una
+   animacion tampoco descuenta su retraso: las letras se encienden en orden
+   recien cuando se ven */
+.formatosMarco[data-entrada]:not([data-visto]) .formatosTitulo *,
+.formatosMarco[data-quieto] :is(.neonTubo, .neonTuboInterior, .neonLuz, .formatosTitulo *) {
+  animation-play-state: paused;
+}
+@keyframes neon-enciende {
+  0%,
+  28% {
+    opacity: 0.14;
+  }
+  30% {
+    opacity: 1;
+  }
+  34% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.55;
+  }
+  56%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes neon-flojo {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  87% {
+    opacity: 0.2;
+  }
+  88% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.35;
+  }
+  91.5%,
+  100% {
+    opacity: 1;
+  }
+}
 .formatosTitulo {
+  margin: 0 0 var(--e-6);
   font-size: var(--t-xl);
-  margin-bottom: var(--e-6);
+  font-weight: 400;
+  line-height: 1;
+  /* el tubo del Bungee Outline es finito: un poco mas de trazo */
+  --trazo: 0.025em;
+}
+
+/* cada fila con su color, alternando como las palabras del logo */
+.filas li:nth-child(odd) {
+  --acento: var(--rosa);
+  --acento-nucleo: var(--rosa-nucleo);
+  --acento-texto: #ff8cc4;
+}
+.filas li:nth-child(even) {
+  --acento: var(--cian);
+  --acento-nucleo: var(--cian-nucleo);
+  --acento-texto: #7fe3f2;
 }
 .filas {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 2px solid var(--tinta);
 }
+/* las divisorias: una linea que va de rosa a cian */
 .filas li {
-  border-bottom: 2px solid var(--tinta);
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(255, 79, 163, 0.35), rgba(53, 208, 232, 0.35)) 1;
 }
 
 .fila {
@@ -80,28 +242,72 @@
   align-items: center;
   gap: var(--e-5);
   padding: var(--e-5) var(--e-4);
-  color: var(--tinta);
+  color: var(--crema);
   overflow: hidden;
+  /* el barrido del hover llega justo hasta el tubo de adentro; el
+     contenido queda donde estaba (lo que se agranda el margen, se agranda
+     el padding) */
+  margin-inline: calc((var(--marco) - var(--interior)) * -1);
+  padding-inline: calc(var(--marco) - var(--interior) + var(--e-4));
 }
-/* al pasar, el naranja entra desde la izquierda (clip-path, no width) */
+/* al pasar, un barrido del color de la fila entra desde la izquierda
+   (clip-path, no width) */
 .fila::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--naranja);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--acento) 22%, transparent),
+    color-mix(in srgb, var(--acento) 5%, transparent) 70%,
+    transparent
+  );
   clip-path: inset(0 100% 0 0);
   transition: clip-path 360ms var(--ease-out);
 }
+/* y a la izquierda se prende una barrita de neon, desde el centro */
+.fila::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--acento-nucleo);
+  box-shadow:
+    0 0 6px var(--acento),
+    0 0 14px var(--acento);
+  scale: 1 0;
+  transition: scale 280ms var(--ease-out);
+}
 @media (hover: hover) and (pointer: fine) {
-  .fila:hover {
-    color: var(--tinta-sobre-naranja);
-  }
   .fila:hover::before {
     clip-path: inset(0 0 0 0);
   }
+  .fila:hover::after {
+    scale: 1 1;
+  }
   .fila:hover .filaMotivo {
     transform: rotate(-12deg) scale(1.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -8px 14px rgba(0, 0, 0, 0.3),
+      0 0 0 2px var(--acento-nucleo),
+      0 0 12px var(--acento),
+      0 0 28px color-mix(in srgb, var(--acento) 45%, transparent);
+  }
+  /* el nombre se corre un poco y se prende como un tubo de su color */
+  .fila:hover .filaNombre {
+    transform: translateX(10px);
+    color: var(--acento-nucleo);
+    text-shadow:
+      0 0 6px var(--acento),
+      0 0 18px color-mix(in srgb, var(--acento) 55%, transparent);
+  }
+  .fila:hover .filaDescripcion {
+    color: var(--crema);
   }
 }
 .fila:focus-visible {
@@ -113,14 +319,15 @@
   font-size: var(--t-xl);
   line-height: 1;
   text-transform: uppercase;
+  transition:
+    transform var(--d-media) var(--ease-out),
+    color var(--d-rapida) ease,
+    text-shadow var(--d-rapida) ease;
 }
 .filaDescripcion {
-  color: var(--tinta-dim);
+  color: var(--crema-dim);
   font-size: var(--t-sm);
   transition: color var(--d-rapida) ease;
-}
-.fila:hover .filaDescripcion {
-  color: var(--tinta-sobre-naranja);
 }
 .filaCantidad {
   font-family: var(--mono);
@@ -129,23 +336,193 @@
   letter-spacing: 0.06em;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  color: var(--acento-texto);
 }
 .filaMotivo {
   width: 96px;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  transition: transform 420ms var(--ease-out);
+  /* El disco del icono: un tono medio, ni claro ni oscuro. Con un fondo
+     claro se perdian los iconos plateados (el CD, los equipos) y con uno
+     oscuro se perderian los negros (el vinilo, el cassette, los
+     auriculares). Es un vidrio gris humo con un toque del color de la fila,
+     mas claro arriba y mas oscuro abajo para que tenga volumen, con un filo
+     de luz arriba y el aro del color de la fila, que se prende en el hover */
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.14), transparent 55%),
+    radial-gradient(
+      circle at 50% 40%,
+      color-mix(in srgb, var(--acento) 10%, #6a6570) 0%,
+      color-mix(in srgb, var(--acento) 8%, #4a4651) 55%,
+      color-mix(in srgb, var(--acento) 6%, #34313a) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.3),
+    0 0 0 2px color-mix(in srgb, var(--acento) 45%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 420ms var(--ease-out),
+    box-shadow var(--d-media) ease;
+}
+/* un contorno de luz finito alrededor del dibujo: recorta las partes negras
+   del disco sin cambiar los colores del icono */
+.filaMotivo > * {
+  width: 72%;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.55)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }
 
 /* ============ LADO B ============ */
 .ladoB {
-  background:
-    radial-gradient(rgba(242, 236, 228, 0.06) 1px, transparent 1.4px) 0 0 / 9px 9px,
-    var(--carbon);
+  position: relative;
+  overflow: clip;
+  background: var(--carbon);
   color: var(--crema);
+  /* la linea de tiempo de la seccion: el disco y la trama se mueven segun
+     cuanto de la seccion se recorrio */
+  view-timeline: --ladob block;
+}
+.ladoBTrama {
+  position: absolute;
+  inset: -80px 0;
+  background: radial-gradient(rgba(242, 236, 228, 0.06) 1px, transparent 1.4px) 0 0 / 9px 9px;
+  pointer-events: none;
+}
+/* El parlante: un woofer que asoma por la derecha (se ve un tercio). El cono
+   late al ritmo (120 BPM, un golpe cada 500 ms) y del borde salen tres ondas
+   que se agrandan y se apagan. Todo dibujado con gradientes. */
+.parlante {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: min(760px, 110vw);
+  aspect-ratio: 1;
+  /* casi la mitad adentro: se ve el cono entero de un lado y la tapa */
+  translate: -46% -50%;
+  pointer-events: none;
+}
+.parlanteScroll,
+.parlanteMarco,
+.parlanteCono,
+.onda {
+  position: absolute;
+  border-radius: 50%;
+}
+.parlanteScroll,
+.parlanteMarco,
+.onda {
+  inset: 0;
+}
+/* el aro de metal, la suspension de goma (con su brillo) y el borde del cono */
+.parlanteMarco {
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 0 74%,
+      #0b0a09 74.5%,
+      #24201d 77.5%,
+      #3a3532 79%,
+      #1a1715 81%,
+      #0b0a09 83%,
+      #1d1a18 84% 94%,
+      #34302c 96.5%,
+      #0a0909 99%,
+      transparent 100%
+    );
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
+}
+/* tornillos del aro */
+.parlanteMarco::before {
+  content: '';
+  position: absolute;
+  inset: 2.5%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 22.5deg, #4a4440 0 0.9deg, transparent 0.9deg 45deg);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 96%, #000 96.5% 99%, transparent 99.5%);
+  mask: radial-gradient(circle closest-side, transparent 96%, #000 96.5% 99%, transparent 99.5%);
+}
+/* el cono de papel con la tapa de polvo al medio y un aro naranja (la marca) */
+.parlanteCono {
+  inset: 13%;
+  background:
+    /* el brillo de la tapa de polvo */
+    radial-gradient(circle at 44% 42%, rgba(255, 255, 255, 0.2), transparent 10%),
+    /* la tapa, el aro naranja y el cono: mas claro cerca del centro */
+    radial-gradient(
+      circle closest-side,
+      #3a3532 0 18%,
+      #24201d 23%,
+      var(--naranja) 23.6% 24.8%,
+      #1a1715 25.4%,
+      transparent 26%
+    ),
+    /* las nervaduras del papel del cono */
+    repeating-conic-gradient(rgba(255, 255, 255, 0.025) 0 2deg, transparent 2deg 6deg),
+    radial-gradient(circle closest-side, #2e2a27 26%, #1d1a18 55%, #121110 85%, #0b0a09 100%);
+  animation: latido 500ms var(--ease-out) infinite;
+}
+@keyframes latido {
+  0%,
+  100% {
+    scale: 1;
+  }
+  12% {
+    scale: 1.035;
+  }
+  32% {
+    scale: 0.992;
+  }
+}
+/* las ondas: salen del borde del parlante, cada una con un tercio de desfase */
+.onda {
+  border: 2px solid rgba(242, 236, 228, 0.14);
+  animation: onda-sale 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  animation-delay: calc(var(--n) * -1.2s);
+}
+@keyframes onda-sale {
+  from {
+    opacity: 1;
+    scale: 0.95;
+  }
+  to {
+    opacity: 0;
+    scale: 1.7;
+  }
+}
+.ladoB[data-quieto] :is(.parlanteCono, .onda) {
+  animation-play-state: paused;
+}
+@supports (animation-timeline: view()) {
+  /* el parlante sube un poco mas lento que la pagina */
+  .parlanteScroll {
+    animation: parlante-paralaje linear both;
+    animation-timeline: --ladob;
+  }
+  .ladoBTrama {
+    animation: trama-paralaje linear both;
+    animation-timeline: --ladob;
+  }
+}
+@keyframes parlante-paralaje {
+  from {
+    translate: 0 90px;
+  }
+  to {
+    translate: 0 -90px;
+  }
+}
+@keyframes trama-paralaje {
+  from {
+    translate: 0 -60px;
+  }
+  to {
+    translate: 0 60px;
+  }
 }
 .ladoBInterior {
+  position: relative;
   max-width: var(--ancho);
   margin: 0 auto;
   padding: var(--seccion) var(--gutter);
@@ -167,7 +544,31 @@
   color: var(--crema);
 }
 .ladoBAcento {
+  position: relative;
+  display: inline-block;
   color: var(--naranja);
+}
+/* el ultimo renglon deja lugar abajo para el subrayado */
+.lineaSubrayada {
+  padding-bottom: 0.3em;
+  margin-bottom: -0.3em;
+}
+.subrayado {
+  position: absolute;
+  left: -2%;
+  bottom: -0.22em;
+  width: 104%;
+  height: 0.26em;
+  overflow: visible;
+}
+.subrayado path {
+  fill: none;
+  stroke: var(--naranja);
+  stroke-width: 5;
+  stroke-linecap: round;
+  /* con pathLength="1" el trazo entero mide 1: se dibuja corriendo el offset */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
 }
 .promesas {
   margin: 0;
@@ -175,16 +576,42 @@
   flex-direction: column;
 }
 .promesas div {
+  position: relative;
   padding: var(--e-5) 0;
-  border-top: 1px solid var(--borde-oscuro-2);
 }
-.promesas div:last-child {
-  border-bottom: 1px solid var(--borde-oscuro-2);
+/* las lineas son pseudo-elementos para poder dibujarlas al entrar */
+.promesas div::before,
+.promesas div:last-child::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--borde-oscuro-2);
+  transform-origin: 0 50%;
+}
+.promesas div::before {
+  top: 0;
+}
+.promesas div:last-child::after {
+  bottom: 0;
 }
 .promesas dt {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-3);
   font-weight: 800;
   font-size: var(--t-md);
   color: var(--naranja);
+}
+.promesaNumero {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--crema-tenue);
+  font-variant-numeric: tabular-nums;
 }
 .promesas dd {
   margin: var(--e-2) 0 0;
@@ -195,10 +622,13 @@
 
 /* ============ CIERRE NARANJA ============ */
 .cierre {
+  position: relative;
+  overflow: clip;
   background: var(--naranja);
   color: var(--tinta-sobre-naranja);
 }
 .cierreInterior {
+  position: relative;
   max-width: var(--ancho);
   margin: 0 auto;
   padding: var(--e-9) var(--gutter);
@@ -206,7 +636,8 @@
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   grid-template-areas:
     'titulo texto'
-    'titulo acciones';
+    'titulo acciones'
+    'radio radio';
   gap: var(--e-5) var(--e-8);
   align-items: end;
 }
@@ -244,6 +675,9 @@
   background: var(--tinta-sobre-naranja);
   color: var(--crema);
 }
+.cierreAcciones .botonOscuro svg {
+  transform-origin: 50% 90%;
+}
 .cierreAcciones .botonOscuro:hover {
   background: #000;
   color: var(--crema);
@@ -258,9 +692,419 @@
   color: var(--tinta-sobre-naranja);
 }
 
+/* ---- el frente de la radio ----
+   Un panel en naranja apenas mas oscuro (tono sobre tono): a la izquierda los
+   botones de banda con su luz, al medio el dial y a la derecha el medidor de
+   señal y las dos perillas. La aguja, la perilla de sintonia, el medidor y la
+   luz de "Estéreo" usan la misma duracion (--ciclo) y arrancan juntos: van
+   sincronizados sin JavaScript. La tinta sobre estos naranjas sigue pasando
+   AA (4,9:1 sobre el mas oscuro). */
+.radio {
+  --ciclo: 9s;
+  grid-area: radio;
+  margin-top: var(--e-6);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'botones dial controles';
+  align-items: center;
+  gap: var(--e-5);
+  padding: var(--e-4) var(--e-5);
+  border-radius: 12px;
+  background: #e8641a;
+  box-shadow:
+    inset 0 0 0 2px rgba(20, 18, 16, 0.14),
+    inset 0 3px 0 rgba(255, 255, 255, 0.12),
+    0 10px 24px rgba(20, 18, 16, 0.12);
+}
+
+/* botones de banda: teclas chatas con una luz arriba */
+.radioBotones {
+  grid-area: botones;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.radioBoton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  background: #d85d18;
+  box-shadow:
+    0 2px 0 rgba(20, 18, 16, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* la tecla apretada queda mas baja y sin sombra */
+.radioBotonActivo {
+  translate: 0 2px;
+  box-shadow: inset 0 2px 4px rgba(20, 18, 16, 0.3);
+}
+.led {
+  position: relative;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(20, 18, 16, 0.45);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.ledPrendido {
+  background: var(--crema);
+  box-shadow: 0 0 8px 1px rgba(242, 236, 228, 0.9);
+}
+/* "Estéreo" se prende mientras la aguja esta quieta en la estacion: una
+   capa de luz encima del led que solo cambia de opacidad (va en la GPU) */
+.ledEstereo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--crema);
+  box-shadow: 0 0 8px 1px rgba(242, 236, 228, 0.9);
+  opacity: 0;
+  animation: estereo var(--ciclo) infinite;
+}
+
+/* el dial: banda de FM con rayitas y frecuencias. La aguja va en una capa del
+   ancho del dial (.dialCarro): moverla un porcentaje es moverla ese
+   porcentaje del dial, y es solo transform */
+.dial {
+  grid-area: dial;
+  position: relative;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  background:
+    /* rayitas: una cada 2%, mas larga cada 10% (la del final va aparte) */
+    linear-gradient(rgba(20, 18, 16, 0.55), rgba(20, 18, 16, 0.55)) 100% 0 / 2px 20px no-repeat,
+    repeating-linear-gradient(90deg, rgba(20, 18, 16, 0.55) 0 2px, transparent 2px 10%) 0 0 / 100% 20px no-repeat,
+    repeating-linear-gradient(90deg, rgba(20, 18, 16, 0.3) 0 1px, transparent 1px 2%) 0 0 / 100% 11px no-repeat,
+    #d85d18;
+  background-origin: content-box;
+  padding-inline: 4%;
+  box-shadow:
+    inset 0 2px 6px rgba(20, 18, 16, 0.25),
+    0 0 0 2px rgba(20, 18, 16, 0.2);
+}
+.dialEscala {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 28px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+/* cada numero centrado sobre su rayita larga */
+.dialEscala span {
+  width: 0;
+  display: flex;
+  justify-content: center;
+}
+.dialCarro {
+  position: absolute;
+  inset: 0 4%;
+  animation: busca var(--ciclo) infinite;
+}
+.dialAguja {
+  position: absolute;
+  left: -1.5px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--tinta-sobre-naranja);
+  box-shadow: 0 0 0 1px rgba(242, 106, 27, 0.6);
+}
+
+/* a la derecha: el medidor de señal y las perillas, cada uno con su nombre */
+.radioControles {
+  grid-area: controles;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--e-4);
+}
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* deja lugar a la escala de rayitas que rodea la perilla */
+  gap: 14px;
+}
+.controlNombre {
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* el medidor de señal: cinco barras apagadas y, encima, las mismas barras
+   prendidas, recortadas segun cuanta señal hay (clip-path) */
+.senal,
+.senalLlena {
+  --barra: currentColor;
+  background:
+    linear-gradient(var(--barra), var(--barra)) 0 100% / 6px 30% no-repeat,
+    linear-gradient(var(--barra), var(--barra)) 25% 100% / 6px 47% no-repeat,
+    linear-gradient(var(--barra), var(--barra)) 50% 100% / 6px 64% no-repeat,
+    linear-gradient(var(--barra), var(--barra)) 75% 100% / 6px 82% no-repeat,
+    linear-gradient(var(--barra), var(--barra)) 100% 100% / 6px 100% no-repeat;
+}
+.senal {
+  position: relative;
+  display: block;
+  width: 42px;
+  height: 30px;
+  margin-bottom: 11px;
+  margin-top: 8px;
+  color: rgba(20, 18, 16, 0.25);
+}
+/* lo prendido se ve a traves de una ventana: la ventana se corre hacia la
+   izquierda y su contenido lo mismo hacia la derecha, asi las barras quedan
+   quietas y solo cambia cuanto se ve. Es lo mismo que recortar, pero con
+   desplazamientos (van en la GPU; un recorte animado no) */
+.senalVentana {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  translate: -80% 0;
+  animation: senal-ventana var(--ciclo) infinite;
+}
+.senalLlena {
+  position: absolute;
+  inset: 0;
+  color: var(--crema);
+  filter: drop-shadow(0 0 3px rgba(242, 236, 228, 0.6));
+  translate: 80% 0;
+  animation: senal-contenido var(--ciclo) infinite;
+}
+
+/* la perilla: canto moleteado que gira con la marca, y un brillo fijo encima
+   (el brillo de una perilla real no gira con ella) */
+.perilla {
+  position: relative;
+  display: block;
+  width: 52px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow:
+    0 3px 0 rgba(20, 18, 16, 0.4),
+    0 8px 14px rgba(20, 18, 16, 0.25);
+}
+/* las rayitas de la escala alrededor */
+.perilla::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(20, 18, 16, 0.5) 0 2.5deg, transparent 2.5deg 30deg);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 84%, #000 85% 100%);
+  mask: radial-gradient(circle closest-side, transparent 84%, #000 85% 100%);
+}
+.perilla::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.22), transparent 50%);
+  pointer-events: none;
+}
+.perillaGiro {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, #2b2724 0 66%, #1a1715 70%, transparent 71%),
+    repeating-conic-gradient(#141210 0 5deg, #36312d 5deg 10deg);
+}
+/* la marca crema que indica la posicion */
+.perillaGiro::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 3px;
+  height: 13px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--crema);
+}
+.perillaSintonia {
+  animation: sintonia var(--ciclo) infinite;
+}
+.perillaVolumen {
+  rotate: 50deg;
+}
+
+.cierre[data-quieto] :is(.dialCarro, .senalVentana, .senalLlena, .perillaSintonia),
+.cierre[data-quieto] .ledEstereo::after {
+  animation-play-state: paused;
+}
+
+/* barre de izquierda a derecha, se pasa, vuelve, ajusta y se queda; despues
+   vuelve al principio para buscar de nuevo */
+@keyframes busca {
+  0% {
+    translate: 4% 0;
+    animation-timing-function: var(--ease-in-out);
+  }
+  26% {
+    translate: 82% 0;
+    animation-timing-function: var(--ease-in-out);
+  }
+  40% {
+    translate: 48% 0;
+    animation-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+  47% {
+    translate: 55% 0;
+    animation-timing-function: ease-out;
+  }
+  52% {
+    translate: 53% 0;
+  }
+  86% {
+    translate: 53% 0;
+    animation-timing-function: var(--ease-in-out);
+  }
+  100% {
+    translate: 4% 0;
+  }
+}
+/* la perilla hace el mismo recorrido que la aguja, en grados */
+@keyframes sintonia {
+  0% {
+    rotate: -130deg;
+    animation-timing-function: var(--ease-in-out);
+  }
+  26% {
+    rotate: 140deg;
+    animation-timing-function: var(--ease-in-out);
+  }
+  40% {
+    rotate: 15deg;
+    animation-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+  47% {
+    rotate: 40deg;
+    animation-timing-function: ease-out;
+  }
+  52% {
+    rotate: 33deg;
+  }
+  86% {
+    rotate: 33deg;
+    animation-timing-function: var(--ease-in-out);
+  }
+  100% {
+    rotate: -130deg;
+  }
+}
+/* la señal: ruido al pasar por otras estaciones, sube al llegar y se va al
+   volver a buscar. Cuanto se ve = cuanto se corrio la ventana (los dos
+   keyframes son espejo) */
+@keyframes senal-ventana {
+  0%,
+  100% {
+    translate: -80% 0;
+  }
+  12% {
+    translate: -45% 0;
+  }
+  18% {
+    translate: -80% 0;
+  }
+  26% {
+    translate: -62% 0;
+  }
+  36% {
+    translate: -30% 0;
+  }
+  42% {
+    translate: -55% 0;
+  }
+  52%,
+  86% {
+    translate: 0 0;
+  }
+  92% {
+    translate: -80% 0;
+  }
+}
+@keyframes senal-contenido {
+  0%,
+  100% {
+    translate: 80% 0;
+  }
+  12% {
+    translate: 45% 0;
+  }
+  18% {
+    translate: 80% 0;
+  }
+  26% {
+    translate: 62% 0;
+  }
+  36% {
+    translate: 30% 0;
+  }
+  42% {
+    translate: 55% 0;
+  }
+  52%,
+  86% {
+    translate: 0 0;
+  }
+  92% {
+    translate: 80% 0;
+  }
+}
+@keyframes estereo {
+  0%,
+  52%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  53%,
+  85% {
+    opacity: 1;
+  }
+}
+
+/* en pantallas angostas, un renglon para cada cosa: el dial, los botones
+   en fila y los controles repartidos a lo ancho */
+@media (max-width: 760px) {
+  .radio {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'dial'
+      'botones'
+      'controles';
+    gap: var(--e-4);
+    padding: var(--e-4);
+  }
+  .radioBotones {
+    flex-direction: row;
+  }
+  .radioControles {
+    justify-content: space-around;
+  }
+}
+
 /* ============ ENTRADA AL HACER SCROLL ============
-   Las fundas de los elegidos y las filas de formatos aparecen cuando entran
-   en pantalla (scroll-driven, sin JavaScript). Sin soporte se ven normales. */
+   Las fundas de los elegidos aparecen cuando entran en pantalla
+   (scroll-driven, sin JavaScript). Sin soporte se ven normales. */
 @keyframes aparece-scroll {
   from {
     opacity: 0;
@@ -268,9 +1112,7 @@
   }
 }
 @supports (animation-timeline: view()) {
-  .carrilItem,
-  .filas li,
-  .promesas div {
+  .carrilItem {
     animation: aparece-scroll linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 55%;
@@ -278,9 +1120,28 @@
 }
 
 /* ============ RESPONSIVE ============ */
+/* tableta y celular: los elegidos pasan a un carril horizontal que se
+   desliza con el dedo (en tableta, 2 columnas dejaban 4 filas de cards
+   gigantes). Se ven unas 3 cards y asoma la siguiente, para que se note que
+   hay mas */
 @media (max-width: 960px) {
   .carril {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    gap: var(--e-5);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    padding-bottom: var(--e-3);
+    scrollbar-width: none;
+  }
+  .carril::-webkit-scrollbar {
+    display: none;
+  }
+  .carrilItem {
+    flex: 0 0 30%;
+    scroll-snap-align: start;
   }
   .fila {
     grid-template-columns: minmax(0, 1fr) auto 72px;
@@ -308,30 +1169,18 @@
   }
   .cierreInterior {
     grid-template-columns: 1fr;
-    grid-template-areas: 'titulo' 'texto' 'acciones';
+    grid-template-areas: 'titulo' 'texto' 'acciones' 'radio';
     align-items: start;
   }
 }
 
-/* mobile: los elegidos pasan a un carril horizontal que se desliza */
+/* celular: en el carril se ve una card y media */
 @media (max-width: 640px) {
   .carril {
-    display: flex;
     gap: var(--e-4);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
-    scroll-padding-inline: var(--gutter);
-    padding-bottom: var(--e-3);
-    scrollbar-width: none;
-  }
-  .carril::-webkit-scrollbar {
-    display: none;
   }
   .carrilItem {
     flex: 0 0 62%;
-    scroll-snap-align: start;
   }
   .fila {
     grid-template-columns: minmax(0, 1fr) 64px;
@@ -339,7 +1188,12 @@
       'nombre motivo'
       'desc motivo'
       'cantidad motivo';
-    padding-inline: var(--e-2);
+    padding-inline: calc(var(--marco) - var(--interior) + var(--e-2));
+  }
+  .formatosMarco {
+    --marco: calc(var(--e-4) + 12px);
+    --separacion: 7px;
+    padding-top: calc(var(--e-6) + var(--grosor) + var(--separacion));
   }
   .filaNombre {
     font-size: var(--t-lg);
@@ -350,5 +1204,191 @@
   .cierreAcciones :global(.btn) {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ============ ENTRADAS (data-visto, ver lib/useEnPantalla) ============
+   Del Lado B para abajo. Lo que falta entrar queda escondido solo
+   mientras el elemento tiene data-entrada y todavia no data-visto. */
+@keyframes sube {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+  }
+}
+@keyframes traza {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes subraya {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+/* el telefono de WhatsApp saluda una vez */
+@keyframes saluda {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  20% {
+    rotate: -16deg;
+  }
+  45% {
+    rotate: 13deg;
+  }
+  70% {
+    rotate: -7deg;
+  }
+}
+
+/* --- Lado B: el titulo renglon por renglon (global .revela) y el subrayado --- */
+.ladoBTitulo[data-entrada]:not([data-visto]) .subrayado path {
+  stroke-dashoffset: 1;
+}
+.ladoBTitulo[data-visto] .subrayado path {
+  animation: subraya 800ms var(--ease-in-out) 950ms backwards;
+}
+
+/* --- promesas: la linea se dibuja y el texto sube, una despues de otra --- */
+.promesas[data-entrada]:not([data-visto]) div::before,
+.promesas[data-entrada]:not([data-visto]) div:last-child::after {
+  scale: 0 1;
+}
+.promesas[data-entrada]:not([data-visto]) :is(dt, dd) {
+  opacity: 0;
+}
+.promesas[data-visto] div {
+  --paso: calc(var(--i, 0) * 140ms);
+}
+.promesas[data-visto] div::before {
+  animation: traza 900ms var(--ease-in-out) var(--paso) backwards;
+}
+.promesas[data-visto] div:last-child::after {
+  animation: traza 900ms var(--ease-in-out) calc(var(--paso) + 140ms) backwards;
+}
+.promesas[data-visto] dt {
+  animation: sube 700ms var(--ease-out) calc(var(--paso) + 180ms) backwards;
+}
+.promesas[data-visto] dd {
+  animation: sube 700ms var(--ease-out) calc(var(--paso) + 260ms) backwards;
+}
+
+/* --- cierre: el telefono saluda --- */
+.cierre[data-visto] .botonOscuro svg {
+  animation: saluda 900ms ease-in-out 1.3s;
+}
+
+/* ============ CINTA ============
+   Tres capas, una animacion por capa (como el disco del hero, asi cada una
+   corre en la GPU): la banda inclinada, el empujon que le da el scroll y la
+   pista que corre sola.
+   .cinta no ocupa alto: es una linea justo en el borde entre "Por formato" y
+   el Lado B, y la banda se centra sobre esa linea (translate -50%). Asi el
+   borde queda siempre tapado: la banda es mas alta que lo que sube por la
+   inclinacion de punta a punta (1,6 grados son 2,8 px cada 100 px de
+   ancho; el alto crece con el ancho de la pantalla). */
+.cinta {
+  position: relative;
+  z-index: 2;
+  height: 0;
+  overflow-x: clip;
+}
+.cintaBanda {
+  position: absolute;
+  top: 0;
+  left: -4%;
+  width: 108%;
+  translate: 0 -50%;
+  rotate: -1.6deg;
+  overflow: hidden;
+  background: var(--naranja);
+  color: var(--tinta-sobre-naranja);
+  border-block: 2px solid var(--tinta-sobre-naranja);
+  box-shadow: 0 14px 30px rgba(16, 15, 14, 0.25);
+}
+.cintaScroll {
+  width: max-content;
+}
+.cintaPista {
+  display: flex;
+  width: max-content;
+  animation: cinta-corre 60s linear infinite;
+}
+.cinta[data-quieto] .cintaPista {
+  animation-play-state: paused;
+}
+.cintaTramo {
+  display: flex;
+}
+.cintaPalabra {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-5);
+  padding: clamp(14px, 1.7vw, 36px) var(--e-6) clamp(14px, 1.7vw, 36px) 0;
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 0.8rem + 1.1vw, 2.1rem);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* los separadores: un cassette chiquito (carcasa con los dos carretes) y
+   una onda de sonido (cinco barras de distinto alto) */
+.cintaCassette {
+  width: 1.25em;
+  height: 0.8em;
+  border-radius: 0.12em;
+  background:
+    radial-gradient(circle, var(--naranja) 0 0.09em, transparent 0.1em) 30% 46% / 0.34em 0.34em no-repeat,
+    radial-gradient(circle, var(--naranja) 0 0.09em, transparent 0.1em) 70% 46% / 0.34em 0.34em no-repeat,
+    linear-gradient(var(--naranja), var(--naranja)) 50% 46% / 62% 0.3em no-repeat,
+    var(--tinta-sobre-naranja);
+}
+.cintaOnda {
+  width: 1em;
+  height: 0.9em;
+  background:
+    linear-gradient(var(--tinta-sobre-naranja), var(--tinta-sobre-naranja)) 0 50% / 0.12em 35% no-repeat,
+    linear-gradient(var(--tinta-sobre-naranja), var(--tinta-sobre-naranja)) 25% 50% / 0.12em 75% no-repeat,
+    linear-gradient(var(--tinta-sobre-naranja), var(--tinta-sobre-naranja)) 50% 50% / 0.12em 100% no-repeat,
+    linear-gradient(var(--tinta-sobre-naranja), var(--tinta-sobre-naranja)) 75% 50% / 0.12em 60% no-repeat,
+    linear-gradient(var(--tinta-sobre-naranja), var(--tinta-sobre-naranja)) 100% 50% / 0.12em 30% no-repeat;
+}
+@keyframes cinta-corre {
+  to {
+    translate: -50% 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  .cintaScroll {
+    animation: cinta-empuja linear both;
+    animation-timeline: view();
+  }
+}
+@keyframes cinta-empuja {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -30vw 0;
+  }
+}
+@media (max-width: 640px) {
+  .cintaPalabra {
+    gap: var(--e-4);
+    padding-right: var(--e-4);
+  }
+  .dial {
+    height: 64px;
+  }
+  .dialEscala {
+    font-size: 11px;
+  }
+  .radioBoton {
+    padding-inline: 8px;
+  }
+  .perilla {
+    width: 44px;
   }
 }

@@ -178,6 +178,32 @@
   }
 }
 
+/* con alScroll: la cinta pasa de un carrete al otro segun el scroll de la
+   pagina, y una capa extra alrededor de cada eje le suma vueltas al bajar */
+.ejeScroll {
+  position: absolute;
+  inset: 0;
+}
+@supports (animation-timeline: scroll()) {
+  .alScroll .izq .cinta {
+    animation: se-vacia linear both;
+    animation-timeline: scroll(root);
+  }
+  .alScroll .der .cinta {
+    animation: se-llena linear both;
+    animation-timeline: scroll(root);
+  }
+  .alScroll .ejeScroll {
+    animation: gira-scroll linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes gira-scroll {
+  to {
+    rotate: 6turn;
+  }
+}
+
 /* ---- la boca de abajo ---- */
 .boca {
   position: absolute;
