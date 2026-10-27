@@ -70,17 +70,15 @@
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.75);
 }
 
-/* El giro del disco son tres rotaciones que se suman: la constante, el
-   arranque al cargar y la que agrega el scroll. Van en tres capas anidadas,
-   una animacion por capa, porque asi cada una corre en la GPU. Antes iban
-   las tres en el mismo elemento combinadas con animation-composition: add, y
-   Chrome no puede llevar eso a la GPU: el disco giraba desde el hilo
-   principal y se trababa cuando la pagina estaba ocupada.
+/* El giro del disco es automatico y no depende del scroll. Son dos
+   rotaciones que se suman: la constante y el arranque al cargar. Van en dos
+   capas anidadas, una animacion por capa, porque asi cada una corre en la
+   GPU (dos animaciones de rotate en el mismo elemento no pueden): el disco
+   gira sin pasar por el hilo principal y no se traba aunque la pagina este
+   ocupada o se este scrolleando.
      .vinilo         -> posicion, tamaño y "disco-baja" (al cargar)
-     .viniloScroll   -> lo que suma el scroll
      .viniloArranque -> el arranque desde quieto
      .viniloGiro     -> el giro constante, y lleva el dibujo del disco */
-.viniloScroll,
 .viniloArranque,
 .viniloGiro {
   position: absolute;
@@ -140,26 +138,10 @@
 .viniloArranque {
   animation: arranque 1.8s cubic-bezier(0.3333, 0.6667, 0.6667, 1) both;
 }
-/* con el scroll suma vueltas: bajar la pagina "acelera" el disco */
-@supports (animation-timeline: scroll()) {
-  .viniloScroll {
-    animation: girar-scroll linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 100vh;
-  }
-}
 /* la capa con el dibujo es grande y solo rota: se prepara como capa propia
    para que la GPU la dibuje una vez y despues solo la gire */
 .viniloGiro {
   will-change: rotate;
-}
-/* Mientras la pagina se desliza con el scroll suave (Lenis pone
-   lenis-scrolling en <html>, ver lib/scrollSuave.js), el disco deja de girar
-   solo y gira unicamente con el scroll (.viniloScroll), como si lo empujaras;
-   al frenar sigue desde donde quedo. Le saca trabajo al hero, la zona mas
-   pesada de dibujar, justo cuando el scroll depende del hilo principal */
-:global(html.lenis-scrolling) .viniloGiro {
-  animation-play-state: paused;
 }
 @keyframes girar {
   to {
@@ -197,14 +179,6 @@
 }
 .brillo {
   animation: luz-prende 1.2s ease 700ms backwards;
-}
-@keyframes girar-scroll {
-  from {
-    rotate: 0turn;
-  }
-  to {
-    rotate: 0.6turn;
-  }
 }
 
 /* Reflejos: los dos conos de luz opuestos que tiene un vinilo bajo una

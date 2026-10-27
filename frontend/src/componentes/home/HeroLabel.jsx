@@ -103,12 +103,10 @@ export default function HeroLabel() {
             el vinilo (gira) y los reflejos de la luz (quietos: la luz no se
             mueve, el disco si) */}
         <span className={estilos.sombra} aria-hidden="true" />
-        {/* tres capas anidadas, una rotacion cada una (ver HeroLabel.module.css) */}
+        {/* dos capas anidadas, una rotacion cada una (ver HeroLabel.module.css) */}
         <span className={estilos.vinilo} aria-hidden="true">
-          <span className={estilos.viniloScroll}>
-            <span className={estilos.viniloArranque}>
-              <span className={estilos.viniloGiro} />
-            </span>
+          <span className={estilos.viniloArranque}>
+            <span className={estilos.viniloGiro} />
           </span>
         </span>
         <span className={estilos.brillo} aria-hidden="true" />

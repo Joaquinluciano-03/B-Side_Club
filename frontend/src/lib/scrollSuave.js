@@ -16,9 +16,8 @@ import 'lenis/dist/lenis.css';
 // Con Lenis el scroll se mueve desde el hilo principal: en el hero (la zona
 // mas pesada de dibujar) un deslizamiento largo se sentia a tirones. Por eso
 // el deslizamiento es corto (lerp 0.2: llega rapido, hay menos cuadros que
-// dependen del hilo principal) y, mientras la pagina se desliza, el disco del
-// hero deja de girar solo (ver HeroLabel.module.css). Con false, el sitio
-// usa el scroll del navegador.
+// dependen del hilo principal). Con false, el sitio usa el scroll del
+// navegador.
 const SCROLL_SUAVE_ACTIVO = true;
 
 let lenis = null;
