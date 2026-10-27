@@ -640,14 +640,3 @@ dialog:not([open])::backdrop {
   animation: revela-sube 900ms var(--ease-out) backwards;
   animation-delay: calc(var(--retraso, 0ms) + var(--i, 0) * 90ms);
 }
-
-/* ============ MIENTRAS SE SCROLLEA ============
-   Con la rueda, el mouse queda quieto y el contenido pasa por debajo: cada
-   fila o card que cruzaba el cursor disparaba su hover (brillos, sombras,
-   colores) y habia que redibujarlo en medio del scroll, que se sentia a
-   tirones. Mientras la pagina se desliza (Lenis pone lenis-scrolling en
-   <html>, ver lib/scrollSuave.js) el contenido no reacciona al mouse; al
-   frenar, los hovers vuelven solos. El header queda afuera: no se mueve. */
-html.lenis-scrolling main {
-  pointer-events: none;
-}

@@ -13,6 +13,12 @@
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
+// PRUEBA: apagado para comparar. Con Lenis el scroll se mueve desde el hilo
+// principal y en el hero (la zona mas pesada de dibujar) se sentian
+// tirones; con el scroll del navegador, el movimiento va en otro hilo. Si
+// se decide volver al scroll suave, poner true.
+const SCROLL_SUAVE_ACTIVO = false;
+
 let lenis = null;
 let cuadro = 0;
 let quietos = 0;
@@ -33,7 +39,7 @@ function despertar() {
 
 /** Prende el scroll suave; devuelve la funcion que lo apaga. */
 export function activarScrollSuave() {
-  if (lenis || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return () => {};
+  if (!SCROLL_SUAVE_ACTIVO || lenis || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return () => {};
   lenis = new Lenis({
     lerp: 0.14,
     wheelMultiplier: 1,

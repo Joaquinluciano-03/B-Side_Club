@@ -89,9 +89,16 @@
 }
 .viniloGiro {
   background:
-    /* polvo, rayones, una huella y zonas gastadas (public/imperfecciones.svg).
-       Es lo unico que no es circular: es lo que hace visible el giro */
+    /* polvo, rayones, una huella y zonas gastadas. Es lo unico que no es
+       circular: es lo que hace visible el giro. Lo nitido (rayones, huella)
+       es un SVG; lo difuso (zonas gastadas y motas de polvo) va horneado en
+       una imagen chica (imperfecciones-suaves.webp). Antes era todo SVG con
+       20 desenfoques (feGaussianBlur): el disco es una capa enorme que gira,
+       y cada parte nueva que quedaba a la vista recalculaba los desenfoques,
+       lo que trababa el scroll en el hero. Una mancha difusa no pierde nada
+       al estirarse, asi que la imagen se ve igual y dibujarla es casi gratis */
     url('/imperfecciones.svg') center / 100% 100% no-repeat,
+    url('/imperfecciones-suaves.webp') center / 100% 100% no-repeat,
     /* zona lisa alrededor del label, con un filo brillante donde empieza el surco */
     radial-gradient(
       circle closest-side,

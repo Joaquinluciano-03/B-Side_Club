@@ -120,6 +120,10 @@ export default function ArteProducto({ producto, categoria, prioridad = false, i
           src={urlImagen(portada.url)}
           alt={portada.alt || producto?.nombre || ''}
           onError={() => setFallo(true)}
+          // la foto baja un poco antes de llegar a pantalla, pero el
+          // navegador recien la decodifica al pintarla, en medio del scroll.
+          // Asi se decodifica apenas baja, mientras todavia no se ve
+          onLoad={(e) => e.currentTarget.decode?.().catch(() => {})}
           loading={prioridad ? 'eager' : 'lazy'}
           fetchPriority={prioridad ? 'high' : 'auto'}
           decoding="async"
