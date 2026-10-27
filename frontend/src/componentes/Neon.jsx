@@ -8,12 +8,14 @@
 //
 // inicio: cuando arranca a encenderse la primera letra (ms desde que monta)
 // paso: cuanto tarda en encenderse cada letra despues de la anterior (ms)
-// color: 'alterna' (rosa, cian, rosa... como el logo) o 'rosa' (todo rosa,
-// como el borde de neon del panel de formatos)
+// color: 'alterna' (rosa, cian, rosa... como el logo), 'rosa' o 'cian' (todo
+// de un color, como el titulo de Categorias o el cartel de abierto/cerrado)
+// tubo: 'doble' (Bungee Outline, cada letra con contorno doble, como el logo)
+// o 'simple' (Bungee Hairline: un solo trazo, como un tubo continuo)
 
 import estilos from './Neon.module.css';
 
-export default function Neon({ texto, inicio = 900, paso = 95, color = 'alterna', className = '' }) {
+export default function Neon({ texto, inicio = 900, paso = 95, color = 'alterna', tubo = 'doble', className = '' }) {
   const palabras = texto.split(/\s+/);
   const total = palabras.join('').length;
   const floja = Math.min(3, total - 1);
@@ -21,11 +23,11 @@ export default function Neon({ texto, inicio = 900, paso = 95, color = 'alterna'
   return (
     <span
       aria-hidden="true"
-      className={`${estilos.neon} ${className}`}
+      className={`${estilos.neon} ${tubo === 'simple' ? estilos.simple : ''} ${className}`}
       style={{ '--inicio': `${inicio}ms`, '--paso': `${paso}ms` }}
     >
       {palabras.map((palabra, i) => (
-        <span key={i} className={`${estilos.palabra} ${i % 2 && color === 'alterna' ? estilos.cian : estilos.rosa}`}>
+        <span key={i} className={`${estilos.palabra} ${color === 'cian' || (i % 2 && color === 'alterna') ? estilos.cian : estilos.rosa}`}>
           {[...palabra].map((letra, j) => {
             const n = l++;
             return (

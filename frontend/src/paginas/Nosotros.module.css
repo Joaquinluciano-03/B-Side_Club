@@ -247,7 +247,12 @@
   color: var(--crema);
   text-decoration-color: var(--naranja);
 }
+/* el cartel de abierto/cerrado al lado del horario de hoy */
 .hoy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2) var(--e-3);
   margin: var(--e-3) 0 0;
   color: var(--crema-dim);
 }

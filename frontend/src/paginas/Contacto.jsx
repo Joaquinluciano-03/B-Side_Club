@@ -15,10 +15,11 @@ import {
 } from '@phosphor-icons/react';
 import { get, post } from '../lib/api';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
-import { normalizarHorario, horarioDeHoy } from '../lib/horario';
+import { normalizarHorario, horarioDeHoy, textoDeHoy } from '../lib/horario';
 import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
 import { mensajeDeError, separarNombre } from '../lib/formato';
 import { irAlScroll } from '../lib/scrollSuave';
+import CartelAbierto from '../componentes/CartelAbierto';
 import estilos from './Contacto.module.css';
 
 const MAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -214,6 +215,13 @@ export default function Contacto() {
                 <MapPin size={20} weight="duotone" aria-hidden="true" />
                 {info.direccion}
               </a>
+              {/* el cartel de abierto/cerrado, arriba de la lista de horarios */}
+              {hoy && (
+                <p className={estilos.estadoHoy}>
+                  <CartelAbierto horario={info?.horario} />
+                  <span>{textoDeHoy(hoy)}</span>
+                </p>
+              )}
               {horario.length > 0 && (
                 <dl className={estilos.horario}>
                   {horario.map((fila) => (

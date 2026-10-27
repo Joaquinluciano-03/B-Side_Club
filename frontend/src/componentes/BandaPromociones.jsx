@@ -2,9 +2,8 @@
 // una seccion vacia con el titulo "Novedades" se ve peor que no tenerla.
 // Cada promo es un volante: imagen (si tiene) y texto, con la fecha de fin.
 
-import { useEffect, useState } from 'react';
-import { get } from '../lib/api';
-import { vigentes } from '../lib/promociones';
+import { useState } from 'react';
+import { usePromocionesVigentes } from '../lib/usePromociones';
 import { formatearDia } from '../lib/formato';
 import estilos from './BandaPromociones.module.css';
 
@@ -33,19 +32,14 @@ function Volante({ promo }) {
 }
 
 export default function BandaPromociones() {
-  const [promos, setPromos] = useState([]);
+  // el mismo pedido que usa la tracklist del hero (lib/usePromociones)
+  const promos = usePromocionesVigentes();
 
-  useEffect(() => {
-    // soloActivas filtra por el flag; la ventana de fechas la filtramos acá
-    get('/promociones?soloActivas=true')
-      .then((lista) => setPromos(vigentes(lista)))
-      .catch(() => setPromos([]));
-  }, []);
-
-  if (promos.length === 0) return null;
+  if (!promos || promos.length === 0) return null;
 
   return (
-    <section className={estilos.banda} aria-labelledby="novedades-titulo">
+    // id: a esta seccion apunta la tracklist del hero
+    <section id="novedades" tabIndex={-1} className={estilos.banda} aria-labelledby="novedades-titulo">
       <div className={estilos.interior}>
         <h2 id="novedades-titulo" className={estilos.encabezado}>
           Novedades

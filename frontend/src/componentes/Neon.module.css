@@ -98,3 +98,11 @@
     opacity: 1;
   }
 }
+
+/* tubo simple: un solo trazo por letra (Bungee Hairline). Es muy finito, asi
+   que el trazo lo engorda hasta que se lee como un tubo; el brillo es el
+   mismo de los otros carteles */
+.simple {
+  font-family: 'Bungee Hairline', 'Bungee Outline', var(--display);
+  --trazo: 0.09em;
+}

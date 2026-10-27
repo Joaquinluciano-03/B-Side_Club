@@ -1,7 +1,7 @@
 // Home. El primer viewport es el label de un vinilo gigante con la tracklist
 // como navegacion (componentes/home/HeroLabel). Abajo, cada seccion con una
-// forma distinta: elegidos (grilla de fundas), formatos (separadores en
-// filas), la cinta con los formatos, la promesa del local (Lado B, oscuro) y
+// forma distinta: elegidos (grilla de fundas), categorias (cartel de neon
+// con una fila por categoria), la cinta con los formatos, la promesa del local (Lado B, oscuro) y
 // el cierre naranja. Del Lado B para abajo cada seccion entra al llegar a pantalla
 // (lib/useEnPantalla) y tiene su propio movimiento.
 
@@ -63,7 +63,8 @@ function Elegidos() {
   if (destacados && destacados.length === 0) return null;
 
   return (
-    <section className={estilos.elegidos} aria-labelledby="elegidos-titulo">
+    // los id de las secciones son a donde apunta la tracklist del hero
+    <section id="destacados" tabIndex={-1} className={estilos.elegidos} aria-labelledby="elegidos-titulo">
       <div className={estilos.cabecera}>
         <h2 id="elegidos-titulo" className={estilos.h2}>
           Destacados y ofertas
@@ -106,7 +107,7 @@ function Formatos() {
   if (categorias.length === 0) return null;
 
   return (
-    <section className={estilos.formatos} aria-labelledby="formatos-titulo">
+    <section id="categorias" tabIndex={-1} className={estilos.formatos} aria-labelledby="formatos-titulo">
       {/* un cartel de neon en los dos colores del logo: el borde son dos
           tubos (rosa afuera, cian adentro), el titulo alterna como el logo y
           las filas tambien. Todo se enciende la primera vez que el panel
@@ -121,9 +122,10 @@ function Formatos() {
         <span className={estilos.neonTuboInterior} aria-hidden="true">
           <span className={estilos.neonLuz} />
         </span>
+        {/* una sola palabra: todo en cian, que equilibra el tubo rosa de afuera */}
         <h2 id="formatos-titulo" className={estilos.formatosTitulo}>
-          <span className="sr-only">Por formato</span>
-          <Neon texto="Por formato" inicio={350} paso={70} />
+          <span className="sr-only">Categorías</span>
+          <Neon texto="Categorías" color="cian" inicio={350} paso={70} />
         </h2>
         <ul className={estilos.filas}>
           {categorias.map((c, i) => (
@@ -144,7 +146,7 @@ function Formatos() {
   );
 }
 
-// La cinta naranja entre "Por formato" y el Lado B: lo que promete el local,
+// La cinta naranja entre Categorias y el Lado B: lo que promete el local,
 // pasando sin parar, y al hacer scroll corre un poco mas rapido. Los formatos
 // ya pasan en la franja del header, por eso aca van frases. Es decorativa (lo
 // mismo se lee abajo, en el Lado B), por eso va aria-hidden.
@@ -192,7 +194,7 @@ function LadoB() {
   const refPromesas = useEnPantalla();
 
   return (
-    <section ref={refSeccion} className={estilos.ladoB} aria-labelledby="ladob-titulo" data-oscuro>
+    <section ref={refSeccion} id="el-local" tabIndex={-1} className={estilos.ladoB} aria-labelledby="ladob-titulo" data-oscuro>
       {/* el fondo: la trama de puntos (se corre despacio con el scroll) y un
           parlante que asoma por la derecha: el cono late al ritmo y salen
           ondas de sonido hacia el texto */}
@@ -254,7 +256,7 @@ function Cierre() {
   const ref = useEnPantalla({ pausa: true });
 
   return (
-    <section ref={ref} data-entrada className={estilos.cierre} aria-labelledby="cierre-titulo">
+    <section ref={ref} id="pedi-tu-disco" tabIndex={-1} data-entrada className={estilos.cierre} aria-labelledby="cierre-titulo">
       <div className={estilos.cierreInterior}>
         <h2 id="cierre-titulo" className={estilos.cierreTitulo}>
           <span className="revela">

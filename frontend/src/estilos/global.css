@@ -640,3 +640,10 @@ dialog:not([open])::backdrop {
   animation: revela-sube 900ms var(--ease-out) backwards;
   animation-delay: calc(var(--retraso, 0ms) + var(--i, 0) * 90ms);
 }
+
+/* Las secciones a las que lleva la tracklist del hero reciben el foco (asi
+   el teclado y el lector de pantalla siguen desde ahi), pero con el mouse no
+   tiene sentido dibujarles el anillo de foco alrededor */
+section[tabindex='-1']:focus:not(:focus-visible) {
+  outline: none;
+}

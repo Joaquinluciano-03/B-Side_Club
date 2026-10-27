@@ -213,6 +213,41 @@
   mask: radial-gradient(circle closest-side, transparent 50%, #000 52% 94%, transparent 96%);
 }
 
+/* el cartel de abierto/cerrado de la mitad de abajo del disco: solo en el
+   celular (ver el final), centrado entre el agujero y el borde */
+.cartelMovil {
+  position: absolute;
+  top: 63%;
+  left: 0;
+  right: 0;
+  display: none;
+  justify-content: center;
+  animation: impreso-entra 600ms var(--ease-out) 420ms both;
+}
+/* el horario de hoy: arriba de todo y centrado, el cartel de neon de
+   abierto/cerrado y el horario del dia, con la misma letra que la linea de
+   "Disqueria" de abajo. El cartel se mide en cqw, como todo el label */
+.hoy {
+  position: absolute;
+  top: 7.6%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.3cqw;
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: max(9px, 1.45cqw);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.label .cartelAbierto {
+  font-size: max(11px, 2.25cqw);
+}
 .catalogo {
   position: absolute;
   top: 14%;
@@ -348,8 +383,8 @@
 
 .tema {
   display: grid;
-  /* 1fr | auto | 1fr: el nombre queda en el centro exacto aunque el dato de
-     la derecha ("22 títulos", "Hoy 13 a 20 hs") tenga largos distintos */
+  /* 1fr | auto | 1fr: el nombre queda en el centro exacto, con el lado a la
+     izquierda y la flechita a la derecha */
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 1.2cqw;
@@ -404,6 +439,11 @@
   white-space: nowrap;
 }
 .dato {
+  display: inline-flex;
+  opacity: 0.55;
+  transition:
+    opacity var(--d-rapida) ease,
+    translate var(--d-media) var(--ease-out);
   justify-self: end;
   font-family: var(--mono);
   font-stretch: 87.5%;
@@ -462,10 +502,14 @@
 .label {
   animation: label-entra 700ms var(--ease-out) both;
 }
+.hoy,
 .catalogo,
 .placa,
 .buscador {
   animation: impreso-entra 600ms var(--ease-out) both;
+}
+.hoy {
+  animation-delay: 120ms;
 }
 .catalogo {
   animation-delay: 180ms;
@@ -648,10 +692,41 @@
   }
   /* el buscador sigue debajo del cartel (en mobile es mas alto, minimo 44px,
      asi que el cartel sube un poco para no tocar el agujero) */
+  .hoy {
+    top: 6.2%;
+  }
+  /* en el celular el cartel va grande en la mitad de abajo del disco, y
+     arriba queda solo el horario */
+  .label .cartelAbierto {
+    display: none;
+  }
+  .cartelMovil {
+    display: flex;
+  }
+  .label .cartelMovil > * {
+    font-size: 6.4cqw;
+  }
+  /* sin tracklist en el celular: el disco se ve entero, con el nombre y el
+     cartel de abierto/cerrado */
+  .tracklistAfuera {
+    display: none;
+  }
   .catalogo {
     top: 12.5%;
   }
   .cartel {
     top: 17.5%;
   }
+}
+
+/* la flechita del tema se enciende y baja un poco al pasar o al enfocar:
+   dice que el tema lleva mas abajo en la Home */
+@media (hover: hover) and (pointer: fine) {
+  .tema:hover .dato {
+    opacity: 1;
+    translate: 0 2px;
+  }
+}
+.tema:focus-visible .dato {
+  opacity: 1;
 }

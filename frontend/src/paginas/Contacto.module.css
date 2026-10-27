@@ -243,3 +243,17 @@
 .formulario {
   animation: formulario-entra 800ms var(--ease-out) 220ms backwards;
 }
+
+/* el cartel de abierto/cerrado con el horario de hoy, arriba de la lista */
+.estadoHoy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2) var(--e-3);
+  margin: var(--e-4) 0 var(--e-3);
+  font-family: var(--mono);
+  font-stretch: 87.5%;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--tinta);
+}

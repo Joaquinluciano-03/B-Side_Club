@@ -6,8 +6,9 @@ import { Link } from 'react-router-dom';
 import { WhatsappLogo, InstagramLogo, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
 import Logotipo from './Logotipo';
-import { normalizarHorario, horarioDeHoy } from '../lib/horario';
+import { normalizarHorario, horarioDeHoy, textoDeHoy } from '../lib/horario';
 import { linkWhatsApp, linkInstagram, arrobaInstagram, linkMapa } from '../lib/contacto';
+import CartelAbierto from './CartelAbierto';
 import estilos from './Footer.module.css';
 
 export default function Footer() {
@@ -30,7 +31,14 @@ export default function Footer() {
           </p>
           {hoy && (
             <p className={estilos.hoy}>
-              Hoy: <strong>{hoy.value}</strong>
+              <CartelAbierto horario={info?.horario} />
+              {/cerrad/i.test(hoy.value) ? (
+                <span>{textoDeHoy(hoy)}</span>
+              ) : (
+                <span>
+                  Hoy: <strong>{hoy.value}</strong>
+                </span>
+              )}
             </p>
           )}
           {info?.direccion && (

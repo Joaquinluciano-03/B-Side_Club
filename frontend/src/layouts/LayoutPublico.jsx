@@ -2,7 +2,9 @@ import { Suspense, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../componentes/Header';
 import Footer from '../componentes/Footer';
+import CartelAbierto from '../componentes/CartelAbierto';
 import { activarScrollSuave } from '../lib/scrollSuave';
+import { useDatosDelLocal } from '../lib/useStoreInfo';
 
 // Cada pagina trae su propia entrada (cascada, hero, tapa...). No hay un
 // fundido general: con el fondo gris de .pagina, un hero oscuro que se funde
@@ -15,6 +17,7 @@ export default function LayoutPublico() {
   // la rueda del mouse se desliza suave en todo el sitio publico (el panel
   // no lo usa: es una herramienta)
   useEffect(() => activarScrollSuave(), []);
+  const { info } = useDatosDelLocal();
 
   return (
     <div className="pagina">
@@ -23,6 +26,9 @@ export default function LayoutPublico() {
         <Outlet />
       </Suspense>
       <Footer />
+      {/* el cartel de abierto/cerrado fijo en la esquina: solo en pantallas
+          anchas (en las angostas va dentro de cada pagina) */}
+      <CartelAbierto horario={info?.horario} fijo />
     </div>
   );
 }

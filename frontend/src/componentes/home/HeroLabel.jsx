@@ -1,21 +1,31 @@
 // Primer viewport de la Home: el label central de un vinilo gigante.
-// La tracklist del label ES la navegacion (A = el catalogo, B = el local), y
-// al pasar por un tema "baja la pua" hasta esa fila. El buscador del pie del
-// label lleva al catalogo con la busqueda hecha.
+// La tracklist del label es el indice de la Home: cada tema lleva a una
+// seccion (A = los discos, B = el local), y al pasar por un tema "baja la
+// pua" hasta esa fila. Arriba del label, el cartel de abierto/cerrado con el
+// horario de hoy. El buscador lleva al catalogo con la busqueda hecha.
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { MagnifyingGlass } from '@phosphor-icons/react';
+import { useNavigate } from 'react-router-dom';
+import { MagnifyingGlass, ArrowDown } from '@phosphor-icons/react';
 import { query } from '../../lib/api';
-import { useConteos } from '../../lib/useConteos';
 import { useDatosDelLocal } from '../../lib/useStoreInfo';
-import { horarioDeHoy } from '../../lib/horario';
+import { horarioDeHoy, textoDeHoy } from '../../lib/horario';
+import { usePromocionesVigentes } from '../../lib/usePromociones';
+import { irAlScroll } from '../../lib/scrollSuave';
 import Neon from '../Neon';
+import CartelAbierto from '../CartelAbierto';
 import estilos from './HeroLabel.module.css';
 
-function cantidad(n, singular, plural) {
-  if (n === null || n === undefined) return '';
-  return `${n} ${n === 1 ? singular : plural}`;
+// Lleva a una seccion de la Home deslizando, y la deja justo debajo del
+// header (que queda pegado arriba). El foco pasa a la seccion: con teclado o
+// lector de pantalla se sigue leyendo desde ahi.
+function irASeccion(evento, id) {
+  const seccion = document.getElementById(id);
+  if (!seccion) return;
+  evento.preventDefault();
+  const alto = document.querySelector('header')?.offsetHeight || 0;
+  irAlScroll(seccion.getBoundingClientRect().top + window.scrollY - alto - 8, { suave: true });
+  seccion.focus({ preventScroll: true });
 }
 
 function Tracklist({ temas, className }) {
@@ -29,21 +39,24 @@ function Tracklist({ temas, className }) {
         {temas.map((t, i) => (
           // --n escalona la entrada de cada tema (ver HeroLabel.module.css)
           <li key={t.lado} style={{ '--n': i }}>
-            {t.a ? (
-              <Link
-                to={t.a}
-                viewTransition={t.a === '/nosotros'}
+            {t.id ? (
+              <a
+                href={`#${t.id}`}
                 className={estilos.tema}
+                onClick={(e) => irASeccion(e, t.id)}
                 onMouseEnter={() => setActiva(i)}
                 onFocus={() => setActiva(i)}
               >
                 <span className={estilos.lado}>{t.lado}</span>
                 <span className={estilos.nombre}>{t.nombre}</span>
-                <span className={estilos.dato}>{t.dato}</span>
-              </Link>
+                {/* la flechita dice que el tema lleva mas abajo en la pagina */}
+                <span className={estilos.dato} aria-hidden="true">
+                  <ArrowDown size={14} weight="bold" />
+                </span>
+              </a>
             ) : (
-              // fila de relleno mientras llegan las categorias: misma altura,
-              // asi la tracklist no salta cuando aparecen
+              // fila de relleno mientras se sabe si hay novedades: misma
+              // altura, asi la tracklist no salta cuando aparecen
               <span className={`${estilos.tema} ${estilos.temaCargando}`} aria-hidden="true">
                 <span className={estilos.lado}>{t.lado}</span>
                 <span className={estilos.barra} />
@@ -61,9 +74,7 @@ export default function HeroLabel() {
   const navigate = useNavigate();
   // todo lo impreso en el label sale de la base (Info del local y categorias)
   const { info, nombre, zona: barrio } = useDatosDelLocal();
-  const { total, categorias: todas, cargando } = useConteos();
-  // el lado A tiene lugar para tres formatos ademas de "recien llegados"
-  const categorias = todas.slice(0, 3);
+  const promos = usePromocionesVigentes();
   const [busqueda, setBusqueda] = useState('');
 
   const hoy = horarioDeHoy(info?.horario);
@@ -71,18 +82,20 @@ export default function HeroLabel() {
   // el tamaño se ajusta al largo del nombre para que entre en el label
   const tamTitulo = `${Math.min(11.2, 78 / (nombre.length * 0.78)).toFixed(2)}cqw`;
 
+  // los temas son las secciones de la Home, en orden. Novedades solo si hay
+  // alguna promocion vigente (mientras se sabe, una fila de relleno)
+  const ladoA = [
+    ...(promos === null ? [{ cargando: true }] : promos.length ? [{ id: 'novedades', nombre: 'Novedades' }] : []),
+    { id: 'destacados', nombre: 'Destacados' },
+    { id: 'categorias', nombre: 'Categorías' },
+  ];
+  const ladoB = [
+    { id: 'el-local', nombre: 'El local' },
+    { id: 'pedi-tu-disco', nombre: 'Pedí tu disco' },
+  ];
   const temas = [
-    { lado: 'A1', nombre: 'Recién llegados', a: '/catalogo', dato: cantidad(total, 'título', 'títulos') },
-    ...(cargando
-      ? ['A2', 'A3', 'A4'].map((lado) => ({ lado, a: null }))
-      : categorias.map((c, i) => ({
-          lado: `A${i + 2}`,
-          nombre: c.nombre,
-          a: `/catalogo${query({ categoriaId: c.id })}`,
-          dato: c.total ?? '',
-        }))),
-    { lado: 'B1', nombre: 'El local', a: '/nosotros', dato: hoy ? `Hoy ${hoy.value}` : barrio || '' },
-    { lado: 'B2', nombre: 'Escribinos', a: '/contacto', dato: 'WhatsApp' },
+    ...ladoA.map((t, i) => ({ ...t, lado: `A${i + 1}` })),
+    ...ladoB.map((t, i) => ({ ...t, lado: `B${i + 1}` })),
   ];
 
   function buscar(e) {
@@ -111,6 +124,12 @@ export default function HeroLabel() {
         </span>
         <span className={estilos.brillo} aria-hidden="true" />
 
+        {/* el horario de hoy, centrado arriba de todo: el cartel de
+            abierto/cerrado y el horario del dia */}
+        <p className={estilos.hoy}>
+          <CartelAbierto horario={info?.horario} className={estilos.cartelAbierto} />
+          {hoy && <span>{textoDeHoy(hoy)}</span>}
+        </p>
         <p className={estilos.catalogo}>
           {['Disquería', barrio, '33⅓ RPM'].filter(Boolean).join(' · ')}
         </p>
@@ -144,6 +163,12 @@ export default function HeroLabel() {
         </div>
 
         <span className={estilos.agujero} aria-hidden="true" />
+
+        {/* en el celular la tracklist no esta: la mitad de abajo del disco
+            queda para el cartel de abierto/cerrado, grande */}
+        <span className={estilos.cartelMovil}>
+          <CartelAbierto horario={info?.horario} />
+        </span>
 
         <Tracklist temas={temas} className={estilos.tracklistLabel} />
       </div>

@@ -16,6 +16,7 @@ import { linkMapa } from '../lib/contacto';
 import { useEnPantalla } from '../lib/useEnPantalla';
 import Cassette from '../componentes/Cassette';
 import PorLetras from '../componentes/PorLetras';
+import CartelAbierto from '../componentes/CartelAbierto';
 import estilos from './Nosotros.module.css';
 
 // los temas del lado B. El barrio sale de la direccion cargada en la base
@@ -118,7 +119,15 @@ export default function Nosotros() {
           )}
           {hoy && (
             <p className={`${estilos.hoy} entra`} style={{ '--i': 2 }}>
-              Hoy abrimos <strong>{hoy.value}</strong>
+              <CartelAbierto horario={info?.horario} />
+              {/* "Hoy abrimos Cerrado" no se lee bien */}
+              {/cerrad/i.test(hoy.value) ? (
+                <span>Hoy no abrimos</span>
+              ) : (
+                <span>
+                  Hoy abrimos <strong>{hoy.value}</strong>
+                </span>
+              )}
             </p>
           )}
           <div className="entra" style={{ '--i': 3 }}>

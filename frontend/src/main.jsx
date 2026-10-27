@@ -11,6 +11,9 @@ import '@fontsource/bungee/latin.css';
 // Bungee Outline: el contorno de Bungee, para el cartel de neon del hero (cada
 // trazo se lee como un tubo de vidrio). Se usa solo ahi.
 import '@fontsource/bungee-outline/latin.css';
+// Bungee Hairline: la de un solo trazo, para el cartel de abierto/cerrado
+// (cada letra es un tubo continuo, sin la doble linea del Outline)
+import '@fontsource/bungee-hairline/latin.css';
 import '@fontsource-variable/archivo/wdth.css';
 // Martian Mono: la mono de la meta (catalogo, años, estados). Tambien variable,
 // con eje de ancho: se usa un poco angosta (font-stretch 87.5%) en etiquetas.

@@ -37,7 +37,12 @@
   line-height: 1.6;
 }
 
+/* el cartel de abierto/cerrado al lado del horario de hoy */
 .hoy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2) var(--e-3);
   margin: var(--e-4) 0 0;
   font-size: var(--t-sm);
   color: var(--crema-dim);

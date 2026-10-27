@@ -1284,7 +1284,7 @@
    Tres capas, una animacion por capa (como el disco del hero, asi cada una
    corre en la GPU): la banda inclinada, el empujon que le da el scroll y la
    pista que corre sola.
-   .cinta no ocupa alto: es una linea justo en el borde entre "Por formato" y
+   .cinta no ocupa alto: es una linea justo en el borde entre Categorias y
    el Lado B, y la banda se centra sobre esa linea (translate -50%). Asi el
    borde queda siempre tapado: la banda es mas alta que lo que sube por la
    inclinacion de punta a punta (1,6 grados son 2,8 px cada 100 px de
