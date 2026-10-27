@@ -3,7 +3,7 @@
 // al pasar por un tema "baja la pua" hasta esa fila. El buscador del pie del
 // label lleva al catalogo con la busqueda hecha.
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { query } from '../../lib/api';
@@ -57,27 +57,8 @@ function Tracklist({ temas, className }) {
   );
 }
 
-// Pausa las animaciones que no terminan nunca (el disco, la luz del cartel,
-// el tubo flojo) mientras el hero esta fuera de pantalla: nadie las ve y la
-// GPU igual las tendria que mover en cada cuadro. Al volver siguen de donde
-// estaban. Se marca con data-quieto en la seccion (ver HeroLabel.module.css).
-function usePausarFueraDePantalla() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !('IntersectionObserver' in window)) return;
-    const obs = new IntersectionObserver(([e]) => {
-      el.toggleAttribute('data-quieto', !e.isIntersecting);
-    });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
-
 export default function HeroLabel() {
   const navigate = useNavigate();
-  const heroRef = usePausarFueraDePantalla();
   // todo lo impreso en el label sale de la base (Info del local y categorias)
   const { info, nombre, zona: barrio } = useDatosDelLocal();
   const { total, categorias: todas, cargando } = useConteos();
@@ -110,8 +91,13 @@ export default function HeroLabel() {
     navigate(`/catalogo${query({ q })}`);
   }
 
+  // Las animaciones del hero (el disco, la luz del cartel, el tubo flojo)
+  // siguen aunque el hero no se vea: son todas de las que van en la GPU y
+  // fuera de pantalla casi no cuestan. Antes se pausaban al salir, pero
+  // pausar y reanudar todo el hero de golpe rearmaba sus capas grandes y
+  // trababa el scroll justo donde Novedades pasa bajo el header.
   return (
-    <section ref={heroRef} className={estilos.hero} aria-labelledby="hero-titulo" data-oscuro>
+    <section className={estilos.hero} aria-labelledby="hero-titulo" data-oscuro>
       <div className={estilos.label}>
         {/* detras del label, centrados en el: la sombra sobre la mesa (quieta),
             el vinilo (gira) y los reflejos de la luz (quietos: la luz no se

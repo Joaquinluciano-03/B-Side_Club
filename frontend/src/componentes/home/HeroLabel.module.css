@@ -153,12 +153,13 @@
 .viniloGiro {
   will-change: rotate;
 }
-/* fuera de pantalla se pausa todo lo que anima en el hero (data-quieto lo
-   pone usePausarFueraDePantalla en HeroLabel.jsx); las entradas ya terminaron
-   para entonces, asi que solo afecta a los loops */
-.hero[data-quieto] *,
-.hero[data-quieto] *::after {
-  animation-play-state: paused !important;
+/* Mientras la pagina se desliza con el scroll suave (Lenis pone
+   lenis-scrolling en <html>, ver lib/scrollSuave.js), el disco deja de girar
+   solo y gira unicamente con el scroll (.viniloScroll), como si lo empujaras;
+   al frenar sigue desde donde quedo. Le saca trabajo al hero, la zona mas
+   pesada de dibujar, justo cuando el scroll depende del hilo principal */
+:global(html.lenis-scrolling) .viniloGiro {
+  animation-play-state: paused;
 }
 @keyframes girar {
   to {
