@@ -19,14 +19,13 @@ import PorLetras from '../componentes/PorLetras';
 import CartelAbierto from '../componentes/CartelAbierto';
 import estilos from './Nosotros.module.css';
 
-// los temas del lado B. El barrio sale de la direccion cargada en la base
-// (Info del local): si el local se muda, la historia lo acompaña
-const temas = (barrio) => [
+// los temas del lado B
+const temas = () => [
   {
     lado: 'B1',
-    titulo: 'Empezó como un cajón',
+    titulo: 'Como empezamos',
     texto:
-      `Arrancamos vendiendo los duplicados de nuestra propia colección en una feria ${barrio ? `de ${barrio}` : 'del barrio'}. Un cajón de verdulería, una lona y una bandeja a pilas para que la gente probara los discos antes de comprar. Esa bandeja todavía está en el mostrador.`,
+      'Todo arrancó con la colección de vinilos de un tío que se mudó y no tenía lugar para llevarla. Eran unos 300 discos, mucho rock nacional y algo de jazz. Los fuimos vendiendo de a poco en el barrio y después empezamos a comprar colecciones de otros.',
   },
   {
     lado: 'B2',
@@ -38,7 +37,7 @@ const temas = (barrio) => [
     lado: 'B3',
     titulo: 'El lado B',
     texto:
-      'Nos interesa lo que no entró en el corte difusión: los prensados nacionales raros, los compilados caseros, el cassette que alguien grabó para otra persona. Si buscás algo puntual, escribinos y lo salimos a buscar.',
+      'Además de lo conocido, tenemos discos que no se consiguen fácil: ediciones nacionales viejas, compilados y algún cassette. Si buscás algo en particular, escribinos.',
   },
 ];
 
@@ -48,7 +47,7 @@ export default function Nosotros() {
   const hoy = horarioDeHoy(info?.horario);
   const refCaratula = useEnPantalla();
   const refVisita = useEnPantalla();
-  const lista = temas(barrio);
+  const lista = temas();
 
   return (
     <main className={estilos.pagina} data-oscuro>

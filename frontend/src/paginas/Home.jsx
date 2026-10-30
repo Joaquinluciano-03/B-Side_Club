@@ -30,12 +30,12 @@ const PROMESAS = [
     texto: 'Cada disco, nuevo o usado, se revisa antes de entrar al catálogo. Si tiene algún detalle, lo decimos en la ficha.',
   },
   {
-    titulo: 'Estado real, sin vueltas',
-    texto: 'Usamos la escala Goldmine para vinilo y tapa, y fotos del ejemplar exacto que te llevás.',
+    titulo: 'Estado real',
+    texto: 'Calificamos los productos según su estado, y las fotos que se muestran son reales sacadas desde el local, no de internet.',
   },
   {
     titulo: 'Reservas por mensaje',
-    texto: 'Te lo guardamos 48 hs. Escribinos por WhatsApp o Instagram y pasá a buscarlo.',
+    texto: 'Escribinos por WhatsApp o Instagram y pasá a buscarlo.',
   },
 ];
 
@@ -210,18 +210,18 @@ function LadoB() {
       </div>
 
       <div className={estilos.ladoBInterior}>
-        {/* renglon por renglon; al final se subraya a mano "se encuentra." */}
+        {/* renglon por renglon; al final se subraya a mano "como fue grabada." */}
         <h2 ref={refTitulo} data-entrada id="ladob-titulo" className={estilos.ladoBTitulo}>
           <span className="revela" style={{ '--i': 0 }}>
-            <span>Un disco</span>
+            <span>Tu música</span>
           </span>{' '}
           <span className="revela" style={{ '--i': 1 }}>
-            <span>no se compra,</span>
+            <span>merece sonar</span>
           </span>{' '}
           <span className={`revela ${estilos.lineaSubrayada}`} style={{ '--i': 2 }}>
             <span>
               <span className={estilos.ladoBAcento}>
-                se encuentra.
+                como fue grabada.
                 <svg className={estilos.subrayado} viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
                   <path d="M4 15 C 52 7, 98 19, 150 12 S 246 6, 296 14" pathLength="1" />
                 </svg>
