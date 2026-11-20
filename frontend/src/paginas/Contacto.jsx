@@ -309,6 +309,7 @@ export default function Contacto() {
           <Campo id="c-mensaje" label="Mensaje" error={errores.mensaje}>
             <textarea
               id="c-mensaje"
+              className={estilos.mensaje}
               value={form.mensaje}
               onChange={(e) => campo('mensaje', e.target.value)}
               placeholder="Contanos qué estás buscando…"

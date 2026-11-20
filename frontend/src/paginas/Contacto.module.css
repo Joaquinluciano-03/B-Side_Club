@@ -257,3 +257,11 @@
   font-weight: 700;
   color: var(--tinta);
 }
+
+/* el mensaje tiene un alto fijo: no se puede agrandar arrastrando la esquina.
+   Si el texto es mas largo, aparece la barra de desplazamiento. Va con la
+   clase doble para ganarle a ".campo textarea" de global.css (resize: vertical) */
+.mensaje.mensaje {
+  resize: none;
+  height: 160px;
+}
