@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { prisma } = require('../config/db');
 const { enviarInvitacion } = require('../config/mailer');
+const { passwordSinDatosPersonales } = require('../utils/validar');
 const { huella } = require('./auth.service');
 
 const DIAS_EXPIRACION = 7;
@@ -102,6 +103,8 @@ async function aceptar({ token, nombre, apellido, telefono, password }) {
     error.status = 409;
     throw error;
   }
+
+  passwordSinDatosPersonales(password, { nombre, apellido, mail: invitacion.email });
 
   const passwordhash = await bcrypt.hash(password, 10);
 

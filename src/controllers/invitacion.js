@@ -38,8 +38,9 @@ async function aceptar(req, res, next) {
       nombre: v.texto(req.body.nombre, 'nombre', { requerido: true, max: 60 }),
       apellido: v.texto(req.body.apellido, 'apellido', { requerido: true, max: 60 }),
       telefono: v.telefono(req.body.telefono, 'telefono', { requerido: true }),
-      password: v.password(req.body.password),
     };
+    // el mail de la invitacion lo revisa el service, que es quien lo conoce
+    datos.password = v.password(req.body.password, { datos });
 
     const resultado = await invitacionService.aceptar(datos);
     res.status(201).json(resultado);

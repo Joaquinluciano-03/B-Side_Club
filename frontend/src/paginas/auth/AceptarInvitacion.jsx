@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
 import InputPassword, { Entrada } from '../../componentes/InputPassword';
+import RequisitosPassword from '../../componentes/RequisitosPassword';
+import { errorPassword } from '../../lib/reglasPassword';
 import { post } from '../../lib/api';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -45,7 +47,8 @@ export default function AceptarInvitacion() {
     if (!form.nombre.trim()) e.nombre = 'Requerido.';
     if (!form.apellido.trim()) e.apellido = 'Requerido.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (form.password.length < 8) e.password = 'Mínimo 8 caracteres.';
+    const problema = errorPassword(form.password, form);
+    if (problema) e.password = problema;
     setErrores(e);
     if (Object.keys(e).length) return;
 
@@ -110,10 +113,11 @@ export default function AceptarInvitacion() {
               value={form[c.k]}
               onChange={(e) => campo(c.k, e.target.value)}
               autoComplete={c.autoComplete}
+              aria-describedby={c.k === 'password' ? 'inv-password-requisitos' : undefined}
             />
             {errores[c.k] && <div className="campo-error">{errores[c.k]}</div>}
-            {c.k === 'password' && !errores.password && (
-              <div className="campo-ayuda">Mínimo 8 caracteres.</div>
+            {c.k === 'password' && (
+              <RequisitosPassword id="inv-password-requisitos" password={form.password} datos={form} />
             )}
           </div>
         ))}

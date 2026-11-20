@@ -5,6 +5,8 @@
 import { useState } from 'react';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
 import InputPassword from '../../componentes/InputPassword';
+import RequisitosPassword from '../../componentes/RequisitosPassword';
+import { errorPassword } from '../../lib/reglasPassword';
 import { useAuth } from '../../lib/auth';
 import { useToast } from '../../lib/toast';
 import { etiquetaRol, mensajeDeError } from '../../lib/formato';
@@ -44,7 +46,8 @@ export default function Perfil() {
     if (!form.apellido.trim()) e.apellido = 'Requerido.';
     if (!MAIL_REGEX.test(form.mail)) e.mail = 'Mail inválido.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (password && password.length < 8) e.password = 'Mínimo 8 caracteres.';
+    const problema = password ? errorPassword(password, form) : null;
+    if (problema) e.password = problema;
     if (password && password !== repetir) e.repetir = 'No coinciden.';
     if (pideActual && !actual) e.actual = 'Escribí tu contraseña actual.';
     setErrores(e);
@@ -143,8 +146,11 @@ export default function Perfil() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
+                  aria-describedby={password ? 'pf-pass-requisitos' : undefined}
                 />
                 {errores.password && <div className="campo-error">{errores.password}</div>}
+                {/* el campo es opcional: los requisitos aparecen al empezar a escribir */}
+                {password && <RequisitosPassword id="pf-pass-requisitos" password={password} datos={form} />}
               </div>
 
               <div className={`campo ${errores.repetir ? 'con-error' : ''}`}>

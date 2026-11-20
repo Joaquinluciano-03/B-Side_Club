@@ -7,6 +7,8 @@
 //   - emails, telefonos, numeros, fechas y el horario tienen su formato
 // Si algo no cumple se corta con un 400 y un mensaje claro para el panel.
 
+const { errorPassword } = require('./reglasPassword');
+
 function error400(mensaje) {
   const error = new Error(mensaje);
   error.status = 400;
@@ -60,16 +62,29 @@ function telefono(valor, campo = 'telefono', { requerido = false } = {}) {
   return limpio;
 }
 
-// bcrypt solo mira los primeros 72 bytes: mas largo no suma seguridad
-function password(valor, { requerido = true } = {}) {
+// Contraseña nueva: tiene que cumplir los requisitos de utils/reglasPassword
+// (largo, mayuscula y minuscula, numero, caracter especial y sin patrones
+// faciles). datos: nombre, apellido y mail de la cuenta, para que no los use.
+// El login NO pasa por aca: una cuenta con clave vieja tiene que poder entrar
+// para cambiarla. bcrypt solo mira los primeros 72 bytes: mas largo no suma.
+function password(valor, { requerido = true, datos = {} } = {}) {
   if (vacio(valor)) {
     if (requerido) throw error400('Falta la contraseña.');
     return null;
   }
   if (typeof valor !== 'string') throw error400('La contraseña tiene que ser un texto.');
-  if (valor.length < 8) throw error400('La contraseña tiene que tener al menos 8 caracteres.');
   if (Buffer.byteLength(valor, 'utf8') > 72) throw error400('La contraseña puede tener hasta 72 caracteres.');
+  const problema = errorPassword(valor, datos);
+  if (problema) throw error400(problema);
   return valor;
+}
+
+// La contraseña nueva no puede contener el nombre, el apellido ni el mail de
+// la cuenta. Para los services que recien conocen esos datos (perfil,
+// recuperar contraseña, invitacion): los requisitos basicos ya se validaron.
+function passwordSinDatosPersonales(valor, datos) {
+  const problema = valor ? errorPassword(valor, datos) : null;
+  if (problema) throw error400(problema);
 }
 
 function entero(valor, campo, { requerido = false, min = 0, max = Number.MAX_SAFE_INTEGER } = {}) {
@@ -170,6 +185,7 @@ module.exports = {
   email,
   telefono,
   password,
+  passwordSinDatosPersonales,
   entero,
   decimal,
   booleano,

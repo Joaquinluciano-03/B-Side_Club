@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
 import InputPassword, { Entrada } from '../../componentes/InputPassword';
+import RequisitosPassword from '../../componentes/RequisitosPassword';
+import { errorPassword } from '../../lib/reglasPassword';
 import { useAuth } from '../../lib/auth';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -37,7 +39,8 @@ export default function Registro() {
     if (!form.mail.trim()) e.mail = 'Requerido.';
     else if (!MAIL_REGEX.test(form.mail)) e.mail = 'Falta el dominio del email.';
     if (!form.telefono.trim()) e.telefono = 'Requerido.';
-    if (form.password.length < 8) e.password = 'Mínimo 8 caracteres.';
+    const problema = errorPassword(form.password, form);
+    if (problema) e.password = problema;
     setErrores(e);
     return Object.keys(e).length === 0;
   }
@@ -95,10 +98,11 @@ export default function Registro() {
               value={form[c.k]}
               onChange={(e) => campo(c.k, e.target.value)}
               autoComplete={c.autoComplete}
+              aria-describedby={c.k === 'password' ? 'r-password-requisitos' : undefined}
             />
             {errores[c.k] && <div className="campo-error">{errores[c.k]}</div>}
-            {c.k === 'password' && !errores.password && (
-              <div className="campo-ayuda">Mínimo 8 caracteres.</div>
+            {c.k === 'password' && (
+              <RequisitosPassword id="r-password-requisitos" password={form.password} datos={form} />
             )}
           </div>
         ))}

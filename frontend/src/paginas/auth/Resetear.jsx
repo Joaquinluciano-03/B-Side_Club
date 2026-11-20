@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import LayoutAuth from '../../layouts/LayoutAuth';
 import InputPassword from '../../componentes/InputPassword';
+import RequisitosPassword from '../../componentes/RequisitosPassword';
+import { errorPassword } from '../../lib/reglasPassword';
 import { post } from '../../lib/api';
 import { mensajeDeError } from '../../lib/formato';
 
@@ -39,8 +41,10 @@ export default function Resetear() {
     setError(null);
     setErrorCampo(null);
 
-    if (password.length < 8) {
-      setErrorCampo('La contraseña necesita al menos 8 caracteres.');
+    // el nombre y el mail de la cuenta no se conocen aca: eso lo revisa el backend
+    const problema = errorPassword(password);
+    if (problema) {
+      setErrorCampo(problema);
       return;
     }
     if (password !== repetir) {
@@ -90,8 +94,9 @@ export default function Resetear() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
+            aria-describedby="rs-pass-requisitos"
           />
-          <div className="campo-ayuda">Mínimo 8 caracteres.</div>
+          <RequisitosPassword id="rs-pass-requisitos" password={password} />
         </div>
 
         <div className={`campo ${errorCampo ? 'con-error' : ''}`}>

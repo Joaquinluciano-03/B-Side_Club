@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
 const { enviarRecuperoPassword } = require('../config/mailer');
+const { passwordSinDatosPersonales } = require('../utils/validar');
 
 const MINUTOS_EXPIRACION_RESET = 30;
 const COSTO_BCRYPT = 10;
@@ -109,6 +110,14 @@ async function actualizarMe(userId, { nombre, apellido, mail, telefono, password
     }
   }
 
+  if (password) {
+    passwordSinDatosPersonales(password, {
+      nombre: nombre ?? actual.nombre,
+      apellido: apellido ?? actual.apellido,
+      mail: mail ?? actual.mail,
+    });
+  }
+
   const data = { nombre, apellido, mail, telefono };
   if (password) {
     data.passwordhash = await bcrypt.hash(password, COSTO_BCRYPT);
@@ -175,6 +184,9 @@ async function resetPassword({ token, password }) {
     error.status = 410;
     throw error;
   }
+
+  const duenio = await prisma.user.findUnique({ where: { id: resetToken.userId } });
+  passwordSinDatosPersonales(password, duenio || {});
 
   const passwordhash = await bcrypt.hash(password, COSTO_BCRYPT);
 

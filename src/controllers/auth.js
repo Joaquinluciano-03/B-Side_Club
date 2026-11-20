@@ -10,8 +10,9 @@ async function register(req, res, next) {
       apellido: v.texto(req.body.apellido, 'apellido', { requerido: true, max: 60 }),
       mail: v.email(req.body.mail, 'mail', { requerido: true }),
       telefono: v.telefono(req.body.telefono, 'telefono', { requerido: true }),
-      password: v.password(req.body.password),
     };
+    // la contraseña no puede contener el nombre, el apellido ni el mail
+    datos.password = v.password(req.body.password, { datos });
 
     const resultado = await authService.register(datos);
     res.status(201).json(resultado);
@@ -65,6 +66,8 @@ async function actualizarMe(req, res, next) {
       apellido: b.apellido === undefined ? undefined : v.texto(b.apellido, 'apellido', { requerido: true, max: 60 }),
       mail: b.mail === undefined ? undefined : v.email(b.mail, 'mail', { requerido: true }),
       telefono: b.telefono === undefined ? undefined : v.telefono(b.telefono),
+      // los requisitos; que no use el nombre ni el mail lo revisa el service,
+      // que tiene los datos de la cuenta
       password: v.password(b.password, { requerido: false }),
       // la de ahora: hace falta para cambiar la contraseña o el mail
       passwordActual: typeof b.passwordActual === 'string' ? b.passwordActual.slice(0, 200) : undefined,
