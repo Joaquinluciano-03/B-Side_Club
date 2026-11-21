@@ -1,10 +1,7 @@
-// logica de negocio de promociones/novedades
-
 const { prisma } = require('../config/db');
 const { subirImagen, borrarImagen } = require('../config/storage');
 
-// Mismo criterio que productos: el visitante solo ve las promociones activas.
-// El panel (con token) puede pedir todas, o filtrar con soloActivas.
+// el visitante solo ve las activas; el panel puede pedir todas o filtrar con soloActivas
 async function listar({ soloActivas } = {}, { esAdmin = false } = {}) {
   const where = {};
   if (esAdmin) {
@@ -29,11 +26,8 @@ async function obtenerPorId(id, { soloActivas = false } = {}) {
   return promocion;
 }
 
-// La imagen de una promo solo se carga subiendo un archivo (subirImagenPromocion).
-// Por el JSON se acepta dejar la que ya tenia o quitarla (null), nada mas: si
-// se aceptara cualquier URL, alguien podia apuntar la promo a un archivo de
-// otro producto y, al borrarla o cambiarle la imagen, borraria ese archivo
-// del storage. Y de paso tampoco se pueden meter links externos en la home.
+// la imagen solo se carga subiendo un archivo; por JSON se puede dejar la que tenía o quitarla (null).
+// Si se aceptara cualquier URL, borrar la promo podría borrar el archivo de otro producto
 function imagenUrlPermitida(nueva, actual = null) {
   if (nueva === null || nueva === actual) return nueva;
   const error = new Error('La imagen de la promoción se carga subiendo un archivo.');
@@ -54,9 +48,7 @@ async function crear(data) {
   });
 }
 
-// Lista blanca, igual que en productos: antes se pasaba el body completo a
-// Prisma y se podia mandar cualquier columna, incluido "id".
-// (las fechas ya llegan como Date o null desde el controller)
+// lista blanca, igual que en productos
 const CAMPOS_EDITABLES = ['titulo', 'descripcion', 'activa', 'fechaInicio', 'fechaFin'];
 
 async function actualizar(id, data) {
@@ -75,16 +67,14 @@ async function actualizar(id, data) {
     data: dataActualizada,
   });
 
-  // si le sacaron la imagen, el archivo tambien se va del storage
+  // si le sacan la imagen, el archivo también se borra del storage
   if (dataActualizada.imagenUrl === null && actual.imagenUrl) {
     await borrarImagen(actual.imagenUrl);
   }
   return actualizada;
 }
 
-// Sube la imagen a Supabase Storage (mismo bucket que los productos) y la deja
-// como imagenUrl de la promocion. Si ya tenia una nuestra, se borra despues:
-// primero la nueva, asi si la subida falla la promo no queda sin imagen.
+// sube la imagen y la deja como imagenUrl. La anterior se borra después, así si falla la subida no queda sin imagen
 async function subirImagenPromocion(id, file) {
   const promocion = await obtenerPorId(id);
   const url = await subirImagen(file);
@@ -94,7 +84,7 @@ async function subirImagenPromocion(id, file) {
     data: { imagenUrl: url },
   });
 
-  // borrarImagen ignora las URLs que no son de nuestro storage (una pegada a mano)
+  // borrarImagen ignora las URLs que no son del storage
   await borrarImagen(promocion.imagenUrl);
   return actualizada;
 }
@@ -102,7 +92,7 @@ async function subirImagenPromocion(id, file) {
 async function eliminar(id) {
   const promocion = await obtenerPorId(id);
   await prisma.promocion.delete({ where: { id: Number(id) } });
-  // la fila primero, igual que con las imagenes de productos
+  // la fila primero, como con las imágenes de productos
   await borrarImagen(promocion.imagenUrl);
 }
 

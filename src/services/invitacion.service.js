@@ -1,5 +1,3 @@
-// logica de negocio de invitaciones
-
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { prisma } = require('../config/db');
@@ -17,9 +15,7 @@ async function crear({ email, rol, invitadoPorId }) {
     throw error;
   }
 
-  // sin este chequeo se podian emitir N tokens validos para el mismo mail,
-  // y revocar uno no servia de nada porque los otros seguian funcionando.
-  // Las vencidas no cuentan: ya no sirven, se puede volver a invitar.
+  // una sola invitación pendiente por mail (las vencidas no cuentan)
   const invitacionVigente = await prisma.invitacion.findFirst({
     where: { email, estado: 'pendiente', expiraEn: { gt: new Date() } },
   });
@@ -32,18 +28,14 @@ async function crear({ email, rol, invitadoPorId }) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiraEn = new Date(Date.now() + DIAS_EXPIRACION * 24 * 60 * 60 * 1000);
 
-  // en la base va la huella del token, no el token (ver huella en auth.service)
+  // en la base va la huella del token
   const invitacion = await prisma.invitacion.create({
     data: { email, rol, token: huella(token), expiraEn, invitadoPorId },
   });
 
   const link = `${process.env.FRONTEND_URL}/aceptar-invitacion?token=${token}`;
 
-  // si el mail no sale, la invitacion no sirve para nada: nadie va a recibir
-  // el link. La borramos para que el admin pueda reintentar, porque si no el
-  // chequeo de "ya hay una invitacion pendiente" de arriba le bloquearia el
-  // segundo intento con un 409.
-  // el mail dice quien invito, para que no llegue como si fuera automatico
+  // si el mail no sale se borra la invitación, para que el admin pueda reintentar
   const quienInvita = invitadoPorId
     ? await prisma.user.findUnique({ where: { id: invitadoPorId }, select: { nombre: true, apellido: true } })
     : null;
@@ -72,8 +64,7 @@ async function crear({ email, rol, invitadoPorId }) {
 }
 
 async function aceptar({ token, nombre, apellido, telefono, password }) {
-  // las invitaciones nuevas guardan la huella; las anteriores a este cambio,
-  // el token tal cual (se aceptan hasta que venzan)
+  // las invitaciones viejas guardan el token tal cual
   const invitacion =
     (await prisma.invitacion.findUnique({ where: { token: huella(token) } })) ||
     (await prisma.invitacion.findUnique({ where: { token } }));
@@ -96,7 +87,7 @@ async function aceptar({ token, nombre, apellido, telefono, password }) {
     throw error;
   }
 
-  // por si el mail ya se registro por otro lado mientras la invitacion esperaba
+  // por si el mail se registró mientras tanto
   const yaExiste = await prisma.user.findUnique({ where: { mail: invitacion.email } });
   if (yaExiste) {
     const error = new Error('Ese email ya tiene una cuenta. Iniciá sesión.');

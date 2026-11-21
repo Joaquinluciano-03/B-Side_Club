@@ -1,11 +1,5 @@
-// El horario del local es un campo Json en la base, y convivieron dos formas:
-//
-//   arreglo (la que vale):  [{ label: 'Martes', value: '13 a 23 hs' }, ...]
-//   objeto (forma vieja):   { martes: '13 a 23 hs', ... }
-//
-// Hoy el panel guarda el arreglo; antes guardaba el objeto. Recorrer el arreglo
-// con Object.entries() era lo que mostraba "0: [object Object]" en el footer.
-// Todo el que lea el horario pasa por aca y recibe siempre el arreglo.
+// el horario es un Json con dos formas: arreglo [{ label, value }] (la actual) y objeto { martes: '...' } (la vieja).
+// Todo lo que lo lea pasa por acá y recibe siempre el arreglo
 
 export function normalizarHorario(horario) {
   if (!horario || typeof horario !== 'object') return [];
@@ -22,7 +16,7 @@ export function normalizarHorario(horario) {
     .map(([label, value]) => ({ label: capitalizar(label.trim()), value: value.trim() }));
 }
 
-// Abreviaturas sin tildes, en el orden de Date.getDay() (0 = domingo)
+// abreviaturas sin tildes, en el orden de Date.getDay() (0 = domingo)
 const DIAS = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
 
 function diaDe(texto) {
@@ -34,8 +28,7 @@ function diaDe(texto) {
   return DIAS.indexOf(limpio.slice(0, 3));
 }
 
-// El local esta en Buenos Aires: "hoy" y "ahora" son los de alla, aunque el
-// visitante este en otra zona horaria
+// "hoy" y "ahora" son los de Buenos Aires, esté donde esté el visitante
 const ZONA_DEL_LOCAL = 'America/Argentina/Buenos_Aires';
 const DIAS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -52,11 +45,7 @@ export function ahoraEnElLocal(fecha = new Date()) {
   return { dia: DIAS_EN.indexOf(parte('weekday')), minutos: Number(parte('hour')) * 60 + Number(parte('minute')) };
 }
 
-/**
- * La fila del horario que corresponde a hoy (en el local), o null si no hay
- * ninguna. Entiende etiquetas sueltas ("Martes", "Sábados") y rangos
- * ("Miér a Vie"). Con una fecha, usa el dia de esa fecha.
- */
+/** La fila del horario de hoy (o de la fecha dada), o null. Entiende "Martes", "Sábados" y rangos ("Miér a Vie"). */
 export function horarioDeHoy(horario, fecha) {
   return filaDelDia(horario, fecha ? fecha.getDay() : ahoraEnElLocal().dia);
 }
@@ -79,14 +68,12 @@ function filaDelDia(horario, hoy) {
 }
 
 /**
- * Los rangos de un horario en minutos desde la medianoche:
- *   "13 a 23 hs"          -> [[780, 1380]]
- *   "10 a 13 y 16 a 20"   -> [[600, 780], [960, 1200]]
- *   "9:30 a 18 hs"        -> [[570, 1080]]
- *   "20 a 2 hs"           -> [[1200, 1560]]   (pasa la medianoche)
- *   "Cerrado"             -> []
- * Si el texto no se entiende devuelve null: mejor no decir nada que decir
- * "abierto" de mas.
+ * Rangos de un horario en minutos desde la medianoche:
+ *   "13 a 23 hs" -> [[780, 1380]]
+ *   "10 a 13 y 16 a 20" -> [[600, 780], [960, 1200]]
+ *   "20 a 2 hs" -> [[1200, 1560]] (pasa la medianoche)
+ *   "Cerrado" -> []
+ * Si no se entiende devuelve null.
  */
 export function rangosDe(valor) {
   const texto = String(valor || '').toLowerCase();
@@ -104,17 +91,13 @@ export function rangosDe(valor) {
   return rangos.length ? rangos : null;
 }
 
-/**
- * ¿El local esta abierto ahora? { abierto: true | false }, o null si no hay
- * horario cargado o no se entiende el de hoy. Tiene en cuenta que el horario
- * de ayer puede seguir pasada la medianoche ("Sábados 20 a 2 hs").
- */
+/** ¿Abierto ahora? { abierto } o null si no hay horario o no se entiende. Cuenta el horario de ayer que pasa la medianoche. */
 export function estadoDelLocal(horario, fecha = new Date()) {
   if (normalizarHorario(horario).length === 0) return null;
   const { dia, minutos } = ahoraEnElLocal(fecha);
   const hoy = filaDelDia(horario, dia);
   const ayer = filaDelDia(horario, (dia + 6) % 7);
-  // un dia que no figura en el horario es un dia cerrado
+  // un día que no figura es un día cerrado
   const rangosHoy = hoy ? rangosDe(hoy.value) : [];
   const rangosAyer = ayer ? rangosDe(ayer.value) || [] : [];
   if (rangosHoy === null) return null;

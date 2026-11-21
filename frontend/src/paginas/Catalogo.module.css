@@ -4,7 +4,7 @@
   padding-bottom: var(--seccion);
 }
 
-/* ============ CABECERA ============ */
+/* Cabecera */
 .cabecera {
   max-width: var(--ancho);
   margin: 0 auto;
@@ -69,7 +69,7 @@
   color: var(--tinta-tenue);
 }
 
-/* ============ BARRA (pegada arriba) ============ */
+/* BARRA (pegada arriba) */
 /* el testigo: 1px justo arriba de la barra para saber cuando se pega */
 .testigo {
   height: 1px;
@@ -442,7 +442,7 @@
   color: var(--tinta-sobre-naranja);
 }
 
-/* ============ RESULTADOS ============ */
+/* Resultados */
 .resultados {
   max-width: var(--ancho);
   margin: 0 auto;
@@ -508,7 +508,7 @@
   margin-top: var(--e-8);
 }
 
-/* ============ MOBILE ============ */
+/* Mobile */
 @media (max-width: 760px) {
   .cabecera {
     padding-top: var(--e-7);

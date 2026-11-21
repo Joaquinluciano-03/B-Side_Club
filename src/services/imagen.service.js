@@ -1,6 +1,4 @@
-// logica de negocio de imagenes de productos.
-// Los archivos viven en Supabase Storage (ver src/config/storage.js); en la
-// base solo guardamos la URL publica que devuelve.
+// las imágenes viven en Supabase Storage; en la base solo va la URL pública
 
 const { prisma } = require('../config/db');
 const { subirImagen, borrarImagen } = require('../config/storage');
@@ -13,24 +11,21 @@ async function agregar(productoId, files) {
     throw error;
   }
 
-  // el orden sigue despues de las imagenes que ya tiene el producto, para no
-  // pisar la portada existente (orden 0) con cada tanda nueva de subidas
+  // el orden sigue después de las imágenes que ya tiene, para no pisar la portada
   const ultima = await prisma.imagen.findFirst({
     where: { productoId: Number(productoId) },
     orderBy: { orden: 'desc' },
   });
   const ordenInicial = ultima ? ultima.orden + 1 : 0;
 
-  // Primero subimos todos los archivos y despues escribimos en la base. Si
-  // una subida falla cortamos acá y no queda ninguna fila apuntando a un
-  // archivo que no existe.
+  // primero se suben todos los archivos y después se escribe en la base: si una subida falla no queda ninguna fila rota
   const urls = [];
   try {
     for (const file of files) {
       urls.push(await subirImagen(file));
     }
   } catch (err) {
-    // limpiamos lo que si llego a subir, para no dejar archivos huerfanos
+    // se borra lo que sí llegó a subir
     await Promise.all(urls.map((u) => borrarImagen(u)));
     throw err;
   }
@@ -78,9 +73,7 @@ async function eliminar(id) {
     throw error;
   }
 
-  // la fila primero: si falla el borrado del archivo preferimos quedarnos con
-  // un archivo huerfano (molesta poco) antes que con una fila apuntando a
-  // algo que ya no existe (rompe la galeria del producto)
+  // primero la fila: mejor un archivo huérfano que una fila apuntando a un archivo que no existe
   await prisma.imagen.delete({ where: { id: Number(id) } });
   await borrarImagen(imagen.url);
 }

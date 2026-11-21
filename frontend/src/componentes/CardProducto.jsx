@@ -1,15 +1,5 @@
-// Card del catalogo: la tapa como una funda con el disco adentro. Quieta, el
-// disco asoma un poco por el costado; al pasar el mouse (o con foco) se
-// desliza afuera, como cuando sacas un disco de la batea para mirarlo.
-//
-// Todas las cards de una fila tienen la misma estructura, para que se lean
-// parejas:
-//   - el estado (si no es "disponible") va como sticker pegado en la tapa, no
-//     en el texto: asi los titulos arrancan todos a la misma altura
-//   - titulo, artista y formato a la izquierda; el icono de la categoria a la
-//     derecha, siempre del mismo tamaño y alineado con el titulo
-//   - el precio al pie: las cards de una fila miden lo mismo (las estira la
-//     grilla) y el precio queda alineado entre todas
+// card del catálogo: la tapa como una funda con el disco que asoma y sale al pasar el mouse.
+// Todas tienen la misma estructura para que se lean parejas (estado como sticker en la tapa, precio al pie)
 
 import { Link } from 'react-router-dom';
 import ArteProducto, { ObjetoInterior } from './ArteProducto';
@@ -22,7 +12,7 @@ export default function CardProducto({ producto, prioridad = false }) {
   const { id, nombre, anio, precio, estado_stock, categoria, esActivo } = producto;
   const { titulo, artista } = separarNombre(nombre);
   const consultar = esAConsultar(precio);
-  // "a consultar" con precio null ya lo dice el precio: no repetirlo en un badge
+  // "a consultar" ya lo dice el precio, no se repite en un badge
   const mostrarEstado = estado_stock !== 'disponible' && !(estado_stock === 'a_consultar' && consultar);
 
   return (

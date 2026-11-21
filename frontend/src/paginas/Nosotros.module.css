@@ -18,7 +18,7 @@
   padding-inline: var(--gutter);
 }
 
-/* ============ CABECERA ============ */
+/* Cabecera */
 .cabecera {
   padding-top: var(--e-9);
   padding-bottom: var(--e-8);
@@ -80,7 +80,7 @@
   color: var(--crema-dim);
 }
 
-/* ============ LA CARATULA DEL CASSETTE ============
+/* La caratula del cassette
    La tarjeta de papel plegada que viene en la cajita: a la izquierda el lomo
    (lo que se lee en el estante) y a la derecha el frente con la lista de
    temas. Mismo papel que la etiqueta del cassette de la cabecera: crema,
@@ -214,7 +214,7 @@
   text-wrap: pretty;
 }
 
-/* ============ VISITA ============ */
+/* Visita */
 .visita {
   padding-bottom: var(--seccion);
   display: grid;
@@ -313,7 +313,7 @@
   background: var(--naranja);
 }
 
-/* ============ RESPONSIVE ============ */
+/* Responsive */
 @media (max-width: 860px) {
   .cabecera {
     grid-template-columns: 1fr;
@@ -368,7 +368,7 @@
   }
 }
 
-/* ============ ENTRADAS (data-visto, ver lib/useEnPantalla) ============ */
+/* ENTRADAS (data-visto, ver lib/useEnPantalla) */
 @keyframes sube {
   from {
     opacity: 0;
@@ -396,7 +396,7 @@
   }
 }
 
-/* --- caratula: el lomo aparece, el frente se despliega y despues los temas --- */
+/* Caratula: el lomo aparece, el frente se despliega y despues los temas */
 .caratula[data-entrada]:not([data-visto]) :is(.lomo, .frente, .tema) {
   opacity: 0;
 }
@@ -416,7 +416,7 @@
   }
 }
 
-/* --- visita: titulo y datos (globales .revela y .entra) y el horario --- */
+/* Visita: titulo y datos (globales .revela y .entra) y el horario */
 .visita[data-entrada]:not([data-visto]) .horario > div {
   opacity: 0;
 }

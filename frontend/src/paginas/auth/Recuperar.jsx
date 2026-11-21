@@ -1,6 +1,4 @@
-// Pedir el link para resetear la contraseña.
-// El backend contesta siempre lo mismo exista o no el mail, para no delatar
-// que cuentas estan registradas: la pantalla replica ese mensaje tal cual.
+// pedir el link para resetear la contraseña. El backend contesta siempre lo mismo exista o no el mail, y la pantalla lo replica
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';

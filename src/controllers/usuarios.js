@@ -1,5 +1,3 @@
-// traduce http a logica de negocio
-
 const usuariosService = require('../services/usuarios.service');
 const v = require('../utils/validar');
 
@@ -15,7 +13,6 @@ async function listar(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const b = req.body;
-    // los que no vienen quedan como estan (undefined); los que vienen se validan
     const datos = {
       nombre: b.nombre === undefined ? undefined : v.texto(b.nombre, 'nombre', { requerido: true, max: 60 }),
       apellido: b.apellido === undefined ? undefined : v.texto(b.apellido, 'apellido', { requerido: true, max: 60 }),

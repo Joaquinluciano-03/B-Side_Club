@@ -1,16 +1,13 @@
-// traduce http a logica de negocio
-
 const promocionService = require('../services/promocion.service');
 const v = require('../utils/validar');
 
-// Valida cada campo que vino. Con parcial (edicion) los que no vienen quedan
-// en undefined y no se tocan.
+// con parcial (edición) lo que no viene no se toca
 function datosDeLaPromocion(b, { parcial = false } = {}) {
   const si = (campo, fn) => (parcial && b[campo] === undefined ? undefined : fn(b[campo]));
   const datos = {
     titulo: si('titulo', (x) => v.texto(x, 'titulo', { requerido: true, max: 120 })),
     descripcion: si('descripcion', (x) => v.texto(x, 'descripcion', { max: 1000, multilinea: true })),
-    // el servicio solo acepta la que ya tenia o null (ver promocion.service)
+    // solo acepta la imagen que ya tenía o null
     imagenUrl: si('imagenUrl', (x) => v.texto(x, 'imagenUrl', { max: 500 })),
     fechaInicio: si('fechaInicio', (x) => v.fecha(x, 'fechaInicio')),
     fechaFin: si('fechaFin', (x) => v.fecha(x, 'fechaFin')),

@@ -1,17 +1,14 @@
-// traduce http a logica de negocio
-
 const productoService = require('../services/producto.service');
 const v = require('../utils/validar');
 
 const ESTADOS_STOCK = ['disponible', 'ultima_unidad', 'reservado', 'a_consultar', 'vendido'];
 const TIPOS_DESCUENTO = ['porcentaje', 'monto'];
 const SI_NO = ['true', 'false'];
-// como se puede ordenar el catalogo (ver ORDENES en producto.service)
+// ver ORDENES en producto.service
 const ORDENES = ['recientes', 'precio-asc', 'precio-desc', 'nombre'];
 const ANIO_MAX = () => new Date().getFullYear() + 1;
 
-// Valida cada campo que vino. Con parcial (edicion) los que no vienen quedan
-// en undefined y no se tocan; al crear, los obligatorios tienen que estar.
+// con parcial (edición) lo que no viene no se toca
 function datosDelProducto(b, { parcial = false } = {}) {
   const req = !parcial;
   const si = (campo, fn) => (parcial && b[campo] === undefined ? undefined : fn(b[campo]));
@@ -19,14 +16,14 @@ function datosDelProducto(b, { parcial = false } = {}) {
   const datos = {
     nombre: si('nombre', (x) => v.texto(x, 'nombre', { requerido: true, max: 160 })),
     anio: si('anio', (x) => v.entero(x, 'anio', { requerido: true, min: 1800, max: ANIO_MAX() })),
-    // vacio o null = "a consultar"
+    // vacío o null = a consultar
     precio: si('precio', (x) => v.decimal(x, 'precio', { min: 0, max: 1e9 })),
     descuento_tipo: si('descuento_tipo', (x) => v.opcion(x, 'descuento_tipo', TIPOS_DESCUENTO)),
     descuento_valor: si('descuento_valor', (x) => v.decimal(x, 'descuento_valor', { min: 0, max: 1e9 })),
     stock: si('stock', (x) => v.entero(x, 'stock', { requerido: true, min: 0, max: 100000 })),
     estado_stock: si('estado_stock', (x) => v.opcion(x, 'estado_stock', ESTADOS_STOCK, { requerido: parcial })),
     condicion: si('condicion', (x) => v.texto(x, 'condicion', { max: 60 })),
-    // de la lista de generos; vacio o null = sin genero
+    // vacío o null = sin género
     generoId: si('generoId', (x) => v.entero(x, 'generoId', { min: 1, max: 2147483647 })),
     destacado: v.booleano(b.destacado, 'destacado'),
     esActivo: v.booleano(b.esActivo, 'esActivo'),
@@ -34,7 +31,7 @@ function datosDelProducto(b, { parcial = false } = {}) {
     categoriaId: si('categoriaId', (x) => v.entero(x, 'categoriaId', { requerido: true, min: 1, max: 2147483647 })),
   };
 
-  // al crear, lo que no vino se completa con el valor por defecto del servicio
+  // lo que no vino toma el valor por defecto
   if (req) {
     if (datos.estado_stock === null) datos.estado_stock = undefined;
     if (datos.precio === null) datos.precio = undefined;
@@ -42,7 +39,7 @@ function datosDelProducto(b, { parcial = false } = {}) {
   return datos;
 }
 
-// donde se esta mirando: categoria, ofertas, busqueda (y activos, en el panel)
+// categoría, ofertas, búsqueda (y activos en el panel)
 function filtrosBase(q) {
   return {
     categoriaId: v.entero(q.categoriaId, 'categoriaId', { min: 1, max: 2147483647 }) ?? undefined,
@@ -53,7 +50,7 @@ function filtrosBase(q) {
   };
 }
 
-// los filtros del catalogo: genero, estado, disponibilidad, decada y precio
+// género, estado, disponibilidad, década y precio
 function filtrosCatalogo(q) {
   const decada = (x) => {
     const n = v.entero(x, 'decada', { min: 1900, max: 2100 });
@@ -92,7 +89,7 @@ async function listar(req, res, next) {
   }
 }
 
-// GET /productos/filtros: que filtros ofrecer para lo que se esta mirando
+// GET /productos/filtros: filtros para lo que se está mirando
 async function filtros(req, res, next) {
   try {
     const resultado = await productoService.filtrosDisponibles(filtrosBase(req.query), { esAdmin: Boolean(req.user) });
@@ -104,7 +101,7 @@ async function filtros(req, res, next) {
 
 async function obtener(req, res, next) {
   try {
-    // mismo criterio que listar: sin token sos visitante y solo ves activos
+    // sin token solo ves activos
     const producto = await productoService.obtenerPorId(v.id(req.params.id), {
       soloActivos: !req.user,
     });

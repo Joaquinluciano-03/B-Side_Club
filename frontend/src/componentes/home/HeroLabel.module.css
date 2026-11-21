@@ -17,7 +17,7 @@
   padding: var(--e-7) var(--gutter);
 }
 
-/* ============ EL LABEL ============ */
+/* El label */
 /* El label crea su propio contexto de apilamiento (isolation): adentro van,
    en este orden, el vinilo y su brillo (z -1), el papel naranja (::after,
    z -1 pero despues en el arbol, asi queda encima del vinilo) y lo impreso.
@@ -261,7 +261,7 @@
   text-transform: uppercase;
 }
 
-/* ============ EL CARTEL DE NEON ============
+/* El cartel de neon
    El nombre de la tienda como cartel de neon atornillado al label: una placa
    oscura (el neon necesita fondo oscuro para leerse sobre el naranja) con
    tubos rosa y cian, como el logo. La luz de los tubos se derrama sobre el
@@ -363,7 +363,7 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
-/* ============ TRACKLIST ============ */
+/* Tracklist */
 .tracklist {
   --fila: 4.7cqw;
   position: relative;
@@ -476,7 +476,7 @@
   background: var(--tinta-sobre-naranja);
 }
 
-/* ============ ENTRADA DEL HERO ============
+/* Entrada del hero
    Al cargar: el label aparece desde un poco mas chico, lo impreso entra
    escalonado (60ms), los temas de la tracklist llegan uno tras otro y la pua
    entra desde afuera hasta A1. Total ~1.2s y todo con ease-out fuerte. */
@@ -528,7 +528,7 @@
   animation: pua-entra 600ms var(--ease-out) 900ms both;
 }
 
-/* ============ BUSCADOR ============ */
+/* Buscador */
 /* impreso debajo del cartel y del mismo largo (ver .cartel) */
 .buscador {
   height: max(44px, 6.4cqw);
@@ -592,7 +592,7 @@
   display: none;
 }
 
-/* ============ PANTALLAS MEDIANAS ============ */
+/* Pantallas medianas */
 /* el label se achica un poco para que entre entero */
 @media (max-width: 1180px) {
   .hero {
@@ -603,8 +603,8 @@
   }
 }
 
-/* ============ MOBILE ============ */
-/* ============ TRACKLIST COMO CONTRATAPA ============
+/* Mobile */
+/* Tracklist como contratapa
    En el celular y en tablets tactiles la lista sale del label: adentro queda
    chica para tocarla con el dedo (filas de 26px). Con mouse, en pantallas
    anchas, sigue impresa en el label. */

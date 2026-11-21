@@ -1,7 +1,4 @@
-// Dashboard: el mostrador del local. Arriba lo urgente (consultas sin
-// responder, con digitos tipo tubo nixie), los accesos de todos los dias y
-// las cifras del catalogo. Todo sale de GET /api/dashboard/metricas y
-// GET /api/consultas: no se muestran metricas que el backend no tiene.
+// dashboard: arriba lo urgente (consultas sin responder), los accesos de todos los días y las cifras del catálogo, desde /dashboard/metricas y /consultas
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -21,7 +18,7 @@ const CIFRAS = [
   { k: 'totalUsuarios', label: 'En el equipo', a: '/panel/usuarios', soloAdmin: true },
 ];
 
-// cada digito en su "tubo": siempre al menos dos, como un contador fisico
+// cada dígito en su "tubo": siempre al menos dos
 function Nixie({ valor }) {
   const digitos = String(valor).padStart(2, '0').split('');
   return (
@@ -52,7 +49,7 @@ export default function Dashboard() {
       .catch((err) => setError(mensajeDeError(err)));
   }, [intento]);
 
-  // sin responder = sin leer + leidas: todo lo que todavia hay que contestar
+  // sin responder = sin leer + leídas
   const pendientes = metricas?.consultasSinResponder ?? metricas?.consultasPendientes ?? 0;
 
   return (

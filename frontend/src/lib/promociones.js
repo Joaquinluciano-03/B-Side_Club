@@ -1,18 +1,6 @@
-// Vigencia de una promocion.
-//
-// OJO: el backend solo filtra por el campo "activa"; NO mira fechaInicio ni
-// fechaFin. O sea que una promo encendida pero con la fecha de fin ya pasada
-// sigue viniendo en GET /promociones. Por eso el filtro de ventana temporal
-// lo hace el frontend, acá, y lo usan tanto la banda publica como el panel.
-
-// Estas fechas son DIAS DE CALENDARIO, no instantes: "hasta el 30" significa
-// hasta que termine el 30 acá, en el local.
-//
-// El problema es que se guardan como medianoche UTC de ese día (el backend
-// hace new Date("2026-06-30")), y Argentina está en UTC-3. Si comparáramos
-// contra el instante guardado, una promo "hasta el 30" se apagaría el 29 a
-// las 21:00. Por eso sacamos el día en UTC —que es el que la persona
-// eligió— y lo reconstruimos en hora local.
+// vigencia de una promoción. El backend solo filtra por "activa" y no mira las fechas, así que la ventana de fechas se filtra acá.
+// Son días de calendario: se guardan como medianoche UTC y en Argentina (UTC-3) una promo "hasta el 30" se apagaría el 29 a las 21:00.
+// Por eso se saca el día en UTC y se reconstruye en hora local
 function diaLocal(valor, finDelDia) {
   if (!valor) return null;
   const d = new Date(valor);

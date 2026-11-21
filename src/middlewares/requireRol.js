@@ -1,5 +1,4 @@
-// verifica que el usuario autenticado tenga uno de los roles permitidos
-// se usa despues de requireAuth (necesita req.user ya seteado)
+// verifica que el usuario tenga uno de los roles permitidos (va después de requireAuth)
 
 function requireRol(...rolesPermitidos) {
   return (req, res, next) => {

@@ -1,18 +1,11 @@
-// Vista previa del mail de invitación, tal como lo diseña la demo.
-//
-// Sirve para algo concreto: cuando el backend no tiene SMTP configurado el
-// mail no se manda, se imprime en su consola. Esta pantalla es la unica forma
-// de ver qué recibe la persona invitada.
-//
-// OJO: esto es un ESPEJO de la plantilla real, que vive en
-// src/config/mailer.js (el backend es quien manda el mail). Si cambia una,
-// hay que cambiar la otra.
+// vista previa del mail de invitación. Es espejo de la plantilla real (src/config/mailer.js): si cambia una, cambiar la otra.
+// Sirve para ver qué recibe la persona invitada cuando no hay SMTP
 
 import Modal from './Modal';
 import { useDatosDelLocal, partirNombre } from '../lib/useStoreInfo';
 
 export default function ModalPlantillaEmail({ abierto, onCerrar, invitadoPor, email, link }) {
-  // nombre y zona del local salen de la base, igual que en el mail real
+  // nombre y zona del local salen de la base
   const { nombre, zona } = useDatosDelLocal();
   const { resto, ultima } = partirNombre(nombre);
   const linkMuestra = link || `${window.location.origin}/aceptar-invitacion?token=…`;

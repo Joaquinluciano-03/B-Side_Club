@@ -1,10 +1,8 @@
-// handler central de errores: cualquier error que llegue con next(err) termina aca,
-// en vez de tirar abajo el servidor o devolver HTML de error por defecto de express.
+// handler central de errores (todo lo que llega con next(err))
 
 const multer = require('multer');
 
-// multer no usa nuestra convencion de .status, tira sus propios errores con
-// un .code. Los traducimos a mensajes utiles en vez de dejarlos caer como 500.
+// multer lanza errores con .code; se traducen a mensajes útiles
 const ERRORES_MULTER = {
   LIMIT_FILE_SIZE: 'La imagen supera el maximo de 5 MB',
   LIMIT_FILE_COUNT: 'Se pueden subir hasta 5 imagenes por vez',
@@ -22,11 +20,8 @@ function errorHandler(err, req, res, next) {
 
   const status = err.status || 500;
 
-  // Los errores que nosotros lanzamos traen .status y un mensaje pensado para
-  // el usuario, asi que se devuelven tal cual. Los que NO traen status son
-  // inesperados (Prisma, bugs nuestros) y su mensaje puede incluir detalles
-  // del schema o de la conexion: esos se reemplazan por un texto generico y
-  // el detalle real queda solo en el log del servidor.
+  // los errores con .status se devuelven tal cual; el resto es inesperado y se reemplaza
+  // por un texto genérico (el detalle queda solo en el log)
   const mensaje = err.status ? err.message : 'Error interno del servidor';
 
   res.status(status).json({ error: mensaje });

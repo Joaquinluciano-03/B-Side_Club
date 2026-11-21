@@ -1,16 +1,11 @@
-// La info del local (nombre, direccion, contacto, horario) sale de la base:
-// GET /api/store-info, que el panel edita en "Info del local". Todo lo que el
-// sitio muestra del local tiene que salir de aca, nunca escrito a mano en el
-// front: si el local cambia de barrio o de nombre, cambia en toda la web.
-//
-// Se cachea en memoria (es una fila sola que casi nunca cambia) y ademas se
-// guarda en el navegador, asi en la siguiente visita el nombre y el barrio
-// aparecen bien desde el primer cuadro, sin esperar a la API.
+// info del local (nombre, dirección, contacto, horario) desde GET /api/store-info; el panel la edita.
+// Todo lo que el sitio muestre del local sale de acá, nunca escrito a mano.
+// Se cachea en memoria y en el navegador, así el nombre aparece desde el primer cuadro
 
 import { useEffect, useState } from 'react';
 import { get } from './api';
 
-// solo mientras la base no respondio nunca en este navegador (o si falla)
+// solo si la base nunca respondió en este navegador (o falla)
 export const NOMBRE_POR_DEFECTO = 'B-Side Club';
 const CLAVE_GUARDADA = 'bsc_info_local';
 
@@ -32,7 +27,7 @@ function guardar(info) {
   try {
     localStorage.setItem(CLAVE_GUARDADA, JSON.stringify(info));
   } catch {
-    // modo privado o almacenamiento lleno: no pasa nada, se usa la de memoria
+    // modo privado o almacenamiento lleno: se usa la de memoria
   }
 }
 
@@ -54,7 +49,7 @@ function traer() {
   return enVuelo;
 }
 
-// la usa el panel despues de guardar, para que el footer muestre lo nuevo
+// el panel la usa después de guardar, para que el footer muestre lo nuevo
 export function invalidarStoreInfo(nueva) {
   cache = nueva || null;
   if (nueva) guardar(nueva);
@@ -76,11 +71,8 @@ export function useStoreInfo() {
 }
 
 /**
- * Los datos del local ya listos para mostrar, derivados de la base.
- * La direccion se carga como "Calle 123, Barrio, Ciudad":
- *   barrio -> "Barrio"            (para "disqueria en ...")
- *   zona   -> "Barrio, Ciudad"    (todo lo que va despues de la calle)
- *   ciudad -> "Ciudad"            (si la direccion la trae)
+ * Datos del local listos para mostrar. La dirección se carga como "Calle 123, Barrio, Ciudad":
+ *   barrio -> "Barrio", zona -> "Barrio, Ciudad", ciudad -> "Ciudad"
  */
 export function datosDelLocal(info) {
   const partes = String(info?.direccion || '')

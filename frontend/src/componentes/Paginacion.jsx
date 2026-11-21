@@ -1,4 +1,4 @@
-// Paginacion: anterior / ventana de 5 paginas / siguiente.
+// anterior / ventana de 5 páginas / siguiente
 
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import estilos from './Paginacion.module.css';
@@ -6,7 +6,7 @@ import estilos from './Paginacion.module.css';
 export default function Paginacion({ pagina, totalPaginas, onCambiar }) {
   if (totalPaginas <= 1) return null;
 
-  // ventana de paginas alrededor de la actual, para no imprimir 30 botones
+  // ventana alrededor de la actual
   const desde = Math.max(1, Math.min(pagina - 2, totalPaginas - 4));
   const hasta = Math.min(totalPaginas, desde + 4);
   const paginas = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);

@@ -1,11 +1,8 @@
-// valida la API key interna que el frontend manda en el header x-api-key.
-// es una capa previa al JWT: filtra pedidos de clientes que no son nuestro frontend,
-// pero NO identifica usuarios (de eso se sigue encargando requireAuth).
+// valida la API key que el frontend manda en x-api-key. No identifica usuarios (eso lo hace requireAuth)
 
 const crypto = require('crypto');
 
-// compara en tiempo constante para no filtrar info por cuanto tarda la comparacion.
-// timingSafeEqual explota si los buffers miden distinto, por eso chequeamos el largo antes.
+// comparación en tiempo constante; timingSafeEqual falla si los largos difieren, por eso se chequea antes
 function comparacionSegura(recibida, esperada) {
   const bufferRecibida = Buffer.from(recibida);
   const bufferEsperada = Buffer.from(esperada);
@@ -20,8 +17,7 @@ function comparacionSegura(recibida, esperada) {
 function requireApiKey(req, res, next) {
   const apiKeyEsperada = process.env.API_KEY;
 
-  // sin API_KEY configurada rechazamos todo: si dejaramos pasar los pedidos,
-  // un .env mal armado desactivaria la proteccion sin que nadie se entere.
+  // sin API_KEY configurada se rechaza todo: un .env mal armado no debe dejar la API abierta
   if (!apiKeyEsperada) {
     return res.status(500).json({ error: 'API key no configurada en el servidor' });
   }

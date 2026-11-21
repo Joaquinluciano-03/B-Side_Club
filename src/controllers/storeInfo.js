@@ -1,5 +1,3 @@
-// traduce http a logica de negocio
-
 const storeInfoService = require('../services/storeInfo.service');
 const v = require('../utils/validar');
 
@@ -17,8 +15,7 @@ async function actualizar(req, res, next) {
     const b = req.body;
     if (b.horario === undefined) throw v.error400('Falta el campo "horario".');
 
-    // lo que se carga aca se muestra en toda la web publica (header, footer,
-    // contacto, mails), asi que pasa por la misma limpieza que el resto
+    // se muestra en toda la web pública, así que se limpia igual que el resto
     const info = await storeInfoService.actualizar({
       nombre: v.texto(b.nombre, 'nombre', { requerido: true, max: 60 }),
       direccion: v.texto(b.direccion, 'direccion', { requerido: true, max: 160 }),

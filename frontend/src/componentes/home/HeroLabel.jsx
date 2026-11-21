@@ -1,8 +1,4 @@
-// Primer viewport de la Home: el label central de un vinilo gigante.
-// La tracklist del label es el indice de la Home: cada tema lleva a una
-// seccion (A = los discos, B = el local), y al pasar por un tema "baja la
-// pua" hasta esa fila. Arriba del label, el cartel de abierto/cerrado con el
-// horario de hoy. El buscador lleva al catalogo con la busqueda hecha.
+// primer pantallazo de la Home: el label de un vinilo gigante. La tracklist es el índice de la Home (A = discos, B = local)
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,9 +12,7 @@ import Neon from '../Neon';
 import CartelAbierto from '../CartelAbierto';
 import estilos from './HeroLabel.module.css';
 
-// Lleva a una seccion de la Home deslizando, y la deja justo debajo del
-// header (que queda pegado arriba). El foco pasa a la seccion: con teclado o
-// lector de pantalla se sigue leyendo desde ahi.
+// desliza a una sección de la Home dejándola bajo el header y le pasa el foco
 function irASeccion(evento, id) {
   const seccion = document.getElementById(id);
   if (!seccion) return;
@@ -37,7 +31,7 @@ function Tracklist({ temas, className }) {
       <span className={estilos.pua} aria-hidden="true" />
       <ol>
         {temas.map((t, i) => (
-          // --n escalona la entrada de cada tema (ver HeroLabel.module.css)
+          // --n escalona la entrada de cada tema
           <li key={t.lado} style={{ '--n': i }}>
             {t.id ? (
               <a
@@ -55,8 +49,7 @@ function Tracklist({ temas, className }) {
                 </span>
               </a>
             ) : (
-              // fila de relleno mientras se sabe si hay novedades: misma
-              // altura, asi la tracklist no salta cuando aparecen
+              // fila de relleno mientras se sabe si hay novedades, para que la tracklist no salte
               <span className={`${estilos.tema} ${estilos.temaCargando}`} aria-hidden="true">
                 <span className={estilos.lado}>{t.lado}</span>
                 <span className={estilos.barra} />
@@ -72,18 +65,17 @@ function Tracklist({ temas, className }) {
 
 export default function HeroLabel() {
   const navigate = useNavigate();
-  // todo lo impreso en el label sale de la base (Info del local y categorias)
+  // lo impreso en el label sale de la base
   const { info, nombre, zona: barrio } = useDatosDelLocal();
   const promos = usePromocionesVigentes();
   const [busqueda, setBusqueda] = useState('');
 
   const hoy = horarioDeHoy(info?.horario);
 
-  // el tamaño se ajusta al largo del nombre para que entre en el label
+  // el tamaño se ajusta al largo del nombre
   const tamTitulo = `${Math.min(11.2, 78 / (nombre.length * 0.78)).toFixed(2)}cqw`;
 
-  // los temas son las secciones de la Home, en orden. Novedades solo si hay
-  // alguna promocion vigente (mientras se sabe, una fila de relleno)
+  // los temas son las secciones de la Home; Novedades solo si hay promo vigente
   const ladoA = [
     ...(promos === null ? [{ cargando: true }] : promos.length ? [{ id: 'novedades', nombre: 'Novedades' }] : []),
     { id: 'destacados', nombre: 'Destacados' },
@@ -104,11 +96,7 @@ export default function HeroLabel() {
     navigate(`/catalogo${query({ q })}`);
   }
 
-  // Las animaciones del hero (el disco, la luz del cartel, el tubo flojo)
-  // siguen aunque el hero no se vea: son todas de las que van en la GPU y
-  // fuera de pantalla casi no cuestan. Antes se pausaban al salir, pero
-  // pausar y reanudar todo el hero de golpe rearmaba sus capas grandes y
-  // trababa el scroll justo donde Novedades pasa bajo el header.
+  // las animaciones siguen aunque el hero no se vea: pausarlas y reanudarlas trababa el scroll
   return (
     <section className={estilos.hero} aria-labelledby="hero-titulo" data-oscuro>
       <div className={estilos.label}>

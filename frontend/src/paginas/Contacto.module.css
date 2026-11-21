@@ -13,7 +13,7 @@
   align-items: start;
 }
 
-/* ============ LADO IZQUIERDO ============ */
+/* Lado izquierdo */
 .titulo {
   margin: 0;
   font-family: var(--display);
@@ -125,7 +125,7 @@
   color: var(--naranja);
 }
 
-/* ============ FORMULARIO ============ */
+/* Formulario */
 .formulario {
   background: var(--superficie);
   border: 1px solid var(--borde);
@@ -191,7 +191,7 @@
   color: var(--tinta-tenue);
 }
 
-/* ============ ENVIADO ============ */
+/* Enviado */
 .enviado {
   max-width: 560px;
   margin: var(--e-6) auto 0;

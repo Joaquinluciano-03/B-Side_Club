@@ -67,7 +67,7 @@
   }
 }
 
-/* ---- flechas, lupa y contador sobre la foto ---- */
+/* Flechas, lupa y contador sobre la foto */
 .flecha,
 .lupa {
   position: absolute;
@@ -148,7 +148,7 @@
   pointer-events: none;
 }
 
-/* ---- miniaturas: una tira que se desliza si no entran ---- */
+/* Miniaturas: una tira que se desliza si no entran */
 .miniaturas {
   display: flex;
   gap: var(--e-2);
@@ -196,7 +196,7 @@
   color: var(--tinta-tenue);
 }
 
-/* ---- la vista grande ---- */
+/* La vista grande */
 .grande {
   width: 100vw;
   height: 100dvh;

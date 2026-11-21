@@ -14,7 +14,7 @@
   outline-offset: 6px;
 }
 
-/* ============ LA FUNDA Y EL DISCO ============ */
+/* La funda y el disco */
 /* la funda ocupa el 88% del ancho: el 12% de la derecha es donde asoma el disco */
 .arte {
   position: relative;
@@ -54,7 +54,7 @@
   transform: translateY(-2px) rotate(-1deg) scale(0.985);
 }
 
-/* ============ STICKER DE ESTADO ============ */
+/* Sticker de estado */
 /* "Ultima unidad", "Reservado", "Vendido": pegado en la esquina de la tapa,
    como el precio marcado en una batea. Viaja con la funda al sacar el disco */
 .stickers {
@@ -73,7 +73,7 @@
   rotate: -2deg;
 }
 
-/* ============ TEXTO ============ */
+/* Texto */
 /* La card ocupa todo el alto de su celda (la grilla estira las de una fila
    al alto de la mas alta) y el precio va al pie: asi queda alineado en toda
    la fila. El bloque termina donde termina la funda (88% del ancho): el 12%

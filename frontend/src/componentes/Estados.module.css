@@ -1,4 +1,4 @@
-/* ---- skeleton con la forma de la card ---- */
+/* Skeleton con la forma de la card */
 .skelCard {
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@
   padding-right: 12%;
 }
 
-/* ---- vacio y error ---- */
+/* Vacio y error */
 .vacio {
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
   justify-content: center;
 }
 
-/* ---- cargando ---- */
+/* Cargando */
 .cargando {
   display: flex;
   align-items: center;

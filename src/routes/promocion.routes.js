@@ -1,5 +1,3 @@
-// mapea urls a funciones del controller
-
 const { Router } = require('express');
 const promocionController = require('../controllers/promocion');
 const { requireAuth, authOpcional } = require('../middlewares/auth');
@@ -11,13 +9,12 @@ const router = Router();
 
 const rolesGestion = ['super_admin', 'administrador', 'vendedor'];
 
-// authOpcional: sin token sos visitante y solo ves las activas; con token
-// (panel) las ves todas, que es lo que hace falta para poder reactivarlas
+// sin token solo ves las activas; con token (panel) ves todas
 router.get('/', authOpcional, promocionController.listar);
 router.get('/:id', authOpcional, promocionController.obtener);
 router.post('/', requireAuth, requireRol(...rolesGestion), promocionController.crear);
 router.put('/:id', requireAuth, requireRol(...rolesGestion), promocionController.actualizar);
-// una sola imagen por promocion, en el campo "imagen" (multipart/form-data)
+// una imagen por promoción, campo "imagen"
 router.post(
   '/:id/imagen',
   requireAuth,

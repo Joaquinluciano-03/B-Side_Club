@@ -1,5 +1,3 @@
-//logica de negocio (bcrypt + jwt)
-
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -10,19 +8,15 @@ const { passwordSinDatosPersonales } = require('../utils/validar');
 const MINUTOS_EXPIRACION_RESET = 30;
 const COSTO_BCRYPT = 10;
 
-// Hash con el que se compara cuando el mail no existe: asi el login tarda lo
-// mismo exista o no la cuenta, y no se puede averiguar que mails estan
-// registrados midiendo cuanto tarda la respuesta.
+// hash de relleno: el login tarda lo mismo exista o no el mail
 const HASH_DE_RELLENO = bcrypt.hashSync('relleno-para-igualar-tiempos', COSTO_BCRYPT);
 
-// Los tokens de un solo uso (recuperar contraseña, invitaciones) se guardan
-// hasheados: el link lleva el token, la base solo su huella. Si alguien
-// llegara a leer la base, no podria usarlos.
+// los tokens de un solo uso se guardan hasheados: el link lleva el token y la base solo su huella
 function huella(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
-// datos del usuario que es seguro devolver (sin el passwordhash)
+// datos seguros de devolver (sin el hash)
 function datosPublicos(user) {
   return {
     id: user.id,
@@ -34,8 +28,7 @@ function datosPublicos(user) {
   };
 }
 
-// "v" es la version de las credenciales: al cambiar la contraseña sube y los
-// tokens firmados antes dejan de servir (lo chequea middlewares/auth.js)
+// v = versión de las credenciales: al cambiar la contraseña sube y los tokens anteriores dejan de servir
 function firmarToken(user) {
   return jwt.sign(
     { id: user.id, rol: user.rol, v: user.tokenVersion ?? 0 },
@@ -45,8 +38,7 @@ function firmarToken(user) {
 }
 
 async function register({ nombre, apellido, mail, telefono, password }) {
-  // el registro solo sirve para crear al super_admin (dueño del local), una unica vez.
-  // cualquier otro usuario se suma despues por invitacion, no por aca.
+  // el registro solo crea al super_admin, una vez; el resto entra por invitación
   const yaHaySuperAdmin = await prisma.user.findFirst({ where: { rol: 'super_admin' } });
   if (yaHaySuperAdmin) {
     const error = new Error('Ya existe un administrador registrado. Pedile una invitacion a alguien del equipo.');
@@ -88,9 +80,7 @@ async function actualizarMe(userId, { nombre, apellido, mail, telefono, password
     throw error;
   }
 
-  // cambiar la contraseña o el mail (con el que se recupera la cuenta) pide la
-  // contraseña de ahora: si no, con una sesion abierta ajena o un token
-  // robado alguien podia quedarse con la cuenta
+  // para cambiar contraseña o mail hace falta la contraseña actual
   const cambiaMail = mail && mail !== actual.mail;
   if (password || cambiaMail) {
     const ok = passwordActual && (await bcrypt.compare(passwordActual, actual.passwordhash));
@@ -121,20 +111,19 @@ async function actualizarMe(userId, { nombre, apellido, mail, telefono, password
   const data = { nombre, apellido, mail, telefono };
   if (password) {
     data.passwordhash = await bcrypt.hash(password, COSTO_BCRYPT);
-    // cambiar la contraseña cierra las sesiones de los otros dispositivos
+    // cambiar la contraseña cierra las otras sesiones
     data.tokenVersion = { increment: 1 };
   }
 
   const user = await prisma.user.update({ where: { id: userId }, data });
-  // con contraseña nueva el token actual tambien quedo viejo: se devuelve uno
-  // nuevo para que este dispositivo siga con la sesion abierta
+  // se devuelve un token nuevo para que este dispositivo siga logueado
   return { ...datosPublicos(user), ...(password && { token: firmarToken(user) }) };
 }
 
 async function login({ mail, password }) {
   const user = await prisma.user.findUnique({ where: { mail } });
 
-  // se compara igual aunque el usuario no exista (ver HASH_DE_RELLENO)
+  // se compara igual aunque no exista (ver HASH_DE_RELLENO)
   const passwordValida = await bcrypt.compare(password, user?.passwordhash || HASH_DE_RELLENO);
 
   if (!user || !passwordValida) {
@@ -149,8 +138,7 @@ async function login({ mail, password }) {
 async function forgotPassword(mail) {
   const user = await prisma.user.findUnique({ where: { mail } });
 
-  // si el mail no existe no avisamos nada distinto: evita que alguien
-  // pueda usar este endpoint para averiguar que mails estan registrados.
+  // no se avisa si el mail no existe, para no revelar qué mails están registrados
   if (!user) return;
 
   const token = crypto.randomBytes(32).toString('hex');
@@ -191,12 +179,12 @@ async function resetPassword({ token, password }) {
   const passwordhash = await bcrypt.hash(password, COSTO_BCRYPT);
 
   await prisma.$transaction([
-    // contraseña nueva: se cierran todas las sesiones abiertas
+    // contraseña nueva: se cierran todas las sesiones
     prisma.user.update({
       where: { id: resetToken.userId },
       data: { passwordhash, tokenVersion: { increment: 1 } },
     }),
-    // este link y cualquier otro pedido anterior del mismo usuario quedan usados
+    // este link y los anteriores del usuario quedan usados
     prisma.passwordResetToken.updateMany({
       where: { userId: resetToken.userId, usado: false },
       data: { usado: true },

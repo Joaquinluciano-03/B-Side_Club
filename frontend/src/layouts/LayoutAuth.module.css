@@ -5,7 +5,7 @@
   background: var(--humo);
 }
 
-/* ============ EL DISCO (izquierda) ============ */
+/* EL DISCO (izquierda) */
 .disco {
   position: relative;
   overflow: hidden;
@@ -83,7 +83,7 @@
   color: var(--tinta-sobre-naranja);
 }
 
-/* ============ FORMULARIO (derecha) ============ */
+/* FORMULARIO (derecha) */
 .lado {
   display: flex;
   align-items: center;
@@ -176,7 +176,7 @@
   }
 }
 
-/* ============ ENTRADA Y GIRO ============
+/* Entrada y giro
    El disco baja sobre el plato y gira despacio, el label aparece encima */
 @keyframes auth-gira {
   to {

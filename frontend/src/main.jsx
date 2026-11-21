@@ -4,19 +4,14 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
-// Fuentes autohospedadas (antes venian de Google Fonts con un <link> que
-// frenaba el primer render). Archivo va en su version variable con eje de
-// ancho (wdth), asi se puede usar condensada o expandida sin cargar otra fuente.
+// fuentes autohospedadas. Archivo es variable con eje de ancho (wdth)
 import '@fontsource/bungee/latin.css';
-// Bungee Outline: el contorno de Bungee, para el cartel de neon del hero (cada
-// trazo se lee como un tubo de vidrio). Se usa solo ahi.
+// Bungee Outline: el contorno del cartel de neón del hero
 import '@fontsource/bungee-outline/latin.css';
-// Bungee Hairline: la de un solo trazo, para el cartel de abierto/cerrado
-// (cada letra es un tubo continuo, sin la doble linea del Outline)
+// Bungee Hairline: un solo trazo, para el cartel de abierto/cerrado
 import '@fontsource/bungee-hairline/latin.css';
 import '@fontsource-variable/archivo/wdth.css';
-// Martian Mono: la mono de la meta (catalogo, años, estados). Tambien variable,
-// con eje de ancho: se usa un poco angosta (font-stretch 87.5%) en etiquetas.
+// Martian Mono: la mono de la meta, variable con eje de ancho (font-stretch 87.5% en etiquetas)
 import '@fontsource-variable/martian-mono/wdth.css';
 import './estilos/tokens.css';
 import './estilos/global.css';

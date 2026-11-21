@@ -1,10 +1,5 @@
-// Categorias: alta, edicion y baja en la misma pantalla (son pocas y cortas,
-// no justifican una ruta aparte).
-// El backend rechaza con 409 borrar una categoria que tenga productos.
-// Cada categoria lleva un icono (SelectorIcono). Al crearla se sugiere uno
-// segun el nombre que se va escribiendo, hasta que se elige otro a mano.
-// Tambien la unidad con que se cuentan sus productos en el sitio ("4 equipos");
-// vacia = "títulos".
+// categorías: alta, edición y baja en la misma pantalla. El backend rechaza con 409 borrar una con productos.
+// Cada una lleva icono (se sugiere según el nombre hasta que se elige uno a mano) y la unidad con que se cuentan sus productos (vacía = "títulos")
 
 import { useEffect, useState } from 'react';
 import { get, post, put, del } from '../../lib/api';
@@ -26,10 +21,10 @@ export default function Categorias() {
   const [editando, setEditando] = useState(null); // null | 'nueva' | id
   const VACIO = { nombre: '', descripcion: '', icono: null, singular: '', plural: '' };
   const [form, setForm] = useState(VACIO);
-  // true cuando el plural lo escribio la persona: desde ahi el singular ya no lo sugiere
+  // true cuando el plural lo escribió la persona: el singular ya no lo sugiere
   const [pluralEscrito, setPluralEscrito] = useState(false);
   const [errorUnidad, setErrorUnidad] = useState(null);
-  // true cuando el icono lo eligio la persona: desde ahi el nombre ya no lo cambia
+  // true cuando el icono lo eligió la persona: el nombre ya no lo cambia
   const [iconoElegido, setIconoElegido] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [aBorrar, setABorrar] = useState(null);
@@ -95,7 +90,7 @@ export default function Categorias() {
         await put(`/categorias/${editando}`, cuerpo);
         toast.exito('Cambios guardados.');
       }
-      // el sitio tiene las categorias en memoria: asi se ve el cambio al volver
+      // el sitio tiene las categorías en memoria: así se ve el cambio al volver
       olvidarConteos();
 
       setEditando(null);
@@ -116,8 +111,7 @@ export default function Categorias() {
       toast.exito(`"${c.nombre}" se eliminó.`);
       setRecargar((r) => r + 1);
     } catch (err) {
-      // El 409 explica qué hacer (mover los productos primero), así que se
-      // queda fijo en pantalla; un toast se iría antes de terminar de leerlo.
+      // el 409 explica qué hacer, así que queda fijo; un toast se iría antes de leerlo
       if (err.status === 409) {
         setAviso({
           tipo: 'error',

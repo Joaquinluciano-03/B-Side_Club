@@ -1,8 +1,4 @@
-// Los filtros del catalogo (ademas de categoria, busqueda y ofertas): genero,
-// estado del ejemplar, disponibilidad, decada y rango de precio. Viven en la
-// URL, asi un filtro se comparte con un link y el boton Atras lo deshace:
-//   ?genero=Rock%20nacional,Tango&decada=1970&precioMax=100000
-// Los de varios valores van separados por coma.
+// filtros del catálogo (género, estado, disponibilidad, década, precio). Viven en la URL: ?genero=Rock,Tango&decada=1970&precioMax=100000
 
 import { etiquetaStock, formatearPrecio } from './formato';
 

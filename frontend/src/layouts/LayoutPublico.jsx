@@ -6,16 +6,11 @@ import CartelAbierto from '../componentes/CartelAbierto';
 import { activarScrollSuave } from '../lib/scrollSuave';
 import { useDatosDelLocal } from '../lib/useStoreInfo';
 
-// Cada pagina trae su propia entrada (cascada, hero, tapa...). No hay un
-// fundido general: con el fondo gris de .pagina, un hero oscuro que se funde
-// se veia lavado los primeros cuadros.
+// cada página trae su propia entrada; no hay un fundido general porque el hero oscuro se veía lavado
 //
-// Las paginas (salvo la home) se bajan aparte (ver App.jsx). Si alguna
-// todavia no llego, el Suspense deja el header y el footer en su lugar y
-// reserva el alto de la pantalla, asi nada salta cuando aparece.
+// las páginas (salvo la home) se bajan aparte: el Suspense deja header y footer en su lugar y reserva el alto
 export default function LayoutPublico() {
-  // la rueda del mouse se desliza suave en todo el sitio publico (el panel
-  // no lo usa: es una herramienta)
+  // scroll suave con la rueda en el sitio público (el panel no lo usa)
   useEffect(() => activarScrollSuave(), []);
   const { info } = useDatosDelLocal();
 

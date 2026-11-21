@@ -1,7 +1,4 @@
-// La lista de generos musicales (va en Panel > Categorias). Los productos
-// eligen su genero de esta lista, asi todos se escriben igual y el filtro del
-// catalogo no repite opciones. Un genero solo se borra si ningun producto lo
-// usa: el backend lo vuelve a chequear y contesta 409 si hiciera falta.
+// lista de géneros musicales (en Panel > Categorías). Un género solo se borra si ningún producto lo usa (si no, 409)
 
 import { useEffect, useState } from 'react';
 import { get, post, del } from '../../lib/api';
@@ -43,7 +40,7 @@ export default function SeccionGeneros() {
       setNuevo('');
       setRecargar((r) => r + 1);
     } catch (err) {
-      // el 409 de "ya existe" queda junto al campo, que es donde se corrige
+      // el 409 de "ya existe" queda junto al campo
       setErrorNuevo(mensajeDeError(err));
     } finally {
       setGuardando(false);

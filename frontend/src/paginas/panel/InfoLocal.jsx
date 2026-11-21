@@ -1,7 +1,4 @@
-// Datos del local. PUT /api/store-info hace upsert sobre la fila unica (id=1).
-// El horario es un campo Json en la base; aca se edita como filas
-// "etiqueta / horario" para no obligar a nadie a escribir JSON a mano, y se
-// guarda siempre como arreglo [{ label, value }] (ver lib/horario.js).
+// datos del local (PUT /api/store-info, fila única id=1). El horario se edita como filas "etiqueta / horario" y se guarda como arreglo [{ label, value }] (lib/horario.js)
 
 import { useEffect, useState } from 'react';
 import { get, put } from '../../lib/api';
@@ -14,7 +11,7 @@ import { normalizarHorario } from '../../lib/horario';
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-// cada fila lleva un id propio para que React no confunda filas al borrar una
+// cada fila lleva un id propio para que React no las confunda al borrar
 let proximoId = 1;
 const nuevaFila = (label = '', value = '') => ({ id: proximoId++, label, value });
 
@@ -56,13 +53,12 @@ export default function InfoLocal() {
           whatsapp: info?.whatsapp ?? '',
           description: info?.description ?? '',
         });
-        // el horario puede venir null, como arreglo o con la forma vieja de
-        // objeto: normalizarHorario lo deja siempre como arreglo
+        // el horario puede venir null, como arreglo o con la forma vieja: normalizarHorario lo deja siempre como arreglo
         const filas = normalizarHorario(info?.horario).map((f) => nuevaFila(f.label, f.value));
         setHorario(filas.length ? filas : DIAS.map((d) => nuevaFila(d)));
       })
       .catch(() => {
-        // todavia no hay fila cargada: arrancamos con el formulario vacio
+        // todavía no hay fila: formulario vacío
         setHorario(DIAS.map((d) => nuevaFila(d)));
         setForm({
           nombre: '',
@@ -94,7 +90,7 @@ export default function InfoLocal() {
     setErrores(e);
     if (Object.keys(e).length) return;
 
-    // sacamos las filas incompletas para no guardar basura en el Json
+    // se sacan las filas incompletas
     const horarioLimpio = horario
       .map((f) => ({ label: f.label.trim(), value: f.value.trim() }))
       .filter((f) => f.label && f.value);
@@ -111,7 +107,7 @@ export default function InfoLocal() {
         description: form.description.trim() || null,
         horario: horarioLimpio,
       });
-      // el footer y las paginas publicas tienen la info cacheada: la refrescamos
+      // el footer y las páginas públicas tienen la info cacheada: se refresca
       invalidarStoreInfo(guardada);
       toast.exito('Datos actualizados. Ya se ven en el sitio público.');
     } catch (err) {

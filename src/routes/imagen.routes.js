@@ -1,5 +1,3 @@
-// mapea urls a funciones del controller
-
 const { Router } = require('express');
 const imagenController = require('../controllers/imagen');
 const upload = require('../config/multer');
@@ -11,7 +9,7 @@ const router = Router();
 
 const rolesGestion = ['super_admin', 'administrador', 'vendedor'];
 
-// sube hasta 5 imagenes juntas, asociadas a un producto puntual
+// hasta 5 imágenes juntas para un producto
 router.post(
   '/productos/:id/imagenes',
   requireAuth,

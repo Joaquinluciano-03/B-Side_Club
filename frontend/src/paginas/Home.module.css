@@ -8,7 +8,7 @@
   text-wrap: balance;
 }
 
-/* ============ ELEGIDOS ============ */
+/* Elegidos */
 .elegidos {
   max-width: var(--ancho);
   margin: 0 auto;
@@ -52,7 +52,7 @@
   gap: var(--e-7) var(--e-5);
 }
 
-/* ============ FORMATOS: un cartel de neon en dos colores ============
+/* FORMATOS: un cartel de neon en dos colores
    Los dos colores del logo, repartidos como en un cartel de verdad:
    - el borde son dos tubos paralelos: rosa afuera y cian, mas fino, adentro.
      Se encienden uno despues del otro y titilan cada uno a su ritmo;
@@ -374,7 +374,7 @@
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.55)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }
 
-/* ============ LADO B ============ */
+/* Lado b */
 .ladoB {
   position: relative;
   overflow: clip;
@@ -611,7 +611,7 @@
   max-width: 46ch;
 }
 
-/* ============ CIERRE NARANJA ============ */
+/* Cierre naranja */
 .cierre {
   position: relative;
   overflow: clip;
@@ -683,7 +683,7 @@
   color: var(--tinta-sobre-naranja);
 }
 
-/* ---- el frente de la radio ----
+/* El frente de la radio
    Un panel en naranja apenas mas oscuro (tono sobre tono): a la izquierda los
    botones de banda con su luz, al medio el dial y a la derecha el medidor de
    señal y las dos perillas. La aguja, la perilla de sintonia, el medidor y la
@@ -1093,7 +1093,7 @@
   }
 }
 
-/* ============ ENTRADA AL HACER SCROLL ============
+/* Entrada al hacer scroll
    Las fundas de los elegidos aparecen cuando entran en pantalla
    (scroll-driven, sin JavaScript). Sin soporte se ven normales. */
 @keyframes aparece-scroll {
@@ -1110,7 +1110,7 @@
   }
 }
 
-/* ============ RESPONSIVE ============ */
+/* Responsive */
 /* tableta y celular: los elegidos pasan a un carril horizontal que se
    desliza con el dedo (en tableta, 2 columnas dejaban 4 filas de cards
    gigantes). Se ven unas 3 cards y asoma la siguiente, para que se note que
@@ -1198,7 +1198,7 @@
   }
 }
 
-/* ============ ENTRADAS (data-visto, ver lib/useEnPantalla) ============
+/* ENTRADAS (data-visto, ver lib/useEnPantalla)
    Del Lado B para abajo. Lo que falta entrar queda escondido solo
    mientras el elemento tiene data-entrada y todavia no data-visto. */
 @keyframes sube {
@@ -1234,7 +1234,7 @@
   }
 }
 
-/* --- Lado B: el titulo renglon por renglon (global .revela) y el subrayado --- */
+/* Lado B: el titulo renglon por renglon (global .revela) y el subrayado */
 .ladoBTitulo[data-entrada]:not([data-visto]) .subrayado path {
   stroke-dashoffset: 1;
 }
@@ -1242,7 +1242,7 @@
   animation: subraya 800ms var(--ease-in-out) 950ms backwards;
 }
 
-/* --- promesas: la linea se dibuja y el texto sube, una despues de otra --- */
+/* Promesas: la linea se dibuja y el texto sube, una despues de otra */
 .promesas[data-entrada]:not([data-visto]) div::before,
 .promesas[data-entrada]:not([data-visto]) div:last-child::after {
   scale: 0 1;
@@ -1266,12 +1266,12 @@
   animation: sube 700ms var(--ease-out) calc(var(--paso) + 260ms) backwards;
 }
 
-/* --- cierre: el telefono saluda --- */
+/* Cierre: el telefono saluda */
 .cierre[data-visto] .botonOscuro svg {
   animation: saluda 900ms ease-in-out 1.3s;
 }
 
-/* ============ CINTA ============
+/* Cinta
    Tres capas, una animacion por capa (como el disco del hero, asi cada una
    corre en la GPU): la banda inclinada, el empujon que le da el scroll y la
    pista que corre sola.

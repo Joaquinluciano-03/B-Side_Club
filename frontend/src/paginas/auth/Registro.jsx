@@ -1,5 +1,4 @@
-// Registro: solo sirve UNA vez, para crear al dueño (super_admin). El resto
-// del equipo entra por invitacion. Si ya existe, el backend contesta 409.
+// registro: solo sirve una vez, para crear al dueño (super_admin). El resto entra por invitación (si ya existe, 409)
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

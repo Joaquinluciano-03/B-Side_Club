@@ -1,7 +1,4 @@
-// Listado de productos del panel. A diferencia del catalogo publico, aca se
-// ven tambien los dados de baja (el backend los muestra cuando hay token).
-// Lo de todos los dias se hace desde la fila: ajustar stock, destacar,
-// publicar o dar de baja. Editar abre el formulario completo.
+// listado de productos del panel (incluye los dados de baja). Lo de todos los días se hace desde la fila: stock, destacar, publicar o dar de baja
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -39,13 +36,12 @@ export default function Productos() {
   const [error, setError] = useState(null);
   const [aBorrar, setABorrar] = useState(null);
   const [recargar, setRecargar] = useState(0);
-  // atajo de descuento: el producto que se esta editando y lo que se carga
+  // atajo de descuento: el producto que se edita y lo que se carga
   const [aDescontar, setADescontar] = useState(null);
   const [descuento, setDescuento] = useState({ tipo: '', valor: '' });
   const [errorDesc, setErrorDesc] = useState(null);
 
-  // mismo debounce que el catalogo publico: un pedido por tecla se come el
-  // limite de 300 cada 15 minutos
+  // mismo debounce que el catálogo público (límite de 300 pedidos cada 15 minutos)
   useEffect(() => {
     const t = setTimeout(() => {
       setQ(texto);
@@ -66,7 +62,7 @@ export default function Productos() {
     };
   }, [q, esActivo, page, recargar]);
 
-  // cambia un campo en la lista sin recargar todo (y vuelve atras si falla)
+  // cambia un campo en la lista sin recargar (y vuelve atrás si falla)
   async function actualizar(p, cambios, mensaje) {
     const antes = datos.productos;
     setDatos((d) => ({ ...d, productos: d.productos.map((x) => (x.id === p.id ? { ...x, ...cambios } : x)) }));
@@ -89,7 +85,7 @@ export default function Productos() {
     setErrorDesc(null);
   }
 
-  // guarda lo cargado en el modal; quitar=true lo saca sin importar lo cargado
+  // guarda lo del modal; quitar=true lo saca
   function guardarDescuento(ev, quitar = false) {
     ev?.preventDefault();
     const p = aDescontar;

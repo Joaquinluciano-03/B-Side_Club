@@ -1,7 +1,4 @@
-// Invitaciones al equipo. Solo super_admin y administrador llegan hasta aca
-// (lo filtra el sidebar y lo vuelve a chequear el backend).
-// Ojo: solo puede haber UNA invitacion pendiente por mail; si ya hay una, el
-// backend contesta 409 y hay que revocarla antes de generar otra.
+// invitaciones al equipo (solo super_admin y administrador). Solo una pendiente por mail: si ya hay, el backend contesta 409 y hay que revocarla
 
 import { useEffect, useState } from 'react';
 import { get, post, del } from '../../lib/api';
@@ -23,7 +20,7 @@ export default function Invitaciones() {
   const [error, setError] = useState(null);
   const [email, setEmail] = useState('');
   const [rol, setRol] = useState('vendedor');
-  // administradores solo los suma el dueño (el backend tambien lo exige)
+  // administradores solo los suma el dueño (el backend también lo exige)
   const roles = usuario?.rol === 'super_admin' ? ['vendedor', 'administrador'] : ['vendedor'];
   const [errorCampo, setErrorCampo] = useState(null);
   const [enviando, setEnviando] = useState(false);
@@ -55,8 +52,7 @@ export default function Invitaciones() {
       toast.exito(`Invitación enviada a ${destino}. El link vence en 7 días.`);
       setRecargar((r) => r + 1);
     } catch (err) {
-      // el 409 pide una acción concreta (revocar la anterior), así que va
-      // al campo y no a un toast que se va solo
+      // el 409 pide una acción concreta (revocar), así que va al campo y no a un toast
       if (err.status === 409) setErrorCampo(mensajeDeError(err));
       else toast.error(mensajeDeError(err));
     } finally {

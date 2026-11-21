@@ -5,11 +5,7 @@ import { useDatosDelLocal } from './lib/useStoreInfo';
 import { Cargando, Vacio } from './componentes/Estados';
 import { irAlScroll } from './lib/scrollSuave';
 
-// La home y su layout van en el paquete principal: es por donde entra casi
-// todo el mundo. El resto de las paginas se bajan aparte, cuando hacen falta
-// (asi la home no carga el codigo del panel, del login, etc). Las publicas
-// ademas se precargan apenas la home termina de cargar (ver
-// usePrecargarPaginas), para que pasar de una a otra siga siendo instantaneo.
+// la home y su layout van en el paquete principal; el resto de las páginas se baja aparte y las públicas se precargan (usePrecargarPaginas)
 import LayoutPublico from './layouts/LayoutPublico';
 import Home from './paginas/Home';
 
@@ -42,8 +38,7 @@ const PanelInvitaciones = lazy(() => import('./paginas/panel/Invitaciones'));
 const PanelUsuarios = lazy(() => import('./paginas/panel/Usuarios'));
 const PanelPerfil = lazy(() => import('./paginas/panel/Perfil'));
 
-// Precarga las paginas publicas cuando el navegador queda libre despues de
-// cargar la primera: no compite con lo que la pagina actual necesita.
+// precarga las páginas públicas cuando el navegador queda libre
 function usePrecargarPaginas() {
   useEffect(() => {
     const precargar = () => Object.values(PUBLICAS).forEach((cargar) => cargar().catch(() => {}));
@@ -55,14 +50,8 @@ function usePrecargarPaginas() {
   }, []);
 }
 
-// Scroll entre paginas:
-// - al entrar a una pagina nueva (un link) se arranca arriba; si no, entrabas
-//   a un producto y aparecias a mitad de la ficha
-// - al volver con Atras (o Adelante) se vuelve a donde estabas: bajabas por
-//   el catalogo, abrias un disco, volvias y aparecias arriba de todo
-// El navegador no lo puede hacer solo porque el contenido llega despues
-// (pedidos a la API): se recuerda la posicion de cada entrada del historial y
-// al volver se reintenta hasta que la pagina tiene alto suficiente.
+// Scroll entre páginas: al entrar por un link arranca arriba; al volver con Atrás vuelve a donde estabas.
+// Como el contenido llega después de la API, se guarda la posición de cada entrada del historial y se reintenta hasta que la página tiene alto
 const posiciones = new Map();
 
 function ManejoDelScroll() {
@@ -74,10 +63,7 @@ function ManejoDelScroll() {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   }, []);
 
-  // recuerda donde esta parado el usuario en esta entrada del historial.
-  // useLayoutEffect y no useEffect: al cambiar de pagina el contenido nuevo
-  // es mas corto y el navegador acomoda el scroll; si el listener viejo
-  // seguia puesto, guardaba esa posicion acomodada en la pagina anterior
+  // useLayoutEffect y no useEffect: si no, el listener viejo guardaba la posición ya acomodada de la página anterior
   useLayoutEffect(() => {
     let cuadro = 0;
     const alScrollear = () => {
@@ -97,15 +83,12 @@ function ManejoDelScroll() {
     const guardada = posiciones.get(location.key);
 
     if (tipo === 'POP' && guardada) {
-      // reintenta hasta llegar (o 6 s: la lista puede tardar en llegar de la
-      // API); si el usuario scrollea o toca una tecla, para y lo deja ahi
+      // reintenta hasta 6 s; si el usuario scrollea o toca una tecla, para
       const limite = performance.now() + 6000;
       let cuadro = 0;
       let parar = false;
       const cortar = () => (parar = true);
-      // ademas de llegar, espera a que la pagina deje de crecer: si arriba
-      // termina de cargar algo (una grilla que pasa de 4 a 8 discos), el
-      // navegador corre el scroll para compensar y te dejaba mas abajo
+      // espera a que la página deje de crecer, si no el navegador corre el scroll al cargar contenido arriba
       let alto = 0;
       let quietoDesde = performance.now();
       const intentar = () => {
@@ -136,9 +119,7 @@ function ManejoDelScroll() {
   return null;
 }
 
-// Titulo de la pestaña y descripcion para buscadores con los datos de la
-// base (nombre y barrio del local). index.html trae unos de respaldo, sin
-// barrio, porque es un archivo fijo que no puede consultar la base.
+// título y descripción con los datos de la base (index.html trae unos de respaldo)
 function useMetadatosDelLocal() {
   const { info, nombre, barrio } = useDatosDelLocal();
   useEffect(() => {
@@ -154,8 +135,7 @@ function useMetadatosDelLocal() {
   }, [nombre, barrio, info?.description]);
 }
 
-// Protege el panel. Mientras revalidamos el token no decidimos nada: si
-// mandaramos al login ahi, al refrescar el panel te echaria siempre.
+// mientras se revalida el token no se decide nada, si no al refrescar el panel te echaría al login
 function SoloStaff({ children }) {
   const { esStaff, cargando } = useAuth();
   const location = useLocation();
@@ -165,9 +145,7 @@ function SoloStaff({ children }) {
   return children;
 }
 
-// Invitaciones y Equipo son solo para el dueño y los administradores. El menu
-// ya no las muestra a los vendedores, pero si alguien entra escribiendo la
-// direccion, mejor un mensaje claro que el error del servidor con "Reintentar".
+// Invitaciones y Equipo son solo para dueño y administradores: si un vendedor entra por la URL, mensaje claro en vez del error del servidor
 function SoloAdmin({ children }) {
   const { puedeInvitar } = useAuth();
   if (puedeInvitar) return children;

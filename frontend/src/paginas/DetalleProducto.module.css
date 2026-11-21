@@ -6,7 +6,7 @@
   padding: var(--e-6) var(--gutter) var(--seccion);
 }
 
-/* ============ MIGAS ============ */
+/* Migas */
 .migas {
   display: flex;
   align-items: center;
@@ -38,7 +38,7 @@
   align-items: start;
 }
 
-/* ============ TAPA ============ */
+/* Tapa */
 .galeria {
   position: sticky;
   top: calc(var(--alto-header) + var(--e-5));
@@ -47,7 +47,7 @@
 /* la tapa, las flechas, las miniaturas y la vista grande estan en
    componentes/GaleriaProducto.module.css */
 
-/* ============ HOJA ============ */
+/* Hoja */
 .hoja {
   min-width: 0;
 }
@@ -131,7 +131,7 @@
   font-size: var(--t-sm);
 }
 
-/* ---- escala de estado ---- */
+/* Escala de estado */
 .escala {
   margin-top: var(--e-6);
 }
@@ -191,7 +191,7 @@
   text-wrap: pretty;
 }
 
-/* ---- ficha tecnica: filas con una sola linea de corte ---- */
+/* Ficha tecnica: filas con una sola linea de corte */
 .ficha {
   margin: var(--e-6) 0 0;
   display: grid;
@@ -246,7 +246,7 @@
   margin-top: 1px;
 }
 
-/* ============ RELACIONADOS ============ */
+/* Relacionados */
 .relacionados {
   margin-top: var(--seccion);
 }
@@ -271,7 +271,7 @@
   white-space: nowrap;
 }
 
-/* ============ ESQUELETO ============ */
+/* Esqueleto */
 .esqueletoTapa {
   width: 86%;
   aspect-ratio: 1;
@@ -284,7 +284,7 @@
   padding-top: var(--e-5);
 }
 
-/* ============ BARRA MOVIL ============ */
+/* Barra movil */
 .barraMovil {
   display: none;
 }

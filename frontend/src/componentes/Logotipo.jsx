@@ -1,6 +1,4 @@
-// El nombre del local escrito como logotipo de dos colores ("B-SIDE CLUB"):
-// la ultima palabra va en un <span> que cada lugar pinta con su color (el
-// footer, el login y el panel). El nombre sale de la base (Info del local).
+// nombre del local como logotipo de dos colores (la última palabra va en un <span>)
 
 import { useDatosDelLocal, partirNombre } from '../lib/useStoreInfo';
 

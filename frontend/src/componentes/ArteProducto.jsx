@@ -1,10 +1,5 @@
-// Arte de un producto: la tapa. Si el local cargo fotos, la primera es la
-// tapa. Si no hay foto (o no carga), se dibuja una tapa generica segun el
-// formato, como las fundas de papel de la casa que usan las disquerias:
-//   vinilo / CD -> funda de papel con troquel redondo que deja ver el label
-//   cassette    -> estuche con la etiqueta escrita
-//   equipo      -> ficha impresa con el nombre del equipo
-// El color sale del nombre, asi el mismo disco tiene siempre la misma tapa.
+// tapa de un producto: la primera foto, o una tapa genérica según el formato (funda con troquel para vinilo/CD,
+// estuche para cassette, ficha para equipo). El color sale del nombre, así el mismo disco siempre tiene la misma tapa
 
 import { useState } from 'react';
 import { urlImagen } from '../lib/api';
@@ -13,7 +8,7 @@ import { useDatosDelLocal } from '../lib/useStoreInfo';
 import { iconoDe } from './IconoCategoria';
 import estilos from './ArteProducto.module.css';
 
-// colores de funda: la paleta del sitio, mas el crema del papel
+// colores de funda: la paleta del sitio más el crema del papel
 const COLORES = ['#F26A1B', '#0E8FA6', '#C41E75', '#B8402C', '#5B45B8', '#9A6100', '#1F7A4E', '#E8E2D8'];
 
 function hash(texto = '') {
@@ -26,12 +21,12 @@ export function colorDe(texto) {
   return COLORES[hash(texto) % COLORES.length];
 }
 
-// el label del disco usa otro color de la paleta, para que contraste con la funda
+// el label usa otro color para contrastar con la funda
 function colorLabel(texto) {
   return COLORES[(hash(texto) + 3) % COLORES.length];
 }
 
-// tinta clara u oscura segun el fondo (luminancia relativa simple)
+// tinta clara u oscura según el fondo
 function tintaPara(hex) {
   const n = parseInt(hex.slice(1), 16);
   const r = (n >> 16) & 255;
@@ -41,12 +36,7 @@ function tintaPara(hex) {
   return lum > 0.5 ? '#141210' : '#F2ECE4';
 }
 
-/**
- * Que objeto va adentro de la funda, segun el icono de la categoria (el
- * elegido en el panel o el que sugiere su nombre). Todo lo que no es un disco
- * ni una cinta (equipos, accesorios, libros, merch) lleva la ficha impresa.
- * Acepta la categoria entera o solo su nombre.
- */
+/** Objeto que va en la funda según el icono de la categoría. Lo que no es disco ni cinta lleva la ficha impresa. */
 export function formatoDe(categoria) {
   const icono = iconoDe(categoria);
   if (icono === 'vinilo' || icono === 'simple' || icono === 'color') return 'vinilo';
@@ -56,7 +46,7 @@ export function formatoDe(categoria) {
 }
 
 function TapaGenerica({ producto, formato }) {
-  // sin artista, el pie de la funda lleva el nombre del local (de la base)
+  // sin artista, el pie lleva el nombre del local
   const { nombre: nombreLocal } = useDatosDelLocal();
   const { titulo, artista } = separarNombre(producto?.nombre);
   const fondo = colorDe(producto?.nombre || '');
@@ -102,11 +92,7 @@ function TapaGenerica({ producto, formato }) {
   );
 }
 
-/**
- * Tapa del producto (cuadrada). Con foto muestra la foto; sin foto, la tapa
- * generica de su formato. `prioridad` carga la imagen sin lazy (la primera
- * imagen grande de una pagina).
- */
+/** Tapa cuadrada del producto. `prioridad` carga la imagen sin lazy. */
 export default function ArteProducto({ producto, categoria, prioridad = false, imagen }) {
   const [fallo, setFallo] = useState(false);
   const portada = imagen || producto?.imagenes?.[0];
@@ -120,9 +106,7 @@ export default function ArteProducto({ producto, categoria, prioridad = false, i
           src={urlImagen(portada.url)}
           alt={portada.alt || producto?.nombre || ''}
           onError={() => setFallo(true)}
-          // la foto baja un poco antes de llegar a pantalla, pero el
-          // navegador recien la decodifica al pintarla, en medio del scroll.
-          // Asi se decodifica apenas baja, mientras todavia no se ve
+          // se decodifica apenas baja, para que no se trabe el scroll al pintarla
           onLoad={(e) => e.currentTarget.decode?.().catch(() => {})}
           loading={prioridad ? 'eager' : 'lazy'}
           fetchPriority={prioridad ? 'high' : 'auto'}
@@ -135,10 +119,7 @@ export default function ArteProducto({ producto, categoria, prioridad = false, i
   return <TapaGenerica producto={producto} formato={formato} />;
 }
 
-/**
- * El objeto que vive adentro de la funda (disco, CD o cassette). La card lo
- * hace asomar y lo saca un poco al pasar el mouse. Los equipos no tienen.
- */
+/** El objeto dentro de la funda (disco, CD o cassette); asoma al pasar el mouse. Los equipos no tienen. */
 export function ObjetoInterior({ producto, categoria }) {
   const formato = formatoDe(categoria || producto?.categoria);
   if (formato === 'equipo') return null;

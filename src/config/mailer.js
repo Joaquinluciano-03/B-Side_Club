@@ -1,7 +1,4 @@
-// envio de mails transaccionales (invitaciones, recuperar contraseña).
-// si no hay credenciales SMTP en el .env, cae a loguear el link por consola
-// en vez de fallar — asi el resto del equipo puede seguir developeando sin
-// tener que configurar un mail real.
+// mails de invitación y recuperar contraseña. Sin SMTP en el .env, loguea el link por consola
 
 const nodemailer = require('nodemailer');
 const { prisma } = require('./db');
@@ -42,9 +39,7 @@ async function enviarMail({ to, subject, html }) {
   });
 }
 
-// Nombre y zona del local para los mails: salen de la base (Info del local),
-// igual que en el sitio. Si el local cambia de nombre o de barrio, los mails
-// tambien. "Calle 123, Barrio, Ciudad" -> zona "Barrio, Ciudad".
+// nombre y zona del local para los mails, salen de la base
 async function datosDelLocal() {
   let info = null;
   try {
@@ -59,7 +54,7 @@ async function datosDelLocal() {
   return { nombre: info?.nombre?.trim() || 'B-Side Club', zona: partes.slice(1).join(', ') };
 }
 
-// lo que se mete en el HTML del mail sale de la base: se escapa
+// se escapa lo que viene de la base
 function escapar(texto) {
   return String(texto).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
@@ -71,13 +66,8 @@ function logotipo(nombre) {
   return ultima ? `${palabras.join(' ')} <span style="color:#35D0E8">${ultima}</span>` : palabras[0];
 }
 
-// Plantilla de los mails, con el diseño del sitio (demo/demo.html, modal
-// "PLANTILLA DEL EMAIL"). Todo va en estilos inline y con tablas implicitas
-// porque los clientes de mail no soportan hojas de estilo ni flexbox.
-//
-// OJO: el panel muestra una vista previa de este mail en
-// frontend/src/componentes/ModalPlantillaEmail.jsx. Si cambia el diseño de
-// acá, hay que tocar ese archivo también.
+// Plantilla de los mails (estilos inline porque los clientes de mail no soportan hojas de estilo).
+// Si cambia el diseño, actualizar la vista previa en ModalPlantillaEmail.jsx
 function plantilla({ marca, kicker, titulo, cuerpo, textoBoton, link, pie }) {
   return `<!doctype html>
 <html lang="es"><body style="margin:0;padding:24px 12px;background:#D5DADD;font-family:Archivo,Helvetica,Arial,sans-serif">

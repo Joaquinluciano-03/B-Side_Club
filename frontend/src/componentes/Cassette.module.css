@@ -27,7 +27,7 @@
   rotate: -5deg;
 }
 
-/* ---- la etiqueta de papel ---- */
+/* La etiqueta de papel */
 .etiqueta {
   position: absolute;
   left: 7cqw;
@@ -76,7 +76,7 @@
   color: #4a413a;
 }
 
-/* ---- la ventana con los carretes ---- */
+/* La ventana con los carretes */
 .ventana {
   position: absolute;
   left: 50%;
@@ -204,7 +204,7 @@
   }
 }
 
-/* ---- la boca de abajo ---- */
+/* La boca de abajo */
 .boca {
   position: absolute;
   left: 50%;

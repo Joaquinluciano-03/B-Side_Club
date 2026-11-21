@@ -4,7 +4,7 @@
    y la demo sean la misma cosa. */
 
 :root {
-  /* ---- Grises frios: recogen el celeste del logo ---- */
+  /* Grises frios: recogen el celeste del logo */
   --humo: #d5dadd; /* fondo general */
   --superficie: #e9edee; /* cards y paneles */
   --gris-medio: #c9d0d3; /* bandas y tablas */
@@ -13,7 +13,7 @@
   --borde-boton: #94a0a4; /* boton secundario */
   --panel-fondo: #dde1e3; /* fondo del panel admin */
 
-  /* ---- Tinta ---- */
+  /* Tinta */
   --tinta: #191c1d; /* texto principal */
   --tinta-cuerpo: #333a3c;
   --tinta-suave: #454d50;
@@ -22,7 +22,7 @@
   --meta: #6e645c; /* labels, gris calido */
   --apagado: #6b7578; /* placeholder y disabled (4.5:1 sobre blanco) */
 
-  /* ---- Oscuros: hero, portadas, panel ---- */
+  /* Oscuros: hero, portadas, panel */
   --carbon: #100f0e;
   --carbon-2: #0e0d0c;
   --negro: #0c0b0a;
@@ -36,7 +36,7 @@
   --crema-dim: #a79e97;
   --crema-tenue: #8a817b;
 
-  /* ---- Color ---- */
+  /* Color */
   --naranja: #f26a1b; /* primario */
   --naranja-hover: #ff7d2f;
   --teja: #b8402c; /* secundario */
@@ -49,13 +49,13 @@
   --magenta: #c41e75; /* acento puntual */
   --error: #a83628;
 
-  /* ---- Neon: aparece de a poco, nunca de fondo ---- */
+  /* Neon: aparece de a poco, nunca de fondo */
   --neon-rosa: #ff4fa3;
   --neon-rosa-claro: #ffc9e4;
   --neon-cian: #35d0e8;
   --neon-cian-claro: #cff6fc;
 
-  /* ---- Estados de stock (coinciden con el enum Stock de Prisma) ---- */
+  /* Estados de stock (coinciden con el enum Stock de Prisma) */
   --ok-fondo: #e4f2e9;
   --ok-texto: #1b6b45;
   --aviso-fondo: #f7ebd5;
@@ -67,7 +67,7 @@
   --mal-fondo: #fae5e1;
   --mal-texto: #a83628;
 
-  /* ---- Tipografia ---- */
+  /* Tipografia */
   --display: 'Bungee', Impact, sans-serif; /* logo, hero, encabezados. Nunca parrafos */
   /* Archivo variable: pesos 100-900 y ancho 62%-125% (font-stretch) */
   --cuerpo: 'Archivo Variable', 'Archivo', system-ui, -apple-system, sans-serif;
@@ -83,7 +83,7 @@
   --t-2xl: clamp(2.25rem, 1.4rem + 4vw, 4.5rem); /* 36-72 */
   --t-3xl: clamp(2.75rem, 1.2rem + 7vw, 7.5rem); /* 44-120, solo el hero */
 
-  /* ---- Espaciado (multiplos de 4) ---- */
+  /* Espaciado (multiplos de 4) */
   --e-1: 4px;
   --e-2: 8px;
   --e-3: 12px;
@@ -97,7 +97,7 @@
   --gutter: clamp(16px, 4vw, 40px); /* margen lateral de la pagina */
   --seccion: clamp(64px, 10vw, 128px); /* aire entre secciones grandes */
 
-  /* ---- Formas ----
+  /* Formas
      Regla: controles 8, cards 14, piezas que se presionan y filtros en pildora. */
   --r-badge: 5px;
   --r-control: 8px;
@@ -111,7 +111,7 @@
   --sombra-suave: 0 1px 2px rgba(16, 15, 14, 0.08), 0 4px 16px rgba(16, 15, 14, 0.08);
   --sombra-alta: 0 2px 4px rgba(16, 15, 14, 0.1), 0 18px 40px rgba(16, 15, 14, 0.18);
 
-  /* ---- Motion ----
+  /* Motion
      ease-out fuerte para lo que entra o responde a un toque; ease-in-out para
      lo que se mueve en pantalla; drawer para paneles que se deslizan.
      Nada de ease-in en interfaz: arranca lento y se siente trabado. */
@@ -129,7 +129,7 @@
   --alto-banda: 36px;
   --alto-header: calc(var(--alto-barra) + var(--alto-banda));
 
-  /* ---- Capas (z-index) ---- */
+  /* Capas (z-index) */
   --z-base: 1;
   --z-sticky: 40; /* header */
   --z-menu: 60; /* menu mobile */
@@ -194,7 +194,7 @@ textarea::placeholder {
   background: var(--gris-medio);
 }
 
-/* ---- Animaciones compartidas ----
+/* Animaciones compartidas
    Decision del proyecto: las animaciones se ven siempre igual, sin mirar
    prefers-reduced-motion (con "Efectos de animacion" apagado en Windows el
    sitio quedaba quieto y se pidio que no pase). No agregar bloques

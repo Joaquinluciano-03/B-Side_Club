@@ -1,16 +1,6 @@
-// Cartel de neon ABIERTO / CERRADO, segun el horario cargado en el panel y la
-// hora del local (Buenos Aires). Abierto en cian, cerrado en rosa: los dos
-// tubos del logo, de un solo trazo. Se revisa cada 30 segundos; si el local
-// abre o cierra con la pagina abierta, el cartel se vuelve a encender (la key
-// del Neon cambia y repite el encendido). Sin horario, o si no se entiende el
-// de hoy, no muestra nada.
-//
-// Dos lugares, segun el ancho de pantalla:
-//   fijo     -> uno solo, en la esquina de abajo a la derecha, que acompaña
-//              el scroll. Solo en pantallas anchas (lo monta LayoutPublico)
-//   (normal) -> en la pagina, junto al horario de hoy (hero, footer,
-//              Nosotros, Contacto). Solo en tablets y celulares
-// El CSS esconde cada uno donde no corresponde.
+// cartel de neón ABIERTO / CERRADO según el horario del panel y la hora de Buenos Aires. Se revisa cada 30 s.
+// Sin horario, o si no se entiende el de hoy, no muestra nada.
+// Hay dos: el fijo (esquina, pantallas anchas) y el de la página (tablets y celulares); el CSS esconde el que no corresponde
 
 import { useEffect, useState } from 'react';
 import Neon from './Neon';

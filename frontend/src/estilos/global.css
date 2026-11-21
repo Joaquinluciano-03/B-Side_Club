@@ -2,7 +2,7 @@
    (botones, badges, campos, tablas del panel, avisos, skeleton). Lo que es
    de un solo componente vive en su propio .module.css. Ver DESIGN.md. */
 
-/* ============ LAYOUT ============ */
+/* Layout */
 .pagina {
   min-height: 100dvh;
   /* trama halftone sobre el gris humo, igual que la demo */
@@ -17,7 +17,7 @@
   flex-direction: column;
 }
 
-/* ============ PANTALLAS TACTILES ============ */
+/* Pantallas tactiles */
 html {
   /* el celular no agranda el texto por su cuenta al girar la pantalla */
   -webkit-text-size-adjust: 100%;
@@ -57,7 +57,7 @@ label {
   }
 }
 
-/* ============ TIPOGRAFIA ============ */
+/* Tipografia */
 /* visible solo para lectores de pantalla (labels de campos con icono, etc) */
 .sr-only {
   position: absolute;
@@ -79,7 +79,7 @@ label {
   color: var(--tinta-tenue);
 }
 
-/* ============ BOTONES ============ */
+/* Botones */
 .btn {
   font-weight: 800;
   font-size: 14px;
@@ -185,7 +185,7 @@ label {
   padding: 10px 16px;
 }
 
-/* ============ BADGES DE ESTADO ============ */
+/* Badges de estado */
 .badge {
   font-family: var(--mono);
   font-stretch: 87.5%;
@@ -257,7 +257,7 @@ label {
   border: 1px solid #1f7a4e33;
 }
 
-/* ============ CAMPOS ============ */
+/* Campos */
 .campo {
   display: flex;
   flex-direction: column;
@@ -331,7 +331,7 @@ label {
   margin-top: 6px;
 }
 
-/* ============ CARDS ============ */
+/* Cards */
 .card {
   background: var(--superficie);
   border: 1px solid var(--borde);
@@ -367,7 +367,7 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* ============ AVISOS ============ */
+/* Avisos */
 .aviso {
   border-radius: var(--r-control);
   padding: 13px 16px;
@@ -386,7 +386,7 @@ textarea:focus-visible {
   border-color: #1f7a4e33;
 }
 
-/* ============ TABLAS DEL PANEL ============ */
+/* Tablas del panel */
 .tabla {
   width: 100%;
   border-collapse: collapse;
@@ -490,7 +490,7 @@ textarea:focus-visible {
   }
 }
 
-/* ============ SKELETON DE CARGA ============ */
+/* Skeleton de carga */
 .skel {
   background: linear-gradient(100deg, #d2d8da 30%, #e3e8ea 50%, #d2d8da 70%);
   background-size: 220% 100%;
@@ -503,7 +503,7 @@ textarea:focus-visible {
   background: #d2d8da;
 }
 
-/* ============ MODALES ============ */
+/* Modales */
 /* Entrada y salida de todos los <dialog> (Modal y Confirmar).
    Entra desde un poco mas chico con fade (240ms, ease-out fuerte); sale mas
    rapido (160ms). Nunca desde scale(0): nada aparece de la nada.
@@ -552,7 +552,7 @@ dialog:not([open])::backdrop {
 
 
 
-/* ============ LADO A -> LADO B ============
+/* Lado a -> lado b
    Los links a Nosotros navegan con View Transition: la pagina nueva (el Lado
    B, en carbon) se abre en circulo desde el centro, como cuando das vuelta el
    disco. Solo esos links la disparan; sin soporte la navegacion es normal. */
@@ -572,7 +572,7 @@ dialog:not([open])::backdrop {
 }
 
 
-/* ============ ENTRADAS AL CARGAR ============
+/* Entradas al cargar
    Piezas compartidas para que cada pagina entre con movimiento.
    - .cascada: los hijos directos entran subiendo, uno detras de otro (70ms).
      --cascada-inicio corre todo el grupo si hace falta esperar a otra cosa.
@@ -599,7 +599,7 @@ dialog:not([open])::backdrop {
 .cascada > :nth-child(9) { animation-delay: calc(var(--cascada-inicio, 0ms) + 560ms); }
 .cascada > :nth-child(n + 10) { animation-delay: calc(var(--cascada-inicio, 0ms) + 630ms); }
 
-/* ============ ENTRADAS AL HACER SCROLL ============
+/* Entradas al hacer scroll
    Lo mismo que la cascada, pero cuando la seccion llega a pantalla y no al
    cargar (lib/useEnPantalla.js pone data-visto). El contenedor lleva
    data-entrada; adentro:

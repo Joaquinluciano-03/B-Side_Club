@@ -1,11 +1,5 @@
-// Validacion y limpieza de lo que llega del cliente. Todo campo que entra a
-// la API pasa por aca antes de tocar la base:
-//   - el tipo tiene que ser el esperado (un objeto en lugar de un texto se
-//     rechaza: Prisma lo tomaria como un filtro, ej. { "mail": { "not": "" } })
-//   - los textos se recortan, se normalizan (NFC) y pierden los caracteres de
-//     control invisibles; tienen un largo maximo
-//   - emails, telefonos, numeros, fechas y el horario tienen su formato
-// Si algo no cumple se corta con un 400 y un mensaje claro para el panel.
+// validación y limpieza de todo lo que llega del cliente. Si algo no cumple se corta con un 400.
+// El tipo tiene que ser el esperado (un objeto en vez de un texto se rechaza: Prisma lo tomaría como filtro)
 
 const { errorPassword } = require('./reglasPassword');
 
@@ -17,13 +11,10 @@ function error400(mensaje) {
 
 const vacio = (v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
 
-// caracteres de control (salvo el salto de linea y el tab en textos largos)
+// caracteres de control (salvo salto de línea y tab en textos largos)
 const CONTROL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F​-‏‪-‮⁦-⁩]/g;
 
-/**
- * Texto libre. Devuelve el texto limpio, o null si es opcional y vino vacio.
- * multilinea: deja los saltos de linea (descripciones, mensajes).
- */
+/** Texto libre: devuelve el texto limpio, o null si es opcional y vino vacío. multilinea deja los saltos de línea. */
 function texto(valor, campo, { requerido = false, max = 200, multilinea = false } = {}) {
   if (vacio(valor)) {
     if (requerido) throw error400(`Falta el campo "${campo}".`);
@@ -62,11 +53,8 @@ function telefono(valor, campo = 'telefono', { requerido = false } = {}) {
   return limpio;
 }
 
-// Contraseña nueva: tiene que cumplir los requisitos de utils/reglasPassword
-// (largo, mayuscula y minuscula, numero, caracter especial y sin patrones
-// faciles). datos: nombre, apellido y mail de la cuenta, para que no los use.
-// El login NO pasa por aca: una cuenta con clave vieja tiene que poder entrar
-// para cambiarla. bcrypt solo mira los primeros 72 bytes: mas largo no suma.
+// Contraseña nueva: cumple utils/reglasPassword y no contiene nombre, apellido ni mail (datos).
+// El login no pasa por acá: una cuenta con clave vieja tiene que poder entrar. bcrypt solo mira los primeros 72 bytes
 function password(valor, { requerido = true, datos = {} } = {}) {
   if (vacio(valor)) {
     if (requerido) throw error400('Falta la contraseña.');
@@ -79,9 +67,7 @@ function password(valor, { requerido = true, datos = {} } = {}) {
   return valor;
 }
 
-// La contraseña nueva no puede contener el nombre, el apellido ni el mail de
-// la cuenta. Para los services que recien conocen esos datos (perfil,
-// recuperar contraseña, invitacion): los requisitos basicos ya se validaron.
+// para los services que recién conocen nombre, apellido y mail de la cuenta (perfil, recuperar, invitación)
 function passwordSinDatosPersonales(valor, datos) {
   const problema = valor ? errorPassword(valor, datos) : null;
   if (problema) throw error400(problema);
@@ -136,7 +122,7 @@ function fecha(valor, campo) {
   return d;
 }
 
-// ids de la URL (/productos/:id): enteros positivos; si no, 404 directo
+// ids de la URL: enteros positivos; si no, 404
 function id(valor) {
   const n = Number(valor);
   if (!Number.isInteger(n) || n <= 0 || n > 2147483647) {
@@ -169,8 +155,7 @@ function horario(valor) {
   });
 }
 
-// varios valores en un parametro: "Rock,Jazz" o el parametro repetido.
-// Cada uno pasa por "uno" (que valida y devuelve el valor limpio).
+// varios valores en un parámetro: "Rock,Jazz" o el parámetro repetido
 function lista(valor, campo, uno, { max = 20 } = {}) {
   if (vacio(valor)) return [];
   const crudos = (Array.isArray(valor) ? valor : [valor]).flatMap((v) => (typeof v === 'string' ? v.split(',') : [v]));

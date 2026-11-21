@@ -1,5 +1,4 @@
-// logica de negocio de gestion de staff (listar/editar/eliminar usuarios ya existentes).
-// crear usuarios nuevos no pasa por aca: se hace via invitacion (invitacion.service.js).
+// gestión de staff. Crear usuarios no pasa por acá: se hace por invitación
 
 const { prisma } = require('../config/db');
 
@@ -32,23 +31,21 @@ async function buscarOFallar(id) {
 async function actualizar(id, { nombre, apellido, mail, telefono, rol }, rolSolicitante) {
   const target = await buscarOFallar(id);
 
-  // al super_admin (el dueño del local) no lo puede tocar nadie desde este endpoint
+  // al super_admin no lo toca nadie desde acá
   if (target.rol === 'super_admin') {
     const error = new Error('No se puede modificar al super_admin');
     error.status = 403;
     throw error;
   }
 
-  // tampoco se puede usar esta via para fabricar un segundo super_admin
+  // tampoco se puede crear un segundo super_admin
   if (rol === 'super_admin') {
     const error = new Error('No se puede asignar el rol super_admin');
     error.status = 403;
     throw error;
   }
 
-  // un administrador gestiona a los vendedores, no a sus pares: si no, podia
-  // bajarle el rol a otro administrador o cambiarle el mail y quedarse con su
-  // cuenta. Tampoco puede ascender a nadie a administrador.
+  // un administrador gestiona vendedores, no a otros administradores, ni puede ascender a nadie a administrador
   if (rolSolicitante !== 'super_admin') {
     if (target.rol === 'administrador') {
       const error = new Error('Solo el dueño del local puede modificar administradores');
@@ -88,7 +85,7 @@ async function eliminar(id, rolSolicitante) {
     throw error;
   }
 
-  // solo el super_admin puede eliminar administradores
+  // solo el super_admin elimina administradores
   if (target.rol === 'administrador' && rolSolicitante !== 'super_admin') {
     const error = new Error('Solo el super_admin puede eliminar administradores');
     error.status = 403;

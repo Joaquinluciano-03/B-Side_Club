@@ -1,7 +1,4 @@
-// Banda que corre bajo el header con los nombres de las categorias reales de
-// la base, como la cinta que separaba el hero de la siguiente seccion en la
-// demo. Es decorativa: no tiene links ni se frena con el mouse (para navegar
-// por categoria estan los separadores del catalogo).
+// banda decorativa bajo el header con los nombres de las categorías
 
 import { useConteos } from '../lib/useConteos';
 import estilos from './BandaCategorias.module.css';
@@ -9,8 +6,7 @@ import estilos from './BandaCategorias.module.css';
 // los puntos alternan los tres colores de la marca
 const PUNTOS = ['var(--naranja)', 'var(--neon-cian)', 'var(--neon-rosa)'];
 
-// cuantas veces se repite la lista dentro de cada mitad: con 4 categorias
-// una sola pasada no llega a cubrir una pantalla ancha
+// cuántas veces se repite la lista por mitad, para cubrir pantallas anchas
 const REPETICIONES = 5;
 
 function Tira({ categorias }) {
@@ -33,12 +29,11 @@ function Tira({ categorias }) {
 export default function BandaCategorias() {
   const { categorias, cargando } = useConteos();
 
-  // aria-hidden: es adorno, un lector de pantalla no tiene que leer la cinta
+  // aria-hidden: es adorno
   return (
     <div className={estilos.banda} aria-hidden="true">
       {!cargando && categorias.length > 0 && (
-        // dos tiras iguales: cuando la primera termina de salir, la segunda ya
-        // esta en su lugar y el loop no se nota
+        // dos tiras iguales para que el loop no se note
         <div className={estilos.pista}>
           <Tira categorias={categorias} />
           <Tira categorias={categorias} />

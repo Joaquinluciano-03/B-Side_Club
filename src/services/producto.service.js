@@ -1,13 +1,10 @@
-// logica de negocio de productos
-
 const { prisma } = require('../config/db');
 const { borrarImagen } = require('../config/storage');
 
 const PAGE_SIZE_DEFAULT = 12;
 const PAGE_SIZE_MAX = 60;
 
-// convierte a numero validando: sin esto un "abc" se vuelve NaN, llega a
-// Prisma y revienta como 500 en vez de avisar que el dato vino mal.
+// un "abc" daría NaN y un error 500: se valida antes
 function aNumero(valor, campo) {
   const numero = Number(valor);
   if (!Number.isFinite(numero)) {
@@ -24,11 +21,10 @@ function errorDescuento(mensaje) {
   return error;
 }
 
-// Valida el descuento contra el precio y devuelve los dos campos listos para
-// guardar. Sin tipo (null, undefined o "") = sin descuento. Reglas:
-// - hace falta un precio: un producto "a consultar" no tiene a que descontarle
-// - porcentaje: mas de 0 y menos de 100
-// - monto: mas de 0 y menos que el precio (el precio final no puede ser 0)
+// Valida el descuento contra el precio. Sin tipo = sin descuento.
+// - hace falta un precio
+// - porcentaje: mayor a 0 y menor a 100
+// - monto: mayor a 0 y menor al precio
 function normalizarDescuento(tipo, valor, precio) {
   if (tipo === null || tipo === undefined || tipo === '') {
     return { descuento_tipo: null, descuento_valor: null };
@@ -51,9 +47,7 @@ function normalizarDescuento(tipo, valor, precio) {
   return { descuento_tipo: tipo, descuento_valor: numero };
 }
 
-// El precio con el descuento aplicado, igual que lo muestra el sitio
-// (frontend/src/lib/formato.js, calcularDescuento): se guarda en precio_final
-// para poder filtrar el catalogo por el precio que ve la gente.
+// precio con descuento aplicado (igual que calcularDescuento en el frontend), se guarda en precio_final para filtrar
 function precioFinal(precio, tipo, valor) {
   if (precio === null || precio === undefined || precio === '') return null;
   const p = Number(precio);
@@ -64,7 +58,7 @@ function precioFinal(precio, tipo, valor) {
   return p;
 }
 
-// el genero tiene que ser uno de la lista (tabla Genero)
+// el género tiene que ser de la tabla Genero
 async function validarGenero(generoId) {
   if (generoId === null || generoId === undefined) return;
   const genero = await prisma.genero.findUnique({ where: { id: generoId } });
@@ -84,13 +78,12 @@ async function validarCategoria(categoriaId) {
   }
 }
 
-// lo que filtra "donde se esta mirando": categoria, ofertas, busqueda y, para
-// el publico, solo los activos. Lo comparten el listado y los filtros.
+// filtro de "dónde se está mirando", lo comparten el listado y los filtros
 function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, { esAdmin = false } = {}) {
   const where = { AND: [] };
   if (categoriaId) where.categoriaId = Number(categoriaId);
   if (destacado !== undefined) where.destacado = destacado === 'true';
-  // conDescuento=true: solo los que tienen un descuento cargado (las ofertas)
+  // conDescuento: solo las ofertas
   if (conDescuento === 'true') where.descuento_tipo = { not: null };
   if (q) {
     where.AND.push({
@@ -102,8 +95,7 @@ function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, 
     });
   }
 
-  // el publico solo ve productos activos, sin excepcion; el panel admin puede
-  // pedir activos, inactivos, o todos segun el filtro que elija
+  // el público solo ve activos; el panel puede pedir activos, inactivos o todos
   if (esAdmin) {
     if (esActivo !== undefined) where.esActivo = esActivo === 'true';
   } else {
@@ -112,15 +104,14 @@ function filtroBase({ categoriaId, destacado, conDescuento, q, esActivo } = {}, 
   return where;
 }
 
-// los filtros del catalogo (todos opcionales; dentro de cada uno, cualquiera
-// de los valores elegidos; entre filtros distintos, todos a la vez)
+// filtros del catálogo: dentro de cada uno vale cualquier valor elegido, entre filtros valen todos a la vez
 function aplicarFiltros(where, { generos, condiciones, disponibilidad, precioMin, precioMax, decadas } = {}) {
-  // los generos llegan por nombre (asi quedan legibles en la URL)
+  // los géneros llegan por nombre (legibles en la URL)
   if (generos?.length) where.genero = { nombre: { in: generos } };
   if (condiciones?.length) where.condicion = { in: condiciones };
   if (disponibilidad?.length) where.estado_stock = { in: disponibilidad };
   if (precioMin !== undefined || precioMax !== undefined) {
-    // con rango de precio, los "a consultar" (sin precio) quedan afuera
+    // con rango de precio, los "a consultar" quedan afuera
     where.precio_final = {
       not: null,
       ...(precioMin !== undefined && { gte: precioMin }),
@@ -133,8 +124,7 @@ function aplicarFiltros(where, { generos, condiciones, disponibilidad, precioMin
   return where;
 }
 
-// como se ordena el catalogo. Los "a consultar" (sin precio) van al final al
-// ordenar por precio, y el id desempata para que la paginacion sea estable
+// orden del catálogo: los "a consultar" van al final y el id desempata
 const ORDENES = {
   recientes: [{ createdAt: 'desc' }, { id: 'desc' }],
   'precio-asc': [{ precio_final: { sort: 'asc', nulls: 'last' } }, { id: 'desc' }],
@@ -169,14 +159,11 @@ async function listar(filtros = {}, opciones = {}) {
   };
 }
 
-// Que filtros tienen sentido para lo que se esta mirando (categoria, ofertas,
-// busqueda), con cuantos productos tiene cada opcion. El catalogo muestra
-// solo los que tienen mas de una opcion: en Equipos no aparece "genero"
-// porque ningun equipo tiene. No dependen de los filtros ya elegidos, asi
-// las opciones no desaparecen mientras se eligen.
+// filtros que tienen sentido para lo que se mira, con cuántos productos tiene cada opción.
+// No dependen de los filtros ya elegidos, así las opciones no desaparecen
 async function filtrosDisponibles(base = {}, opciones = {}) {
   const where = filtroBase(base, opciones);
-  // opcional: los productos sin ese dato (un equipo no tiene genero) no cuentan
+  // los productos sin ese dato no cuentan
   const contar = async (campo, { opcional = true } = {}) => {
     const filas = await prisma.producto.groupBy({
       by: [campo],
@@ -196,7 +183,7 @@ async function filtrosDisponibles(base = {}, opciones = {}) {
     prisma.producto.aggregate({ where: { ...where, precio_final: { not: null } }, _min: { precio_final: true }, _max: { precio_final: true } }),
     prisma.genero.findMany({ select: { id: true, nombre: true } }),
   ]);
-  // el filtro trabaja con nombres (son los que van en la URL)
+  // el filtro usa nombres (los de la URL)
   const nombreDe = new Map(listaGeneros.map((g) => [g.id, g.nombre]));
   const generos = porGenero
     .map((g) => ({ valor: nombreDe.get(g.valor), total: g.total }))
@@ -222,10 +209,7 @@ async function filtrosDisponibles(base = {}, opciones = {}) {
   };
 }
 
-// soloActivos=true es la vista publica: un producto dado de baja tiene que
-// responder 404 igual que uno inexistente, para no delatar que existe.
-// Los llamados internos (actualizar/eliminar) lo dejan en false: el panel
-// necesita poder tocar productos inactivos.
+// soloActivos=true es la vista pública: un producto dado de baja responde 404 como uno inexistente
 async function obtenerPorId(id, { soloActivos = false } = {}) {
   const producto = await prisma.producto.findUnique({
     where: { id: Number(id) },
@@ -264,9 +248,7 @@ async function crear(data) {
   });
 }
 
-// Campos que el cliente puede editar. Es una lista blanca a proposito: antes
-// se hacia { ...req.body } y se podia mandar cualquier columna de la tabla
-// (por ejemplo "id", que reasignaba la clave primaria del producto).
+// lista blanca de campos editables (si no, se podía mandar cualquier columna, ej. "id")
 const CAMPOS_EDITABLES = [
   'nombre',
   'precio',
@@ -293,15 +275,13 @@ async function actualizar(id, data) {
     if (data[campo] !== undefined) dataActualizada[campo] = aNumero(data[campo], campo);
   }
 
-  // el descuento se valida contra el precio que va a quedar: si cambia el
-  // precio o el descuento, se revisan los dos juntos (lo que no viene en el
-  // pedido se toma de lo que ya esta guardado)
+  // el descuento se valida contra el precio que va a quedar (lo que no viene se toma de lo guardado)
   const tocaDescuento = data.descuento_tipo !== undefined || data.descuento_valor !== undefined;
   if (tocaDescuento || data.precio !== undefined) {
     const precio = data.precio !== undefined ? data.precio : actual.precio;
     const tipo = data.descuento_tipo !== undefined ? data.descuento_tipo : actual.descuento_tipo;
     const valor = data.descuento_valor !== undefined ? data.descuento_valor : actual.descuento_valor;
-    // pasar a "a consultar" saca el descuento solo (no hay precio que descontar)
+    // pasar a "a consultar" saca el descuento
     const sinPrecio = precio === null || precio === '';
     Object.assign(
       dataActualizada,
@@ -311,15 +291,14 @@ async function actualizar(id, data) {
     );
   }
 
-  // si cambia de categoria avisamos con un 400 claro, en vez de dejar que
-  // la foreign key falle contra la base y salga como error interno
+  // 400 claro si la categoría no existe, en vez de un error de foreign key
   if (dataActualizada.generoId) await validarGenero(dataActualizada.generoId);
 
   if (dataActualizada.categoriaId !== undefined) {
     await validarCategoria(dataActualizada.categoriaId);
   }
 
-  // el precio final se recalcula siempre con lo que va a quedar guardado
+  // el precio final se recalcula siempre
   const quedan = { ...actual, ...dataActualizada };
   dataActualizada.precio_final = precioFinal(quedan.precio, quedan.descuento_tipo, quedan.descuento_valor);
 
@@ -331,8 +310,7 @@ async function actualizar(id, data) {
 
 async function eliminar(id) {
   const producto = await obtenerPorId(id);
-  // las filas de imagenes se borran solas (onDelete: Cascade), pero los
-  // archivos del storage no: si no los borramos quedan ocupando lugar
+  // las filas de imágenes se borran solas (Cascade), los archivos del storage no
   await prisma.producto.delete({ where: { id: Number(id) } });
   // la fila primero, igual que con las promociones
   for (const imagen of producto.imagenes || []) {

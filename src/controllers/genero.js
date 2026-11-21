@@ -1,5 +1,3 @@
-// traduce http a logica de negocio
-
 const generoService = require('../services/genero.service');
 const v = require('../utils/validar');
 

@@ -1,7 +1,4 @@
-// Un texto partido en letras para animarlas de a una: cada letra lleva --n
-// (su posicion) y la clase que le pase quien lo usa, que es quien decide la
-// animacion. Las palabras no se cortan al bajar de renglon. El lector de
-// pantalla lee el texto entero, no las letras sueltas.
+// texto partido en letras para animarlas; cada una lleva --n (su posición) y la clase que le pasen. El lector de pantalla lee el texto entero
 
 export default function PorLetras({ texto, claseLetra = '' }) {
   let n = 0;

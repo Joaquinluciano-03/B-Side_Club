@@ -1,6 +1,4 @@
-// Datos personales del usuario logueado (PUT /api/auth/me).
-// La contraseña se manda solo si se escribio algo: si va vacia, el backend
-// no la toca. Cambiar la contraseña o el email pide la contraseña actual.
+// datos del usuario logueado (PUT /api/auth/me). La contraseña se manda solo si se escribió algo; cambiarla o cambiar el mail pide la contraseña actual
 
 import { useState } from 'react';
 import { CabeceraPanel, CuerpoPanel } from '../../layouts/LayoutPanel';
@@ -29,7 +27,7 @@ export default function Perfil() {
   const [errores, setErrores] = useState({});
   const [guardando, setGuardando] = useState(false);
 
-  // el mail es con el que se recupera la cuenta: cambiarlo tambien la pide
+  // el mail recupera la cuenta: cambiarlo también pide la contraseña
   const cambiaMail = form.mail.trim().toLowerCase() !== (usuario?.mail ?? '').toLowerCase();
   const pideActual = Boolean(password) || cambiaMail;
 

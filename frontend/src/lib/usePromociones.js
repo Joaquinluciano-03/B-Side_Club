@@ -1,7 +1,4 @@
-// Las promociones vigentes, pedidas una sola vez para toda la Home: las usan
-// la banda de Novedades y la tracklist del hero (que solo apunta a Novedades
-// si hay alguna). El pedido se reusa un minuto, como los conteos.
-// null mientras carga; despues, la lista (puede venir vacia).
+// promociones vigentes, pedidas una vez para toda la Home (banda de Novedades y tracklist). null mientras carga
 
 import { useEffect, useState } from 'react';
 import { get } from './api';

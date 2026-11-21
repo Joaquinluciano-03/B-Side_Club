@@ -1,6 +1,4 @@
-// Panel interno: sidebar carbon fija + area de contenido gris.
-// En pantallas chicas el sidebar se esconde y se abre como cajon lateral
-// desde un boton de menu en la barra de arriba.
+// panel interno: sidebar fija y área de contenido; en pantallas chicas el sidebar es un cajón
 
 import { NavLink, Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Suspense, useEffect, useRef, useState } from 'react';
@@ -60,8 +58,7 @@ export default function LayoutPanel() {
   const [abierto, setAbierto] = useState(false);
   const botonRef = useRef(null);
 
-  // el badge de consultas pendientes se refresca al cambiar de seccion:
-  // alcanza para que no quede viejo despues de marcar una como leida
+  // el badge de consultas pendientes se refresca al cambiar de sección
   useEffect(() => {
     get('/dashboard/metricas')
       .then(setMetricas)
@@ -69,7 +66,7 @@ export default function LayoutPanel() {
     setAbierto(false);
   }, [location.pathname]);
 
-  // con el cajon abierto en mobile: Escape lo cierra
+  // con el cajón abierto: Escape lo cierra
   useEffect(() => {
     if (!abierto) return;
     function alTeclear(e) {

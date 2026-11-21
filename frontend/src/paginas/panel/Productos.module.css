@@ -1,4 +1,4 @@
-/* ============ BARRA ============ */
+/* Barra */
 .barra {
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
   color: var(--tinta-tenue);
 }
 
-/* ============ TABLA ============ */
+/* Tabla */
 .tabla {
   background: var(--superficie);
   border: 1px solid var(--borde);
@@ -251,7 +251,7 @@
   margin-top: var(--e-6);
 }
 
-/* ============ MOBILE: cada fila es una tarjeta ============ */
+/* MOBILE: cada fila es una tarjeta */
 @media (max-width: 980px) {
   .encabezado {
     display: none;

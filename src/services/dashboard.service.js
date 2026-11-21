@@ -1,5 +1,3 @@
-// logica de negocio del dashboard: agrega metricas de distintas tablas
-
 const { prisma } = require('../config/db');
 
 async function obtenerMetricas() {
@@ -12,8 +10,7 @@ async function obtenerMetricas() {
     invitacionesPendientes,
     totalUsuarios,
   ] = await Promise.all([
-    // pendientes = sin leer (el aviso del menu lateral); sin responder =
-    // pendientes + leidas (lo que falta contestar, el contador del inicio)
+    // pendientes = sin leer (aviso del menú); sin responder = pendientes + leídas
     prisma.consulta.count({ where: { estado: 'pendiente' } }),
     prisma.consulta.count({ where: { estado: { in: ['pendiente', 'leida'] } } }),
     prisma.producto.count({ where: { esActivo: true } }),

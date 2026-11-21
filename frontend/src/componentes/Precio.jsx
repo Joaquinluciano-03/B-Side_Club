@@ -1,11 +1,6 @@
-// Precio de un producto. Sin descuento es el precio formateado, tal cual.
-// Con descuento muestra el precio original tachado, el precio nuevo y un
-// badge con el descuento aplicado ("-15%" o "-$ 20.000"); en la ficha suma
-// cuanto se ahorra. El tamaño de la letra lo pone el contenedor (todo va en
-// em), asi sirve igual en la card, en la ficha y en el panel.
-//
-// variante: "card" | "ficha" | "compacto" (barra mobile y listado del panel)
-// "A consultar" lo resuelve quien lo usa, porque cada lugar lo pinta distinto.
+// precio de un producto: con descuento muestra el original tachado, el nuevo y un badge ("-15%"); en la ficha suma cuánto se ahorra.
+// Todo va en em, así que el tamaño lo pone el contenedor. variante: "card" | "ficha" | "compacto".
+// "A consultar" lo resuelve quien lo usa
 
 import { formatearPrecio, descuentoDe } from '../lib/formato';
 import estilos from './Precio.module.css';

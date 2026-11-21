@@ -1,30 +1,23 @@
-// Requisitos de una contraseña nueva (registro, invitacion, recuperar y
-// cambiar desde el perfil). El formulario los muestra como una lista que se
-// va tildando mientras se escribe.
-//
-// OJO: el backend valida exactamente lo mismo en src/utils/reglasPassword.js
-// (es el que manda: esto es solo para avisar antes de enviar). Si se cambia
-// una regla, hay que cambiarla en los dos archivos.
+// requisitos de una contraseña nueva, mostrados como lista que se tilda al escribir.
+// El backend valida lo mismo en src/utils/reglasPassword.js (el que manda): si cambia una regla, cambiarla en los dos
 
 export const LARGO_MINIMO = 10;
 
-// contraseñas y palabras que aparecen primero en cualquier lista de claves
-// filtradas. Se comparan sin acentos y deshaciendo los reemplazos tipicos
-// (P@ssw0rd -> password)
+// contraseñas comunes, se comparan sin acentos y deshaciendo reemplazos típicos (P@ssw0rd -> password)
 const PALABRAS_COMUNES = [
   'password', 'contrasena', 'clave', 'qwerty', 'admin', 'administrador', 'usuario', 'bside', 'bsideclub',
   'disqueria', 'vinilo', 'letmein', 'welcome', 'bienvenido', 'iloveyou', 'teamo', 'monkey', 'dragon',
   'football', 'futbol', 'argentina', 'abc123', 'secreto',
 ];
 
-// filas del teclado: "qwer" o "asdf" son tan faciles como "1234"
+// filas del teclado
 const FILAS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm', '1234567890'];
 
 const sinAcentos = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
 const deshacerLeet = (t) =>
   t.replace(/[@4]/g, 'a').replace(/3/g, 'e').replace(/[1!|]/g, 'i').replace(/0/g, 'o').replace(/[$5]/g, 's').replace(/7/g, 't');
 
-// 4 o mas caracteres consecutivos: abcd, 1234, 9876, qwer, lkjh
+// 4 o más caracteres seguidos: abcd, 1234, qwer
 function tieneSecuencia(t) {
   for (let i = 0; i + 4 <= t.length; i++) {
     const tramo = t.slice(i, i + 4);
@@ -38,7 +31,7 @@ function tieneSecuencia(t) {
   return false;
 }
 
-// el patron facil que tenga, o null. datos: nombre, apellido, mail
+// el patrón fácil que tenga, o null
 function patronFacil(password, datos = {}) {
   const t = sinAcentos(password.toLowerCase());
   if (/(.)\1\1/.test(t)) return 'repite el mismo carácter tres veces seguidas';
@@ -52,7 +45,7 @@ function patronFacil(password, datos = {}) {
   return null;
 }
 
-// la lista que se muestra en el formulario, cada requisito con ok true/false
+// lista para el formulario, cada requisito con ok true/false
 export function requisitosPassword(password = '', datos = {}) {
   const patron = password ? patronFacil(password, datos) : 'vacia';
   return [
@@ -68,7 +61,7 @@ export function requisitosPassword(password = '', datos = {}) {
   ];
 }
 
-// el primer problema como mensaje de error, o null si cumple todo
+// el primer problema, o null si cumple todo
 export function errorPassword(password = '', datos = {}) {
   if (!password) return 'Escribí una contraseña.';
   const falta = requisitosPassword(password, datos).find((r) => !r.ok);

@@ -1,6 +1,4 @@
-// Ficha del producto: la hoja de inspeccion del ejemplar. Un producto dado de
-// baja da 404 al visitante (lo filtra el backend); el staff logueado si lo
-// ve, con un aviso de que no esta publico.
+// ficha del producto. Uno dado de baja da 404 al visitante; el staff logueado lo ve con un aviso
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
@@ -82,7 +80,7 @@ export default function DetalleProducto() {
       .then((p) => {
         if (!vigente) return;
         setProducto(p);
-        // otros de la misma categoria, sacando el actual
+        // otros de la misma categoría, sin el actual
         return get(`/productos${query({ categoriaId: p.categoriaId, pageSize: 5 })}`).then((r) => {
           if (vigente) setRelacionados(r.productos.filter((x) => x.id !== p.id).slice(0, 4));
         });

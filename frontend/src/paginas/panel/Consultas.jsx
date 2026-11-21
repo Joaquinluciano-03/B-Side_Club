@@ -1,6 +1,4 @@
-// Bandeja de consultas. La lista es compacta y el detalle se abre en un modal,
-// como lo diseña la demo: los mensajes son largos y adentro de la fila
-// desarmaban el listado.
+// bandeja de consultas: lista compacta y detalle en un modal
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -22,8 +20,7 @@ import {
 } from '../../lib/formato';
 import estilos from './Consultas.module.css';
 
-// "Sin responder" junta las pendientes y las leidas: lo que falta contestar
-// (es lo que cuenta el inicio del panel)
+// "sin responder" junta pendientes y leídas (es lo que cuenta el inicio del panel)
 const SIN_RESPONDER = ['pendiente', 'leida'];
 const FILTROS = [
   { valor: '', label: 'Todas' },
@@ -39,7 +36,7 @@ export default function Consultas() {
 
   // el filtro vive en la URL: el dashboard puede abrir la bandeja ya filtrada
   const estado = VALORES_FILTRO.includes(params.get('estado')) ? params.get('estado') : '';
-  // ¿una consulta en este estado entra en el filtro elegido?
+  // ¿una consulta en este estado entra en el filtro?
   const entraEnFiltro = (e) => !estado || (estado === 'sin_responder' ? SIN_RESPONDER.includes(e) : e === estado);
   function setEstado(nuevo) {
     setParams(nuevo ? { estado: nuevo } : {}, { replace: true });
@@ -67,8 +64,7 @@ export default function Consultas() {
     };
   }, [estado, recargar]);
 
-  // Al abrir una consulta sin leer la marcamos leída sola: es lo que uno
-  // espera de una bandeja, y evita tener que acordarse de hacerlo a mano.
+  // al abrir una consulta sin leer se marca leída sola
   async function abrir(c) {
     setAbierta(c);
     if (c.estado !== 'pendiente') return;
@@ -77,7 +73,7 @@ export default function Consultas() {
       setConsultas((prev) => prev.map((x) => (x.id === c.id ? { ...x, estado: 'leida' } : x)));
       setAbierta((a) => (a && a.id === c.id ? { ...a, estado: 'leida' } : a));
     } catch {
-      // si falla no molestamos: el estado se puede cambiar a mano desde el modal
+      // si falla no molesta: el estado se puede cambiar desde el modal
     }
   }
 
@@ -85,7 +81,7 @@ export default function Consultas() {
     try {
       await patch(`/consultas/${c.id}/estado`, { estado: nuevo });
       setConsultas((prev) =>
-        // si hay un filtro puesto y la consulta ya no entra, la sacamos de la lista
+        // si ya no entra en el filtro, se saca de la lista
         !entraEnFiltro(nuevo)
           ? prev.filter((x) => x.id !== c.id)
           : prev.map((x) => (x.id === c.id ? { ...x, estado: nuevo } : x))

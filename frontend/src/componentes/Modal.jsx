@@ -1,9 +1,4 @@
-// Contenedor de los modales del panel (detalle de consulta, plantilla del
-// mail): fondo oscuro con blur, tarjeta clara centrada, cierre con la X.
-//
-// Usa <dialog> nativo para no reimplementar a mano el foco atrapado, el
-// cierre con Escape y el aislamiento del resto de la pagina. La animacion de
-// entrada y salida vive en global.css.
+// modal del panel con <dialog> nativo (foco, Escape y aislamiento); la animación vive en global.css
 
 import { useEffect, useRef } from 'react';
 import { X } from '@phosphor-icons/react';
@@ -30,7 +25,7 @@ export default function Modal({ abierto, onCerrar, titulo, kicker, bajada, ancho
         onCerrar();
       }}
       onClick={(e) => {
-        // click en el backdrop (afuera de la tarjeta) cierra
+        // click fuera de la tarjeta cierra
         if (e.target === ref.current) onCerrar();
       }}
     >

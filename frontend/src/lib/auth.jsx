@@ -1,5 +1,4 @@
-// Sesion del staff. Guarda el token en localStorage y revalida contra
-// /auth/me al arrancar, porque el token puede haber vencido entre visitas.
+// sesión del staff: token en localStorage, revalidado contra /auth/me al arrancar
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { get, post, put, guardarToken, borrarToken, leerToken, alExpirarSesion } from './api';
@@ -8,9 +7,7 @@ const Ctx = createContext(null);
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
-  // "cargando" arranca en true si hay token: hasta que /me conteste no sabemos
-  // si la sesion sigue viva, y mostrar el login mientras tanto haria parpadear
-  // la pantalla a todo el que ya estaba logueado.
+  // "cargando" arranca en true si hay token, para que no parpadee el login a quien ya estaba logueado
   const [cargando, setCargando] = useState(Boolean(leerToken()));
 
   const cerrarSesion = useCallback(() => {
@@ -18,7 +15,7 @@ export function AuthProvider({ children }) {
     setUsuario(null);
   }, []);
 
-  // si cualquier pedido vuelve 401 con un token puesto, la sesion murio
+  // un 401 con token puesto significa que la sesión murió
   useEffect(() => {
     alExpirarSesion(cerrarSesion);
   }, [cerrarSesion]);
@@ -31,7 +28,7 @@ export function AuthProvider({ children }) {
         if (vigente) setUsuario(u);
       })
       .catch(() => {
-        // token vencido o backend caido: arrancamos como visitante
+        // token vencido o backend caído: sigue como visitante
         borrarToken();
       })
       .finally(() => {
@@ -57,8 +54,7 @@ export function AuthProvider({ children }) {
   }
 
   async function actualizarPerfil(datos) {
-    // con contraseña nueva el backend invalida los tokens anteriores y manda
-    // uno nuevo: hay que guardarlo, si no la proxima llamada cierra la sesion
+    // con contraseña nueva el backend manda un token nuevo: hay que guardarlo
     const { token, ...u } = await put('/auth/me', datos);
     if (token) guardarToken(token);
     setUsuario(u);
@@ -66,8 +62,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    // el token es stateless: el backend solo confirma, el que lo descarta
-    // es el frontend. Si el pedido falla igual cerramos sesion local.
+    // el token no se guarda en el backend: si el pedido falla, se cierra la sesión local igual
     try {
       await post('/auth/logout', {});
     } catch {

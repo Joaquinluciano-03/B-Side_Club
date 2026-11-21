@@ -1,12 +1,5 @@
-// Panel de filtros del catalogo: genero, estado del ejemplar, disponibilidad,
-// decada y precio. Es un <dialog> (foco adentro, Escape y clic afuera
-// cierran): en escritorio entra desde la derecha, en el celular sube desde
-// abajo como una hoja.
-//
-// Se eligen los filtros "en borrador" y se aplican con el boton de abajo, que
-// va diciendo cuantos resultados quedan ("Ver 12 títulos"). Solo aparecen los
-// filtros que tienen sentido para lo que se esta mirando (los manda el
-// backend en /productos/filtros): en Equipos no hay genero.
+// panel de filtros del catálogo (<dialog>). Se elige en borrador y se aplica con el botón, que muestra cuántos resultados quedan.
+// Solo aparecen los filtros que sirven para lo que se mira (vienen de /productos/filtros)
 
 import { useEffect, useRef, useState } from 'react';
 import { X } from '@phosphor-icons/react';
@@ -17,8 +10,7 @@ import { FILTROS_VACIOS, cantidadDeFiltros, etiquetaDecada, filtrosAQuery } from
 import estilos from './FiltrosCatalogo.module.css';
 
 function Seccion({ titulo, opciones, elegidos, etiqueta = (v) => v, onCambiar }) {
-  // una sola opcion no filtra nada; si ya estaba elegida se muestra igual,
-  // para poder sacarla
+  // una sola opción no filtra nada, salvo que ya esté elegida (para poder sacarla)
   if (opciones.length < 2 && elegidos.length === 0) return null;
   const alternar = (valor) =>
     onCambiar(elegidos.includes(valor) ? elegidos.filter((v) => v !== valor) : [...elegidos, valor]);
@@ -47,7 +39,7 @@ function Seccion({ titulo, opciones, elegidos, etiqueta = (v) => v, onCambiar })
   );
 }
 
-// solo digitos: "$ 20.000" o "20000" quedan en "20000"
+// solo dígitos: "$ 20.000" queda en "20000"
 const soloNumero = (texto) => texto.replace(/\D/g, '').slice(0, 10);
 
 export default function FiltrosCatalogo({ abierto, onCerrar, opciones, valores, base, categoria, onAplicar }) {
@@ -55,7 +47,7 @@ export default function FiltrosCatalogo({ abierto, onCerrar, opciones, valores, 
   const [borrador, setBorrador] = useState(valores);
   const [total, setTotal] = useState(null);
 
-  // abrir y cerrar el dialog nativo; al abrir, el borrador arranca de lo aplicado
+  // abre y cierra el dialog; al abrir, el borrador arranca de lo aplicado
   useEffect(() => {
     const d = dialogo.current;
     if (!d) return;
@@ -68,8 +60,7 @@ export default function FiltrosCatalogo({ abierto, onCerrar, opciones, valores, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [abierto]);
 
-  // cuantos resultados daria el borrador (con una pausa, para no pedir por
-  // cada toque: el backend tiene un techo de pedidos)
+  // cuántos resultados da el borrador, con pausa para no pedir en cada toque
   useEffect(() => {
     if (!abierto) return;
     let vigente = true;
@@ -106,7 +97,7 @@ export default function FiltrosCatalogo({ abierto, onCerrar, opciones, valores, 
       className={estilos.panel}
       aria-labelledby="filtros-titulo"
       onClose={onCerrar}
-      // clic en el fondo oscuro (fuera de la hoja): cierra
+      // clic en el fondo: cierra
       onClick={(e) => e.target === dialogo.current && onCerrar()}
     >
       <div className={estilos.hoja}>

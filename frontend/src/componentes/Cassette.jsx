@@ -1,9 +1,4 @@
-// Un cassette sonando, para la cabecera de Nosotros (el Lado B). Hecho solo
-// con CSS: los dos ejes giran y la cinta pasa de a poco de un carrete al otro
-// (el de la izquierda se achica y el de la derecha crece). Es decorativo.
-// Con alScroll la cinta avanza segun cuanto se bajo la pagina (arriba de todo
-// esta llena a la izquierda, al final paso a la derecha) y los ejes giran mas
-// rapido mientras se scrollea. Sin soporte de scroll-driven, avanza sola.
+// cassette decorativo de la cabecera de Nosotros, solo con CSS. Con alScroll la cinta avanza según el scroll; si no, avanza sola
 
 import { useDatosDelLocal } from '../lib/useStoreInfo';
 import estilos from './Cassette.module.css';
@@ -21,7 +16,7 @@ function Carrete({ lado }) {
 }
 
 export default function Cassette({ className = '', alScroll = false }) {
-  // la etiqueta lleva el nombre del local (de la base)
+  // la etiqueta lleva el nombre del local
   const { nombre } = useDatosDelLocal();
   return (
     <figure className={`${estilos.figura} ${alScroll ? estilos.alScroll : ''} ${className}`} aria-hidden="true">

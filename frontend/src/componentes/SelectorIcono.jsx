@@ -1,6 +1,4 @@
-// Grilla para elegir el icono de una categoria en el panel. Son radios
-// nativos debajo de cada tarjeta: las flechas del teclado recorren la grilla
-// y el lector de pantalla anuncia "Icono, grupo de opciones".
+// grilla para elegir el icono de una categoría: radios nativos, así anda con teclado y lector de pantalla
 
 import IconoCategoria, { ICONOS } from './IconoCategoria';
 import estilos from './SelectorIcono.module.css';

@@ -1,8 +1,6 @@
 // Links de contacto armados a partir de lo que el local carga en el panel.
 
-// wa.me necesita el numero completo en formato internacional y sin simbolos.
-// En el panel suele cargarse como "11 5555-0142" (sin codigo de pais): en ese
-// caso le agregamos el 549 de Argentina para celulares.
+// links de contacto a partir de lo que carga el local. wa.me necesita el número internacional sin símbolos: si falta el código de país se agrega 549
 export function linkWhatsApp(numero, mensaje) {
   if (!numero) return null;
   let digitos = String(numero).replace(/\D/g, '');
@@ -12,8 +10,7 @@ export function linkWhatsApp(numero, mensaje) {
   return `https://wa.me/${digitos}${texto}`;
 }
 
-// solo letras, numeros, punto y guion bajo (lo que acepta Instagram): asi un
-// valor raro cargado en la base no arma un link a otra parte
+// solo letras, números, punto y guion bajo, para que un valor raro no arme un link a otra parte
 export function linkInstagram(usuario) {
   if (!usuario) return null;
   const limpio = String(usuario).trim().replace(/^@/, '');
@@ -27,7 +24,7 @@ export function arrobaInstagram(usuario) {
   return limpio.startsWith('@') ? limpio : `@${limpio}`;
 }
 
-// Abre la direccion en el mapa del celular o en Google Maps
+// abre la dirección en el mapa del celular o en Google Maps
 export function linkMapa(direccion) {
   if (!direccion) return null;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;

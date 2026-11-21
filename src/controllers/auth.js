@@ -1,5 +1,3 @@
-//traduce http a logica de negocio
-
 const authService = require('../services/auth.service');
 const v = require('../utils/validar');
 
@@ -25,8 +23,7 @@ async function login(req, res, next) {
   try {
     const { mail, password } = req.body;
 
-    // solo se chequea que sean textos, no la politica de contraseñas: una
-    // cuenta con clave vieja (mas corta) tiene que poder entrar para cambiarla
+    // acá solo se chequea que sean textos: una cuenta con clave vieja tiene que poder entrar
     if (typeof mail !== 'string' || typeof password !== 'string' || !mail.trim() || !password) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
@@ -41,9 +38,7 @@ async function login(req, res, next) {
   }
 }
 
-// el token es stateless: este dispositivo lo descarta. Para cerrar las
-// sesiones de los demas dispositivos alcanza con cambiar la contraseña, que
-// invalida los tokens anteriores (ver tokenVersion en auth.service.js).
+// el token no se guarda: cambiar la contraseña invalida los anteriores
 async function logout(req, res) {
   res.json({ mensaje: 'Sesion cerrada' });
 }
@@ -60,14 +55,12 @@ async function me(req, res, next) {
 async function actualizarMe(req, res, next) {
   try {
     const b = req.body;
-    // los que no vienen quedan como estan (undefined); los que vienen se validan
     const datos = {
       nombre: b.nombre === undefined ? undefined : v.texto(b.nombre, 'nombre', { requerido: true, max: 60 }),
       apellido: b.apellido === undefined ? undefined : v.texto(b.apellido, 'apellido', { requerido: true, max: 60 }),
       mail: b.mail === undefined ? undefined : v.email(b.mail, 'mail', { requerido: true }),
       telefono: b.telefono === undefined ? undefined : v.telefono(b.telefono),
-      // los requisitos; que no use el nombre ni el mail lo revisa el service,
-      // que tiene los datos de la cuenta
+      // el service revisa que no use su nombre ni su mail
       password: v.password(b.password, { requerido: false }),
       // la de ahora: hace falta para cambiar la contraseña o el mail
       passwordActual: typeof b.passwordActual === 'string' ? b.passwordActual.slice(0, 200) : undefined,
@@ -84,7 +77,7 @@ async function forgotPassword(req, res, next) {
     const mail = v.email(req.body.mail, 'mail', { requerido: true });
 
     await authService.forgotPassword(mail);
-    // respuesta identica exista o no el mail, para no filtrar que usuarios estan registrados
+    // misma respuesta exista o no el mail
     res.json({ mensaje: 'Si el mail esta registrado, te enviamos un link para recuperar la contraseña' });
   } catch (err) {
     next(err);

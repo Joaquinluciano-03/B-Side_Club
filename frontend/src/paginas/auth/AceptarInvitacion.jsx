@@ -1,5 +1,4 @@
-// Alta de un integrante del equipo con el token de invitacion.
-// El mail no se pide: lo define la invitacion, no la persona que la acepta.
+// alta de un integrante con el token de invitación. El mail lo define la invitación
 
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';

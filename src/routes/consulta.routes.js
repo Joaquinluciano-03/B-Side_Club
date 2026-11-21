@@ -1,5 +1,3 @@
-// mapea urls a funciones del controller
-
 const { Router } = require('express');
 const consultaController = require('../controllers/consulta');
 const { requireAuth } = require('../middlewares/auth');

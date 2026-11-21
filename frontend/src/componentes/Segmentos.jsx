@@ -1,13 +1,11 @@
-// Control segmentado para filtrar listas del panel (Todas / Pendiente / …).
-// La opcion activa se marca con una pastilla oscura que se desliza.
+// control segmentado para filtrar listas del panel, con una pastilla que se desliza
 
 import { motion, MotionConfig } from 'motion/react';
 import estilos from './Segmentos.module.css';
 
 export default function Segmentos({ opciones, valor, onCambiar, etiqueta, id = 'segmentos' }) {
   return (
-    // reducedMotion="never": la pastilla se desliza siempre, aunque el sistema
-    // tenga "Efectos de animacion" apagado (decision del proyecto, ver tokens.css)
+    // reducedMotion="never": la pastilla se desliza siempre (decisión del proyecto, ver tokens.css)
     <MotionConfig reducedMotion="never">
       <div className={estilos.segmentos} role="tablist" aria-label={etiqueta}>
         {opciones.map((o) => {

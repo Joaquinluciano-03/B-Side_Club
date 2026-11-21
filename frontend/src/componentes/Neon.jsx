@@ -1,17 +1,7 @@
-// Texto como cartel de neon: cada palabra es un tubo de un color (rosa, cian,
-// rosa...) como el logo, y cada letra se enciende por su cuenta. Una letra
-// tiene el tubo "flojo" y parpadea cada tanto. Lo usan el titulo del hero y
-// el logotipo del header.
-//
-// Es solo la parte visual (aria-hidden): quien lo usa pone el texto accesible
-// con aria-label en el elemento que lo contiene.
-//
-// inicio: cuando arranca a encenderse la primera letra (ms desde que monta)
-// paso: cuanto tarda en encenderse cada letra despues de la anterior (ms)
-// color: 'alterna' (rosa, cian, rosa... como el logo), 'rosa' o 'cian' (todo
-// de un color, como el titulo de Categorias o el cartel de abierto/cerrado)
-// tubo: 'doble' (Bungee Outline, cada letra con contorno doble, como el logo)
-// o 'simple' (Bungee Hairline: un solo trazo, como un tubo continuo)
+// texto como cartel de neón: cada palabra es un tubo y cada letra se enciende por su cuenta (una parpadea).
+// Solo lo visual (aria-hidden): quien lo usa pone el aria-label.
+// inicio: ms hasta encender la primera letra; paso: ms entre letras
+// color: 'alterna', 'rosa' o 'cian'; tubo: 'doble' (contorno doble) o 'simple' (un trazo)
 
 import estilos from './Neon.module.css';
 

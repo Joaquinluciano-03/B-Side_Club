@@ -1,13 +1,10 @@
-// logica de negocio de generos musicales (la lista que usan los productos)
-
 const { prisma } = require('../config/db');
 
-// para comparar sin mayusculas ni acentos: "Electrónica" = "electronica"
+// para comparar sin mayúsculas ni acentos
 const comparable = (texto) =>
   texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-// cada genero con cuantos productos lo usan (activos o no: un genero en uso
-// por un producto dado de baja tampoco se puede borrar)
+// cada género con cuántos productos lo usan (activos o no)
 async function listar() {
   const generos = await prisma.genero.findMany({
     orderBy: { nombre: 'asc' },
@@ -17,10 +14,9 @@ async function listar() {
 }
 
 async function crear({ nombre: escrito }) {
-  // primera letra en mayuscula, como el resto de la lista ("cumbia" -> "Cumbia")
+  // primera letra en mayúscula
   const nombre = escrito.charAt(0).toLocaleUpperCase('es') + escrito.slice(1);
-  // "rock nacional" no puede convivir con "Rock nacional": seria el mismo
-  // genero escrito distinto, que es justo lo que la lista viene a evitar
+  // "rock nacional" y "Rock nacional" serían el mismo género
   const existentes = await prisma.genero.findMany({ select: { nombre: true } });
   const igual = existentes.find((g) => comparable(g.nombre) === comparable(nombre));
   if (igual) {

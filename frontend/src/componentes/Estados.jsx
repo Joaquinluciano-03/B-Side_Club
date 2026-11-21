@@ -1,6 +1,4 @@
-// Estados compartidos: carga, vacio y error.
-// El skeleton tiene la misma forma que la card (funda + texto suelto), asi
-// cuando llegan los productos no se mueve nada de lugar.
+// estados compartidos: carga, vacío y error. El skeleton tiene la forma de la card para que nada se mueva al cargar
 
 import { Disc, WarningCircle } from '@phosphor-icons/react';
 import estilos from './Estados.module.css';
@@ -33,9 +31,7 @@ export function Vacio({ titulo, texto, children }) {
   );
 }
 
-// OJO con el nombre: si este componente se llamara "Error", taparia el
-// constructor global Error en todos los modulos que lo importen, y un
-// throw new Error(...) ahi adentro reventaria de forma muy confusa.
+// no llamarlo "Error": taparía el Error global
 export function ErrorCarga({ mensaje, onReintentar }) {
   return (
     <div className={`${estilos.vacio} ${estilos.error}`} role="alert">
@@ -53,7 +49,7 @@ export function ErrorCarga({ mensaje, onReintentar }) {
   );
 }
 
-// carga de una pantalla entera (panel): un disco chico girando
+// carga de una pantalla entera (panel)
 export function Cargando({ texto = 'Cargando…' }) {
   return (
     <div className={estilos.cargando} role="status">

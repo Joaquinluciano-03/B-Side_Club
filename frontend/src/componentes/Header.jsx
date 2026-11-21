@@ -1,7 +1,4 @@
-// Header pegajoso del sitio publico. Sobre el carbon del disco: el logotipo
-// es un cartel de neon rosa/cian igual al titulo del hero (componente Neon),
-// y la navegacion va en una sola linea. En pantallas chicas los links se esconden detras de un boton
-// de menu que despliega un panel desde arriba.
+// header pegajoso del sitio público. En pantallas chicas los links van en un menú que baja desde arriba
 
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
@@ -14,7 +11,7 @@ import estilos from './Header.module.css';
 const NAV = [
   { a: '/', label: 'Home', exacto: true },
   { a: '/catalogo', label: 'Catálogo' },
-  // ir al Lado B "da vuelta el disco" (View Transition, ver global.css)
+  // ir al Lado B da vuelta el disco (View Transition, ver global.css)
   { a: '/nosotros', label: 'Nosotros', transicion: true },
   { a: '/contacto', label: 'Contacto' },
 ];
@@ -22,19 +19,19 @@ const NAV = [
 const claseLink = ({ isActive }) => `${estilos.link} ${isActive ? estilos.activo : ''}`;
 
 export default function Header() {
-  // el nombre del cartel sale de la base (Info del local)
+  // el nombre del cartel sale de la base
   const { nombre } = useDatosDelLocal();
   const [abierto, setAbierto] = useState(false);
   const { pathname } = useLocation();
   const botonRef = useRef(null);
   const panelRef = useRef(null);
 
-  // al navegar se cierra el menu (si no, queda tapando la pagina nueva)
+  // al navegar se cierra el menú
   useEffect(() => {
     setAbierto(false);
   }, [pathname]);
 
-  // con el menu abierto: Escape lo cierra y el foco entra al primer link
+  // con el menú abierto: Escape lo cierra y el foco entra al primer link
   useEffect(() => {
     if (!abierto) return;
     panelRef.current?.querySelector('a')?.focus();
@@ -82,7 +79,7 @@ export default function Header() {
         ref={panelRef}
         className={estilos.panel}
         data-abierto={abierto}
-        // fuera de pantalla no tiene que recibir foco ni lectores de pantalla
+        // fuera de pantalla no recibe foco
         inert={!abierto}
       >
         {NAV.map((n) => (

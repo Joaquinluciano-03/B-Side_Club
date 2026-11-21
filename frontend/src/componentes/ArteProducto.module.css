@@ -16,7 +16,7 @@
   object-fit: cover;
 }
 
-/* ============ FUNDA DE PAPEL (vinilo / CD) ============ */
+/* FUNDA DE PAPEL (vinilo / CD) */
 .funda {
   /* trama de puntos impresa + sombra suave en el lomo y el borde */
   background:
@@ -100,7 +100,7 @@
     conic-gradient(from 30deg, #c9cdd1, #f4f6f7, #a8b3bb, #e7d9f2, #c9cdd1, #d8f0ea, #f4f6f7, #c9cdd1);
 }
 
-/* ============ ESTUCHE DE CASSETTE ============ */
+/* Estuche de cassette */
 .estuche {
   background:
     radial-gradient(rgba(242, 236, 228, 0.07) 0.9px, transparent 1.3px) 0 0 / 7px 7px,
@@ -169,7 +169,7 @@
     repeating-conic-gradient(#e8e2d8 0 20deg, #8a817b 20deg 60deg);
 }
 
-/* ============ FICHA DE EQUIPO ============ */
+/* Ficha de equipo */
 .ficha {
   background:
     radial-gradient(color-mix(in srgb, var(--tinta) 14%, transparent) 0.9px, transparent 1.3px) 0 0 / 7px 7px,
@@ -214,7 +214,7 @@
   text-transform: uppercase;
 }
 
-/* ============ OBJETO QUE ASOMA DE LA FUNDA ============ */
+/* Objeto que asoma de la funda */
 /* Se posiciona dentro de la card (que tiene position: relative), detras de
    la tapa. La card decide cuanto asoma con --asomar. */
 .objeto {

@@ -1,17 +1,9 @@
-// Marca un elemento segun este o no en pantalla, para que el CSS lo anime:
-//   - data-visto: se pone una sola vez, cuando entra (con un margen, asi la
-//     entrada se ve y no pasa en el borde de abajo). El CSS anima la entrada
-//     con [data-visto] y esconde lo que falta entrar con
-//     [data-entrada]:not([data-visto]).
-//   - data-quieto (con pausa: true): mientras esta fuera de pantalla, para
-//     pausar los loops que nadie esta mirando (la cinta, los discos).
-//
+// marca un elemento según esté o no en pantalla para que el CSS lo anime:
+// - data-visto: se pone una vez, al entrar. El CSS esconde lo que falta entrar con [data-entrada]:not([data-visto])
+// - data-quieto (con pausa: true): mientras está fuera de pantalla, para pausar loops
+// Es un ref de callback. Sin IntersectionObserver se marca visto de una
 //   const ref = useEnPantalla();
 //   <section ref={ref} data-entrada>...</section>
-//
-// Es un ref de callback: funciona aunque el elemento aparezca despues (una
-// seccion que espera datos). Sin IntersectionObserver se marca visto de una,
-// asi nunca queda nada escondido.
 
 import { useCallback } from 'react';
 

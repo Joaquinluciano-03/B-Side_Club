@@ -1,9 +1,7 @@
-// logica de negocio de consultas
-
 const { prisma } = require('../config/db');
 
 const ESTADOS_VALIDOS = ['pendiente', 'leida', 'respondida'];
-// "sin responder": las que todavia hay que contestar, se hayan leido o no
+// sin responder: pendientes y leídas
 const SIN_RESPONDER = ['pendiente', 'leida'];
 
 async function crear({ nombre, email, telefono, asunto, mensaje, productoId }) {
@@ -33,8 +31,7 @@ async function crear({ nombre, email, telefono, asunto, mensaje, productoId }) {
 async function listar({ estado } = {}) {
   const where = {};
 
-  // el estado es un enum en la base: un valor cualquiera metido en el where
-  // falla como error interno, asi que lo validamos antes y devolvemos 400
+  // el estado es un enum: se valida antes para devolver 400 y no un error interno
   if (estado === 'sin_responder') {
     where.estado = { in: SIN_RESPONDER };
   } else if (estado) {

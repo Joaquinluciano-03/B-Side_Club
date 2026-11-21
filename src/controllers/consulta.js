@@ -1,5 +1,3 @@
-// traduce http a logica de negocio
-
 const consultaService = require('../services/consulta.service');
 const v = require('../utils/validar');
 
@@ -7,7 +5,7 @@ const ESTADOS_VALIDOS = ['pendiente', 'leida', 'respondida'];
 
 async function crear(req, res, next) {
   try {
-    // formulario publico: es lo primero que alguien de afuera puede escribir en la base
+    // formulario público: todo se valida
     const datos = {
       nombre: v.texto(req.body.nombre, 'nombre', { requerido: true, max: 80 }),
       email: v.email(req.body.email, 'email', { requerido: true }),
@@ -18,7 +16,7 @@ async function crear(req, res, next) {
     };
 
     await consultaService.crear(datos);
-    // a quien escribe le alcanza con saber que llego: no se le devuelve el registro
+    // no se devuelve el registro
     res.status(201).json({ mensaje: 'Consulta enviada' });
   } catch (err) {
     next(err);

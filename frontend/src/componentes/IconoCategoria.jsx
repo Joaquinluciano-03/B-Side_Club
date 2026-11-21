@@ -1,11 +1,4 @@
-// Los iconos de las categorias: objetos de disqueria dibujados con la misma
-// paleta que las tapas genericas (cuerpos carbon, metal, crema del papel) y
-// un solo color de acento, que llega por `color`. El local elige uno al
-// crear la categoria (panel > Categorias); si no eligio, se deduce del nombre.
-//
-// Vinilo, CD, cassette y perilla son los motivos originales, hechos con CSS
-// (ver IconoCategoria.module.css). El resto son SVG con el mismo lenguaje.
-// La lista de ids tiene que coincidir con ICONOS de src/controllers/categoria.js.
+// iconos de las categorías con la paleta de las tapas y un color de acento. Los ids tienen que coincidir con ICONOS de src/controllers/categoria.js
 
 import { useId } from 'react';
 import estilos from './IconoCategoria.module.css';
@@ -23,7 +16,7 @@ const C = {
   tinta: 'rgba(20, 18, 16, 0.6)',
 };
 
-// circulo con agujero (fill-rule evenodd): un disco, un label perforado
+// círculo con agujero (evenodd)
 function anillo(cx, cy, R, r) {
   const c = (rad) => `M${cx - rad},${cy}a${rad},${rad} 0 1,0 ${2 * rad},0a${rad},${rad} 0 1,0 ${-2 * rad},0Z`;
   return c(R) + (r ? c(r) : '');
@@ -201,7 +194,7 @@ const DIBUJOS = {
     </>
   ),
 
-  // el brazo apoyado en el borde de un disco: la pua sola no se reconoce
+  // el brazo apoyado en un disco: la púa sola no se reconoce
   aguja: () => (
     <>
       <circle cx="20" cy="98" r="60" fill={C.carbon} />
@@ -219,7 +212,7 @@ const DIBUJOS = {
     </>
   ),
 
-  // cepillo de pana y rociador: con el cepillo solo parecia un borrador
+  // cepillo y rociador: el cepillo solo parecía un borrador
   cepillo: () => (
     <>
       {[
@@ -366,9 +359,7 @@ export const ICONOS = [
 
 const IDS = new Set(ICONOS.map((i) => i.id));
 
-// palabras del nombre -> icono, para las categorias que todavia no tienen uno
-// elegido (y para sugerirlo mientras se escribe el nombre en el panel).
-// El orden importa: "vinilos de color" tiene que ganarle a "vinilo".
+// palabras del nombre -> icono, para categorías sin icono elegido. El orden importa: "vinilos de color" va antes que "vinilo"
 const PISTAS = [
   [/color|edici[oó]n especial/, 'color'],
   [/simple|7"|7 pulgadas/, 'simple'],
@@ -399,11 +390,7 @@ export function iconoSugerido(nombre = '') {
   return PISTAS.find(([re]) => re.test(n))?.[1] ?? null;
 }
 
-/**
- * El icono de una categoria: el elegido en el panel o, si no hay, el que
- * sugiere el nombre. Acepta la categoria entera o solo su nombre. Sin pistas
- * queda el vinilo, que es lo que es casi todo en una disqueria.
- */
+/** Icono de una categoría: el elegido o el que sugiere su nombre; sin pistas, el vinilo. */
 export function iconoDe(categoria) {
   if (categoria && typeof categoria === 'object') {
     if (IDS.has(categoria.icono)) return categoria.icono;
@@ -412,10 +399,7 @@ export function iconoDe(categoria) {
   return iconoSugerido(categoria) ?? 'vinilo';
 }
 
-/**
- * Dibuja un icono. `icono` es el id; si no, se toma de `categoria`.
- * Ocupa el 72% de su contenedor (cuadrado), igual que los motivos de siempre.
- */
+/** Dibuja un icono por `icono` (id) o por `categoria`. */
 export default function IconoCategoria({ icono, categoria, color = '#F26A1B', className = '' }) {
   const id = useId().replace(/:/g, '');
   const cual = IDS.has(icono) ? icono : iconoDe(categoria);

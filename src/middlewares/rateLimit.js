@@ -1,19 +1,11 @@
-// Limites de pedidos por IP. Es la capa que faltaba: la API key no sirve para
-// frenar fuerza bruta porque viaja en el frontend y cualquiera la puede leer
-// desde las herramientas del navegador y reusarla con curl.
+// límites de pedidos por IP (la API key no frena fuerza bruta porque viaja en el frontend)
 
 const rateLimit = require('express-rate-limit');
 const { ipKeyGenerator } = require('express-rate-limit');
 
 const MINUTO = 60 * 1000;
 
-// De donde sacamos "quien es el que pide".
-//
-// Por defecto la libreria usa req.ip, que Express arma a partir del socket de
-// la conexion. Corriendo como funcion de Netlify NO hay socket: req.ip queda
-// undefined y la libreria explota al intentar hashearlo, tirando 500 en TODOS
-// los pedidos. Por eso lo resolvemos a mano, leyendo el header con la IP real
-// del cliente que pone Netlify.
+// la IP se saca de los headers: como función de Netlify no hay socket y req.ip queda undefined
 function identificarCliente(req) {
   const ip =
     req.headers['x-nf-client-connection-ip'] || // la que pone Netlify
@@ -21,14 +13,11 @@ function identificarCliente(req) {
     req.ip ||
     '';
 
-  // ipKeyGenerator normaliza IPv6 a su subred: sin esto, alguien con un /64
-  // tiene millones de direcciones y cada intento contaria como un cliente
-  // distinto, dejando el limite en nada.
+  // ipKeyGenerator agrupa IPv6 por subred, si no cada dirección contaría como un cliente distinto
   return ip ? ipKeyGenerator(ip) : 'sin-ip';
 }
 
-// respuesta en el mismo formato { error } que usa el resto de la API,
-// para que el frontend la pueda mostrar sin un caso especial
+// mismo formato { error } que el resto de la API
 function respuesta(mensaje) {
   return (req, res) => res.status(429).json({ error: mensaje });
 }
@@ -39,27 +28,21 @@ function crearLimite({ windowMs, limit, mensaje, skipSuccessfulRequests = false 
     limit,
     skipSuccessfulRequests,
     keyGenerator: identificarCliente,
-    // draft-7 y no draft-8: el borrador 8 agrega una "partition key" que la
-    // libreria arma hasheando datos de la conexion, y eso no existe cuando
-    // corremos sin socket. draft-7 manda los mismos RateLimit-* utiles.
+    // draft-7: el draft-8 necesita datos del socket que acá no existen
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     handler: respuesta(mensaje),
   });
 }
 
-// Techo general de toda la API. Alto a proposito: no es para frenar ataques
-// puntuales (de eso se encargan los de abajo) sino para que un script suelto
-// no pueda inundar el servidor.
+// techo general, alto a propósito: solo evita que un script suelto inunde el servidor
 const limiteGeneral = crearLimite({
   windowMs: 15 * MINUTO,
   limit: 300,
   mensaje: 'Demasiados pedidos. Esperá unos minutos y volvé a intentar.',
 });
 
-// Login: solo contamos los intentos FALLIDOS (skipSuccessfulRequests).
-// Asi el que entra bien puede seguir usando la app normalmente, y el que
-// prueba contraseñas al azar se queda sin intentos enseguida.
+// login: solo cuentan los intentos fallidos
 const limiteLogin = crearLimite({
   windowMs: 15 * MINUTO,
   limit: 10,
@@ -67,16 +50,14 @@ const limiteLogin = crearLimite({
   mensaje: 'Demasiados intentos de login fallidos. Esperá 15 minutos.',
 });
 
-// Operaciones que crean o cambian credenciales. Son poco frecuentes por
-// naturaleza, asi que un limite bajo no molesta al uso normal. En
-// forgot-password tambien evita que se use la API para bombardear un mail.
+// cambios de credenciales: poco frecuentes, límite bajo (en forgot-password evita bombardear un mail)
 const limiteCuenta = crearLimite({
   windowMs: 60 * MINUTO,
   limit: 10,
   mensaje: 'Demasiados pedidos seguidos. Esperá una hora y volvé a intentar.',
 });
 
-// Formulario de contacto: es publico y sin login, el vector de spam mas obvio.
+// formulario de contacto: público, el vector de spam más obvio
 const limiteFormulario = crearLimite({
   windowMs: 60 * MINUTO,
   limit: 5,

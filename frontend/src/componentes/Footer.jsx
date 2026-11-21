@@ -1,6 +1,4 @@
-// Pie del sitio: el Lado B. Todo sale de GET /api/store-info (lo edita el
-// panel), asi que tiene que verse bien aunque falte algun dato o la info no
-// este configurada todavia.
+// pie del sitio, todo sale de store-info; tiene que verse bien aunque falten datos
 
 import { Link } from 'react-router-dom';
 import { WhatsappLogo, InstagramLogo, EnvelopeSimple, Phone, MapPin } from '@phosphor-icons/react';

@@ -1,7 +1,4 @@
-// Formateo de datos que vienen del backend.
-
-// OJO: "precio" es Decimal en Prisma, asi que llega como STRING en el JSON
-// (no como number). Hay que pasarlo por Number antes de cualquier cuenta.
+// formateo de datos del backend. OJO: "precio" llega como string (Decimal), hay que pasarlo por Number
 export function formatearPrecio(precio) {
   if (precio === null || precio === undefined || precio === '') return 'A consultar';
   const n = Number(precio);
@@ -17,13 +14,8 @@ export function esAConsultar(precio) {
   return precio === null || precio === undefined || precio === '';
 }
 
-// Descuento de un producto (descuento_tipo + descuento_valor, ver el backend).
-// Devuelve null si no tiene, o los numeros listos para mostrar:
-//   final: el precio con el descuento, redondeado a pesos enteros
-//   ahorro: cuanto se descuenta en pesos
-//   etiqueta: lo que se lee en el badge ("-15%" o "-$ 20.000")
-// Recibe tipo, valor y precio sueltos para poder usarlo tambien en el
-// formulario del panel, antes de guardar.
+// descuento de un producto: null si no tiene, o { final, ahorro, etiqueta } ("-15%" o "-$ 20.000").
+// Recibe tipo, valor y precio sueltos para usarlo también en el formulario
 export function calcularDescuento(precio, tipo, valor) {
   if (esAConsultar(precio) || !tipo) return null;
   const p = Number(precio);
@@ -45,11 +37,7 @@ export function descuentoDe(producto) {
   return calcularDescuento(producto?.precio, producto?.descuento_tipo, producto?.descuento_valor);
 }
 
-// Producto no tiene campo "artista": por convencion el nombre se carga como
-// "Titulo — Artista" (tambien vale con " - " o " – "). Lo separamos para
-// mostrar dos lineas con jerarquia. Si no hay separador, todo es titulo.
-// Se corta en el PRIMER separador con espacios alrededor, asi un titulo con
-// guion pegado ("Lado-B") no se parte.
+// el nombre se carga como "Título — Artista" (también " - " o " – "). Se corta en el primer separador con espacios, así "Lado-B" no se parte
 const SEPARADOR_NOMBRE = /\s+[—–-]\s+/;
 
 export function separarNombre(nombre) {
@@ -60,10 +48,7 @@ export function separarNombre(nombre) {
   return { titulo: titulo.trim(), artista: resto.join(' - ').trim() || null };
 }
 
-// Escala Goldmine para vinilos, cassettes y CDs, de mejor a peor. La
-// condicion es texto libre en la base ("Muy bueno (VG+)", "Casi nuevo (NM)"):
-// si trae un codigo entre parentesis lo marcamos en la escala; si no
-// ("Revisado en taller", "Coleccionista") no se muestra escala.
+// escala Goldmine: si la condición trae un código entre paréntesis se marca en la escala; si no, no se muestra
 export const ESCALA_GOLDMINE = [
   { codigo: 'M', nombre: 'Nuevo' },
   { codigo: 'NM', nombre: 'Casi nuevo' },
@@ -75,8 +60,7 @@ export const ESCALA_GOLDMINE = [
 export function gradoGoldmine(condicion) {
   const m = String(condicion ?? '').match(/\((M|NM|VG\+|VG|G\+?)\)/i);
   if (!m) return null;
-  // G+ no esta en la escala corta: cuenta como G. Ojo: solo el codigo "G+"
-  // exacto (un replace suelto convertia "VG+" en "VG")
+  // G+ cuenta como G (solo el código exacto: un replace suelto convertía "VG+" en "VG")
   const leido = m[1].toUpperCase();
   const codigo = leido === 'G+' ? 'G' : leido;
   return ESCALA_GOLDMINE.some((g) => g.codigo === codigo) ? codigo : null;
@@ -118,8 +102,7 @@ export function etiquetaRol(rol) {
   return ETIQUETAS_ROL[rol] || rol;
 }
 
-// Para INSTANTES (cuándo llegó una consulta, cuándo vence una invitación):
-// convertir a hora local es lo correcto.
+// para instantes (cuándo llegó una consulta): hora local
 export function formatearFecha(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -127,11 +110,7 @@ export function formatearFecha(iso) {
   return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Para DÍAS DE CALENDARIO (la vigencia de una promoción): acá convertir a
-// hora local está MAL. Se guardan como medianoche UTC del día elegido, así
-// que en Argentina (UTC-3) ese instante cae el día anterior a las 21:00 y
-// "1 de junio" se mostraría como "31 de mayo". Leemos los componentes en UTC,
-// que son los que la persona eligió en el formulario.
+// para días de calendario (vigencia de una promo): se guardan como medianoche UTC, así que en Argentina caerían el día anterior. Se leen en UTC
 export function formatearDia(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -155,8 +134,7 @@ export function formatearFechaHora(iso) {
   });
 }
 
-// Mismo texto que usa el backend cuando no hay SMTP: sirve para explicarle al
-// usuario por que no le llego el mail en desarrollo.
+// mismo texto que el backend cuando no hay SMTP
 export function mensajeDeError(err) {
   return err?.message || 'Algo salió mal. Probá de nuevo.';
 }

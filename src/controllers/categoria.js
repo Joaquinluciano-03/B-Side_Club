@@ -1,18 +1,14 @@
-// traduce http a logica de negocio
-
 const categoriaService = require('../services/categoria.service');
 const v = require('../utils/validar');
 
-// los iconos que sabe dibujar el sitio: tiene que coincidir con la lista de
-// frontend/src/componentes/IconoCategoria.jsx
+// tiene que coincidir con IconoCategoria.jsx
 const ICONOS = [
   'vinilo', 'simple', 'color', 'cd', 'cassette', 'vhs',
   'bandeja', 'amplificador', 'perilla', 'parlante', 'auriculares', 'radio', 'microfono',
   'aguja', 'cepillo', 'funda', 'caja', 'libro', 'poster', 'remera', 'regalo', 'etiqueta',
 ];
 
-// como se cuentan sus productos: "1 equipo" / "4 equipos". Van de a dos:
-// las dos vacias = la unidad por defecto (título / títulos)
+// unidad con la que se cuentan los productos (singular / plural); vacías = título / títulos
 function unidades(b) {
   const singular = v.texto(b.unidad_singular, 'unidad_singular', { max: 30 });
   const plural = v.texto(b.unidad_plural, 'unidad_plural', { max: 30 });
@@ -57,7 +53,6 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { nombre, descripcion, icono, unidad_singular, unidad_plural } = req.body;
-    // los que no vienen quedan como estan (undefined); los que vienen se validan
     const categoria = await categoriaService.actualizar(v.id(req.params.id), {
       nombre: nombre === undefined ? undefined : v.texto(nombre, 'nombre', { requerido: true, max: 60 }),
       descripcion: descripcion === undefined ? undefined : v.texto(descripcion, 'descripcion', { max: 300, multilinea: true }),

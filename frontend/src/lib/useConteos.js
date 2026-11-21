@@ -1,13 +1,5 @@
-// Cuantos titulos hay en total y por categoria. /categorias trae el "total"
-// de productos publicados de cada una, y el total general es la suma (todo
-// producto tiene categoria): un solo pedido. Se cachea en memoria: lo usan el
-// hero de la home, la seccion de formatos y los separadores del catalogo, y
-// no queremos repetir pedidos (el backend tiene un techo de 300 cada 15 minutos).
-//
-// El cache vence al minuto: pasado ese tiempo se muestra lo que habia y se
-// pide de nuevo en segundo plano. Y el panel lo descarta al tocar una
-// categoria o un producto (olvidarConteos), para que al volver al sitio se
-// vea el cambio (el icono nuevo, la categoria nueva) sin recargar la pagina.
+// cuántos títulos hay en total y por categoría, con un solo pedido a /categorias. Se cachea un minuto (el backend limita los pedidos);
+// el panel lo descarta al tocar una categoría o producto (olvidarConteos)
 
 import { useEffect, useState } from 'react';
 import { get } from './api';
@@ -17,7 +9,7 @@ const VIGENCIA_MS = 60 * 1000;
 let cache = null;
 let pedidoEn = 0;
 let enVuelo = null;
-// los componentes montados, para avisarles cuando llegan datos nuevos
+// componentes montados, para avisarles cuando llegan datos nuevos
 const suscriptores = new Set();
 
 function vigente() {
@@ -29,7 +21,7 @@ function traer() {
     enVuelo = get('/categorias')
       .catch(() => null)
       .then((categorias) => {
-        // si falla y ya habia datos, se quedan los de antes
+        // si falla y ya había datos, quedan los de antes
         if (!categorias) return cache ?? { total: null, categorias: [] };
         const conTotal = categorias.every((c) => typeof c.total === 'number');
         cache = {

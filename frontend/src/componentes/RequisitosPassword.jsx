@@ -1,7 +1,4 @@
-// Lista de requisitos de una contraseña nueva, debajo del campo. Cada uno se
-// tilda mientras se escribe, asi no hace falta enviar el formulario para saber
-// que falta. Las reglas estan en lib/reglasPassword (el backend valida lo
-// mismo). datos: nombre, apellido y mail, para avisar si la contraseña los usa.
+// requisitos de una contraseña nueva, se tildan mientras se escribe (reglas en lib/reglasPassword). datos: nombre, apellido y mail
 
 import { Check, Circle } from '@phosphor-icons/react';
 import { requisitosPassword } from '../lib/reglasPassword';

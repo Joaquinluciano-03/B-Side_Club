@@ -1,12 +1,5 @@
-// Nosotros: el Lado B. Toda la pagina va en carbon y son tres partes, cada
-// una con un solo movimiento:
-//   1. la cabecera, con el cassette sonando (la cinta avanza con el scroll);
-//   2. la caratula del cassette (la tarjeta de papel plegada que viene en la
-//      cajita): la historia del local son los temas del lado B (B1, B2, B3).
-//      Cuando llega a pantalla, el frente se despliega desde el lomo;
-//   3. la visita: direccion, horario y como escribirnos.
-// Los datos de contacto y el horario salen de GET /api/store-info, que el
-// panel puede editar.
+// Nosotros, el Lado B: cabecera con el cassette (la cinta avanza con el scroll), la carátula con la historia (B1, B2, B3) que se despliega al llegar a pantalla, y la visita.
+// Contacto y horario salen de store-info
 
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight } from '@phosphor-icons/react';

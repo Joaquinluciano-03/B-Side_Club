@@ -1,11 +1,6 @@
-// logica de negocio de categorias
-
 const { prisma } = require('../config/db');
 
-// Cada categoria viene con "total": cuantos productos publicados tiene. El
-// sitio lo muestra en el hero, en la home y en los separadores del catalogo;
-// antes lo averiguaba con un pedido aparte por categoria, despues de recibir
-// esta lista (una cadena de pedidos que demoraba la carga).
+// cada categoría trae "total": cuántos productos publicados tiene
 async function listar() {
   const categorias = await prisma.categoria.findMany({
     orderBy: { nombre: 'asc' },

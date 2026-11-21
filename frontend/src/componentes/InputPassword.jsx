@@ -1,12 +1,10 @@
-// Campo de contraseña con boton para mostrarla. Recibe las mismas props que
-// un <input>; va adentro de un .campo como cualquier otro.
+// campo de contraseña con botón para mostrarla; recibe las props de un <input>
 
 import { useState } from 'react';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import estilos from './InputPassword.module.css';
 
-// Para formularios armados con un .map de campos: <Entrada as={...} /> pinta
-// un <input> comun o un InputPassword segun el tipo del campo.
+// para formularios armados con .map: pinta un <input> o un InputPassword según el tipo
 export function Entrada({ as: Componente = 'input', ...props }) {
   return <Componente {...props} />;
 }

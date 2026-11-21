@@ -1,8 +1,4 @@
-// El catalogo. Busqueda + filtro por categoria + filtros (genero, estado,
-// disponibilidad, decada, precio) + paginacion, todo reflejado en la URL para
-// que un filtro se pueda compartir y el boton Atras funcione.
-// Los filtros son separadores de batea, cada uno con su cantidad; el elegido
-// queda estirado y naranja (todo en Catalogo.module.css).
+// catálogo: búsqueda, categoría, filtros y paginación, todo en la URL para poder compartir y usar Atrás
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -29,9 +25,7 @@ import { irAlScroll } from '../lib/scrollSuave';
 import IconoCategoria from '../componentes/IconoCategoria';
 import estilos from './Catalogo.module.css';
 
-// La busqueda dispara un pedido por tecla si no se la frena, y el backend
-// tiene un techo de 300 pedidos cada 15 minutos: escribir "pink floyd" se
-// comeria 11 de una. Esperamos a que la persona deje de tipear.
+// la búsqueda espera a que la persona deje de tipear: el backend limita a 300 pedidos cada 15 minutos
 function useDebounce(valor, ms = 350) {
   const [debounced, setDebounced] = useState(valor);
   useEffect(() => {
@@ -41,11 +35,10 @@ function useDebounce(valor, ms = 350) {
   return debounced;
 }
 
-// el total de todo el catalogo mezcla discos, equipos y accesorios: se cuenta
-// en "productos", no en la unidad de una categoria
+// el total mezcla discos, equipos y accesorios: se cuenta en "productos"
 const SIN_CATEGORIA = { unidad_singular: 'producto', unidad_plural: 'productos' };
 
-// como se puede ordenar (el backend acepta los mismos valores en ?orden=)
+// formas de ordenar (el backend acepta los mismos valores en ?orden=)
 const ORDENES = [
   { valor: 'recientes', label: 'Más nuevos' },
   { valor: 'precio-asc', label: 'Menor precio' },
@@ -78,9 +71,9 @@ export default function Catalogo() {
   const page = Number(params.get('page')) || 1;
   const qUrl = params.get('q') || '';
   const orden = params.get('orden') || 'recientes';
-  // ?ofertas=1: solo los productos con descuento (se combina con el resto)
+  // ?ofertas=1: solo con descuento
   const soloOfertas = params.get('ofertas') === '1';
-  // genero, estado, disponibilidad, decada y precio (ver lib/filtrosCatalogo)
+  // género, estado, disponibilidad, década y precio (lib/filtrosCatalogo)
   const claveFiltros = LISTAS.concat('precioMin', 'precioMax')
     .map((k) => params.get(k) || '')
     .join('|');
@@ -88,15 +81,14 @@ export default function Catalogo() {
   const filtros = useMemo(() => leerFiltros(params), [claveFiltros]);
   const nFiltros = cantidadDeFiltros(filtros);
   const [verFiltros, setVerFiltros] = useState(false);
-  // donde se esta mirando: con esto el backend dice que filtros tienen sentido
+  // dónde se está mirando: el backend dice qué filtros tienen sentido
   const base = useMemo(
     () => ({ q: qUrl || undefined, categoriaId: categoriaId || undefined, conDescuento: soloOfertas ? 'true' : undefined }),
     [qUrl, categoriaId, soloOfertas]
   );
   const [opciones, setOpciones] = useState(null);
 
-  // el input es estado local y la URL se actualiza recien con el debounce,
-  // asi no se reescribe el historial en cada tecla
+  // el input es estado local y la URL se actualiza con el debounce
   const [texto, setTexto] = useState(qUrl);
   const q = useDebounce(texto);
 
@@ -104,13 +96,12 @@ export default function Catalogo() {
   const [error, setError] = useState(null);
   const [intento, setIntento] = useState(0);
 
-  // si la busqueda cambia desde afuera (el buscador del hero), sincronizamos
+  // si la búsqueda cambia desde afuera (el buscador del hero), se sincroniza
   useEffect(() => {
     setTexto(qUrl);
   }, [qUrl]);
 
-  // cuando cambia el texto buscado volvemos a la pagina 1: quedarse en la 3
-  // de una busqueda nueva casi siempre deja la pantalla vacia
+  // al cambiar el texto vuelve a la página 1
   useEffect(() => {
     if (q === qUrl) return;
     const nuevos = new URLSearchParams(params);
@@ -159,7 +150,7 @@ export default function Catalogo() {
     setVerFiltros(false);
   }
 
-  // saca un valor de un filtro (la "x" de las etiquetas de filtros activos)
+  // saca un valor de un filtro (la "x" de las etiquetas)
   function quitarFiltro(clave, valor) {
     aplicarFiltros(
       clave === 'precio'
@@ -176,11 +167,8 @@ export default function Catalogo() {
     setParams(nuevos);
   }
 
-  // Las pestañas no se deslizan nunca: si no entran al lado del buscador bajan
-  // a su propia fila (CSS), y si tampoco entran ahi (muchas categorias o una
-  // pantalla angosta) se cambian por el selector. En el celular siempre va el
-  // selector (CSS). Se mide el ancho natural de las pestañas cuando estan a la
-  // vista y se compara con el lugar que hay en la barra.
+  // si las pestañas no entran al lado del buscador bajan a su fila, y si tampoco entran ahí se cambian por el selector (siempre en el celular).
+  // Se mide el ancho natural de las pestañas y se compara con el lugar de la barra
   const barraRef = useRef(null);
   const pestanasRef = useRef(null);
   const [noEntran, setNoEntran] = useState(false);
@@ -202,9 +190,7 @@ export default function Catalogo() {
     return () => observador.disconnect();
   }, [categorias.length]);
 
-  // un link viejo puede traer una categoria que ya no existe: sin esto no
-  // quedaba ninguna pestaña marcada y la grilla salia vacia. Se vuelve a
-  // "Todo" sin sumar un paso al historial
+  // un link viejo puede traer una categoría que ya no existe: se vuelve a "Todo" sin sumar un paso al historial
   useEffect(() => {
     if (!categoriaId || categorias.length === 0) return;
     if (categorias.some((c) => String(c.id) === categoriaId)) return;
@@ -223,10 +209,7 @@ export default function Catalogo() {
     setParams(nuevos);
   }
 
-  // La barra pegada: cuando queda fija arriba lleva una sombra, para
-  // separarse de las cards que pasan por debajo. Un elemento de 1px justo
-  // arriba de la barra avisa cuando paso por debajo del header (a la altura
-  // a la que se pega la barra: su "top" en el CSS)
+  // la barra pegada lleva sombra al quedar fija arriba; un elemento de 1px sobre la barra avisa cuándo pasó bajo el header
   const testigoRef = useRef(null);
   const refBarra = useRef(null);
   const [pegada, setPegada] = useState(false);

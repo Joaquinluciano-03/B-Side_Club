@@ -1,4 +1,4 @@
-// logica de negocio de la info del local (registro unico, id siempre 1)
+// registro único (id siempre 1)
 
 const { prisma } = require('../config/db');
 

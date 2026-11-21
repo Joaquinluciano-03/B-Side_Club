@@ -1,9 +1,5 @@
-// Revisa que lo que se subio sea de verdad una imagen, mirando sus primeros
-// bytes (la "firma" de cada formato). El tipo que manda el navegador lo
-// elige el cliente: alguien podia subir un .html o un .svg con codigo
-// diciendo que era image/png, y quedaba publicado en nuestro storage.
-// Si la firma coincide, el tipo y la extension con que se guarda salen de
-// aca, no de lo que dijo el cliente.
+// revisa que lo subido sea una imagen mirando los primeros bytes: el tipo que manda
+// el navegador no es confiable. El tipo y la extensión que se guardan salen de acá
 
 const FORMATOS = [
   { tipo: 'image/jpeg', ext: '.jpg', es: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },

@@ -2,23 +2,17 @@
 
 const multer = require('multer');
 
-// memoryStorage y no diskStorage: el backend corre como funcion de Netlify y
-// no tiene disco propio donde escribir. El archivo queda en memoria y de ahi
-// lo sube storage.js a Supabase Storage.
-// El limite de 5 MB de abajo es lo que mantiene acotado el uso de memoria.
+// memoryStorage: el backend no tiene disco propio, el archivo pasa a Supabase Storage (máx. 5 MB)
 const storage = multer.memoryStorage();
 
-// los formatos que muestra cualquier navegador. SVG queda afuera a proposito:
-// es texto y puede llevar scripts adentro. Ademas, despues de multer,
-// middlewares/validarImagen.js confirma el formato mirando el contenido.
+// SVG queda afuera porque puede llevar scripts; validarImagen.js revisa el contenido
 const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 
 const fileFilter = (req, file, cb) => {
   if (TIPOS_PERMITIDOS.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    // con .status el errorHandler lo devuelve como 400 con este mismo mensaje,
-    // en vez de tratarlo como un error interno inesperado
+    // con .status el errorHandler lo devuelve como 400
     const error = new Error('Solo se permiten imágenes JPG, PNG, WEBP, GIF o AVIF');
     error.status = 400;
     cb(error, false);

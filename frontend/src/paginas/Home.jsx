@@ -1,9 +1,5 @@
-// Home. El primer viewport es el label de un vinilo gigante con la tracklist
-// como navegacion (componentes/home/HeroLabel). Abajo, cada seccion con una
-// forma distinta: elegidos (grilla de fundas), categorias (cartel de neon
-// con una fila por categoria), la cinta con los formatos, la promesa del local (Lado B, oscuro) y
-// el cierre naranja. Del Lado B para abajo cada seccion entra al llegar a pantalla
-// (lib/useEnPantalla) y tiene su propio movimiento.
+// Home: el primer pantallazo es el label de un vinilo con la tracklist como navegación (componentes/home/HeroLabel).
+// Del Lado B para abajo cada sección entra al llegar a pantalla (lib/useEnPantalla)
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -44,8 +40,7 @@ function Elegidos() {
   const [cantidadOfertas, setCantidadOfertas] = useState(0);
   const { total } = useConteos();
 
-  // las ofertas (productos con descuento) primero y despues los destacados,
-  // sin repetir los que son las dos cosas; hasta 8 en total
+  // primero las ofertas y después los destacados, sin repetir; hasta 8
   useEffect(() => {
     const pedir = (filtro) =>
       get(`/productos${query({ ...filtro, pageSize: 8 })}`).catch(() => ({ productos: [], total: 0 }));
@@ -59,7 +54,7 @@ function Elegidos() {
     });
   }, []);
 
-  // sin destacados cargados la seccion no aporta: mejor no mostrarla
+  // sin destacados la sección no se muestra
   if (destacados && destacados.length === 0) return null;
 
   return (
@@ -101,8 +96,7 @@ function Elegidos() {
 
 function Formatos() {
   const { categorias } = useConteos();
-  // el neon se enciende la primera vez que el panel se ve, y su titileo se
-  // pausa cuando no esta en pantalla
+  // el neón se enciende la primera vez que se ve y titila solo en pantalla
   const refMarco = useEnPantalla({ pausa: true });
   if (categorias.length === 0) return null;
 
@@ -146,21 +140,17 @@ function Formatos() {
   );
 }
 
-// La cinta naranja entre Categorias y el Lado B: lo que promete el local,
-// pasando sin parar, y al hacer scroll corre un poco mas rapido. Los formatos
-// ya pasan en la franja del header, por eso aca van frases. Es decorativa (lo
-// mismo se lee abajo, en el Lado B), por eso va aria-hidden.
+// cinta naranja entre Categorías y el Lado B, con frases del local. Decorativa (aria-hidden), lo mismo se lee en el Lado B
 const FRASES_CINTA = ['Nuevos y usados', 'Garantía de calidad', 'Escala Goldmine', 'Fotos del ejemplar real', 'Reservas por 48 hs'];
 
 function Cinta() {
   const ref = useEnPantalla({ entrada: false, pausa: true });
 
-  // se repiten las frases hasta llenar bien el ancho de una pantalla grande
+  // se repiten las frases hasta llenar una pantalla grande
   const palabras = FRASES_CINTA;
   const tramo = [];
   while (tramo.length < 12) tramo.push(...palabras);
-  // dos tramos iguales seguidos: la pista se corre medio largo (-50%) y
-  // vuelve a empezar sin que se note el salto
+  // dos tramos iguales: la pista se corre -50% y vuelve a empezar sin salto
   const dibujarTramo = (copia) => (
     <span key={copia} className={estilos.cintaTramo}>
       {tramo.map((p, n) => (
@@ -188,7 +178,7 @@ function Cinta() {
 }
 
 function LadoB() {
-  // la seccion solo se observa para pausar el parlante fuera de pantalla
+  // la sección se observa solo para pausar el parlante fuera de pantalla
   const refSeccion = useEnPantalla({ entrada: false, pausa: true });
   const refTitulo = useEnPantalla();
   const refPromesas = useEnPantalla();
@@ -244,7 +234,7 @@ function LadoB() {
   );
 }
 
-// las marcas del dial de FM del cierre
+// marcas del dial de FM del cierre
 const FRECUENCIAS = [88, 92, 96, 100, 104, 108];
 
 function Cierre() {

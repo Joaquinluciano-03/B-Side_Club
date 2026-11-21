@@ -1,7 +1,4 @@
-// Marco de las pantallas de sesion (login, registro, recuperar, resetear,
-// aceptar invitacion). Pantalla partida: a la izquierda el disco con un label
-// de "solo staff" (el mismo mundo del hero), a la derecha el formulario.
-// En mobile queda solo el formulario, con un label chico arriba.
+// marco de las pantallas de sesión: el disco de "solo staff" a la izquierda y el formulario a la derecha (en mobile, solo el formulario)
 
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react';

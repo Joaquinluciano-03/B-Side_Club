@@ -1,11 +1,6 @@
-// Equipo. Las reglas de permisos las decide el backend; aca solo escondemos
-// los botones que sabemos que van a dar 403, para no ofrecer acciones que no
-// se pueden hacer:
-//   - al super_admin no lo toca nadie
-//   - nadie puede asignar el rol super_admin
-//   - solo el super_admin puede eliminar a un administrador
-//   - solo el super_admin cambia roles (un administrador no puede ascender
-//     a nadie ni tocar a otro administrador)
+// equipo. Los permisos los decide el backend; acá solo se esconden los botones que darían 403:
+// - al super_admin no lo toca nadie, y nadie asigna ese rol
+// - solo el super_admin elimina administradores y cambia roles
 
 import { useEffect, useState } from 'react';
 import { get, put, del } from '../../lib/api';
@@ -83,7 +78,7 @@ export default function Usuarios() {
                 {usuarios.map((u) => {
                   const esDueño = u.rol === 'super_admin';
                   const soyYo = u.id === yo?.id;
-                  // el backend solo deja al super_admin eliminar administradores
+                  // solo el super_admin elimina administradores
                   const puedoBorrar =
                     !esDueño && !soyYo && (u.rol !== 'administrador' || soyDueño);
                   const puedoCambiarRol = soyDueño && !esDueño;

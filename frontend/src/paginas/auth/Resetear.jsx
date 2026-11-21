@@ -1,6 +1,4 @@
-// Elegir contraseña nueva con el token que llego por mail.
-// El backend distingue tres fallas del token y conviene no mezclarlas:
-// 400 invalido, 409 ya usado, 410 vencido.
+// elegir contraseña nueva con el token del mail. Fallas del token: 400 inválido, 409 ya usado, 410 vencido
 
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
@@ -41,7 +39,7 @@ export default function Resetear() {
     setError(null);
     setErrorCampo(null);
 
-    // el nombre y el mail de la cuenta no se conocen aca: eso lo revisa el backend
+    // el nombre y el mail de la cuenta los revisa el backend
     const problema = errorPassword(password);
     if (problema) {
       setErrorCampo(problema);

@@ -1,11 +1,6 @@
-// Punto unico de contacto con el backend. Todo pedido pasa por aca para que
-// la API key y el token se manden siempre y se configuren en un solo lugar
-// (es el patron que documenta docs/backend-estado.txt).
+// único punto de contacto con el backend: manda siempre la API key y el token
 
-// Por defecto "/api", o sea el mismo dominio desde el que se sirve el sitio.
-// En Netlify eso lo atiende la funcion del backend; en desarrollo lo reenvia
-// el proxy de vite.config.js. Solo hace falta definir VITE_API_URL si alguna
-// vez el backend se muda a otro dominio.
+// API_URL es "/api" (mismo dominio; en desarrollo lo reenvía el proxy de vite.config.js). VITE_API_URL solo si el backend se muda
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 const API_KEY = import.meta.env.VITE_API_KEY || '';
 
@@ -23,8 +18,7 @@ export function borrarToken() {
   localStorage.removeItem(CLAVE_TOKEN);
 }
 
-// Error con el status a mano, para que las pantallas puedan distinguir
-// "credenciales mal" (401) de "te pasaste de intentos" (429) sin parsear texto.
+// error con el status, para distinguir un 401 de un 429 sin parsear texto
 export class ErrorApi extends Error {
   constructor(mensaje, status) {
     super(mensaje);
@@ -33,8 +27,7 @@ export class ErrorApi extends Error {
   }
 }
 
-// Avisa cuando el token dejo de servir, para que el AuthProvider cierre sesion
-// sin que cada pantalla tenga que acordarse de hacerlo.
+// avisa cuando el token dejó de servir, para que el AuthProvider cierre la sesión
 let alExpirar = null;
 export function alExpirarSesion(fn) {
   alExpirar = fn;
@@ -50,8 +43,7 @@ export async function api(ruta, opciones = {}) {
     ...opciones.headers,
   };
 
-  // con FormData el Content-Type lo arma el navegador con su boundary:
-  // si lo ponemos a mano, multer no encuentra donde empieza cada archivo
+  // con FormData el navegador arma el Content-Type con su boundary; a mano, multer no encuentra los archivos
   if (!esFormData && opciones.body !== undefined) {
     headers['Content-Type'] = 'application/json';
   }
@@ -60,13 +52,13 @@ export async function api(ruta, opciones = {}) {
   try {
     res = await fetch(API_URL + ruta, { ...opciones, headers });
   } catch {
-    // fetch solo rechaza si no hubo respuesta: servidor caido, DNS, CORS
+    // fetch solo rechaza si no hubo respuesta: servidor caído, DNS, CORS
     throw new ErrorApi('No pudimos conectarnos con el servidor. ¿Está levantado el backend?', 0);
   }
 
   if (res.status === 204) return null;
 
-  // algunas respuestas de error pueden no ser JSON (502 de un proxy, por ejemplo)
+  // un error puede no ser JSON (ej. 502 de un proxy)
   let datos = null;
   const texto = await res.text();
   if (texto) {
@@ -78,7 +70,7 @@ export async function api(ruta, opciones = {}) {
   }
 
   if (!res.ok) {
-    // el token vencio o es invalido: cerramos sesion una sola vez, desde aca
+    // token vencido o inválido: se cierra sesión una sola vez, desde acá
     if (res.status === 401 && token && alExpirar) alExpirar();
     throw new ErrorApi(datos?.error || `Error ${res.status}`, res.status);
   }
@@ -86,7 +78,7 @@ export async function api(ruta, opciones = {}) {
   return datos;
 }
 
-// Helpers para que las pantallas no repitan el objeto de opciones
+// helpers para no repetir el objeto de opciones
 export const get = (ruta) => api(ruta);
 export const post = (ruta, body) =>
   api(ruta, { method: 'POST', body: body instanceof FormData ? body : JSON.stringify(body) });
@@ -94,8 +86,7 @@ export const put = (ruta, body) => api(ruta, { method: 'PUT', body: JSON.stringi
 export const patch = (ruta, body) => api(ruta, { method: 'PATCH', body: JSON.stringify(body) });
 export const del = (ruta) => api(ruta, { method: 'DELETE' });
 
-// Arma una query string salteando los valores vacios, para no mandar
-// ?q=&categoriaId= y que el backend filtre por cadena vacia.
+// arma una query string salteando los valores vacíos
 export function query(params) {
   const usp = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
@@ -105,16 +96,12 @@ export function query(params) {
   return s ? `?${s}` : '';
 }
 
-// Las imagenes se guardan en Supabase Storage, asi que la base ya tiene la
-// URL completa y no hay nada que armar. Se deja la funcion igual por si queda
-// alguna fila vieja con una ruta relativa: asi no revienta.
+// las imágenes ya vienen con URL completa (Supabase Storage); se deja por si queda alguna fila vieja con ruta relativa
 export function urlImagen(url) {
   if (!url) return null;
-  // las imagenes de relleno de los primeros datos de prueba (placehold.co) no son fotos: se
-  // tratan como "sin imagen" y el sitio dibuja la tapa generica del formato
+  // las imágenes de relleno (placehold.co) cuentan como "sin imagen" y se dibuja la tapa genérica
   if (url.includes('placehold.co')) return null;
-  // rutas relativas a /uploads son de cuando las fotos se guardaban en el
-  // disco del server; el backend ya no sirve esa carpeta (ver src/app.js)
+  // las rutas a /uploads son de cuando las fotos estaban en el disco del server
   if (url.startsWith('/uploads')) return null;
   return url;
 }

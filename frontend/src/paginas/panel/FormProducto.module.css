@@ -5,7 +5,7 @@
   align-items: start;
 }
 
-/* ============ FORMULARIO ============ */
+/* Formulario */
 .formulario {
   display: flex;
   flex-direction: column;
@@ -108,7 +108,7 @@
   width: 100%;
 }
 
-/* ============ LATERAL ============ */
+/* Lateral */
 .lateral {
   position: sticky;
   top: 96px;

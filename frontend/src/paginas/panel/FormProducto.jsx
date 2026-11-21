@@ -1,12 +1,5 @@
-// Alta y edicion de producto. Sirve para las dos cosas: si hay :id en la URL
-// edita, si no crea. Las imagenes se suben aparte (POST /productos/:id/imagenes)
-// porque necesitan un producto ya existente al que colgarse: al crear, las
-// fotos elegidas quedan "pendientes" en el navegador y se suben apenas el
-// producto se guarda.
-//
-// El backend tiene un solo campo "nombre": aca se carga en dos (titulo y
-// artista) y se guarda como "Titulo — Artista", que es lo que el sitio
-// separa despues (lib/formato.js, separarNombre).
+// alta y edición de producto (con :id edita, si no crea). Las imágenes se suben aparte (POST /productos/:id/imagenes): al crear quedan pendientes y se suben al guardar.
+// El backend tiene un solo campo "nombre": acá se carga título y artista y se guarda como "Título — Artista" (lib/formato.js, separarNombre)
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -44,8 +37,7 @@ const VACIO = {
 const MAX_IMAGENES = 5;
 const MAX_MB = 5;
 
-// sugerencias para "condicion": la escala Goldmine (la que entiende la ficha
-// publica) y las que se usan para equipos
+// sugerencias para "condición": la escala Goldmine y las de equipos
 const CONDICIONES = [
   'Nuevo (M)',
   'Casi nuevo (NM)',
@@ -92,8 +84,7 @@ export default function FormProducto() {
   const [arrastrando, setArrastrando] = useState(false);
   const [errores, setErrores] = useState({});
   const [imagenABorrar, setImagenABorrar] = useState(null);
-  // fotos elegidas antes de crear el producto: { archivo, url } con una URL
-  // local (blob:) para mostrarlas hasta que se suban
+  // fotos elegidas antes de crear: { archivo, url } con URL local (blob:) hasta que se suban
   const [pendientes, setPendientes] = useState([]);
 
   // las URLs locales ocupan memoria hasta que se liberan
@@ -116,7 +107,7 @@ export default function FormProducto() {
           titulo,
           artista: artista ?? '',
           anio: p.anio ?? '',
-          // precio es Decimal: llega como string, y el input lo quiere como string igual
+          // precio es Decimal: llega como string y el input lo quiere igual
           precio: p.precio ?? '',
           stock: String(p.stock ?? 0),
           estado_stock: p.estado_stock ?? 'disponible',
@@ -127,7 +118,7 @@ export default function FormProducto() {
           destacado: Boolean(p.destacado),
           esActivo: p.esActivo !== false,
           descuento_tipo: p.descuento_tipo ?? '',
-          // Decimal: llega como string ("15.00"); Number lo deja en "15"
+          // Decimal llega como string ("15.00"); Number lo deja en "15"
           descuento_valor: p.descuento_valor != null ? String(Number(p.descuento_valor)) : '',
         });
         setImagenes(p.imagenes || []);
@@ -146,13 +137,13 @@ export default function FormProducto() {
     if (!form.titulo.trim()) e.titulo = 'Poné el título del disco o el nombre del equipo.';
     if (!form.descripcion.trim()) e.descripcion = 'Contá el estado real del ejemplar.';
     if (!form.categoriaId) e.categoriaId = 'Elegí una categoría.';
-    // el backend toma anio 0 como faltante
+    // el backend toma año 0 como faltante
     if (!Number.isFinite(Number(form.anio)) || Number(form.anio) <= 0) e.anio = 'Poné el año (por ejemplo 1973).';
     if (form.stock === '' || !Number.isFinite(Number(form.stock)) || Number(form.stock) < 0)
       e.stock = 'Tiene que ser un número, 0 o más.';
     if (form.precio !== '' && !Number.isFinite(Number(form.precio)))
       e.precio = 'Tiene que ser un número, o vacío para "a consultar".';
-    // sin precio el descuento no se manda (ver guardar), asi que no se valida
+    // sin precio el descuento no se manda, así que no se valida
     if (!e.precio && form.precio !== '') {
       e.descuento = errorDescuento(form.precio, form.descuento_tipo, form.descuento_valor);
     }
@@ -167,8 +158,7 @@ export default function FormProducto() {
     ev.preventDefault();
     if (!validar()) return;
 
-    // precio vacio = "a consultar": se manda null, no "" ni 0. Y sin precio
-    // (o con "Sin descuento") el descuento se manda en null, o sea se quita
+    // precio vacío = "a consultar": se manda null; sin precio o con "Sin descuento" el descuento también va null
     const conDescuento = form.precio !== '' && form.descuento_tipo !== '';
     const cuerpo = {
       nombre: unirNombre(form.titulo, form.artista),
@@ -188,7 +178,7 @@ export default function FormProducto() {
 
     setGuardando(true);
     try {
-      // las cantidades por categoria del sitio pueden cambiar (alta, baja, categoria)
+      // las cantidades por categoría del sitio pueden cambiar
       olvidarConteos();
       if (editando) {
         await put(`/productos/${id}`, cuerpo);
@@ -196,8 +186,7 @@ export default function FormProducto() {
       } else {
         const creado = await post('/productos', cuerpo);
         if (pendientes.length) {
-          // el producto ya existe: ahora si se pueden subir las fotos elegidas,
-          // en el orden en que se ven (la primera queda de portada)
+          // el producto ya existe: se suben las fotos elegidas en orden (la primera es la portada)
           const fd = new FormData();
           pendientes.forEach((p) => fd.append('imagenes', p.archivo));
           try {
@@ -209,7 +198,7 @@ export default function FormProducto() {
         } else {
           toast.exito('Producto creado.');
         }
-        // pasamos a la edicion del producto recien creado
+        // pasa a la edición del producto recién creado
         navigate(`/panel/productos/${creado.id}`, { replace: true });
       }
     } catch (err) {
@@ -219,11 +208,8 @@ export default function FormProducto() {
     }
   }
 
-  // filtra lo elegido, lo comprime (lib/comprimirImagen) y avisa si no se
-  // puede subir. El backend acepta hasta 5 por tanda y 5 MB cada una:
-  // avisamos antes de gastar el pedido y que vuelva un 400. El peso se mira
-  // despues de comprimir: una foto de celular de 8 MB entra sin problema.
-  // "yaHay" cuenta las pendientes, que despues van en la misma tanda.
+  // filtra lo elegido, lo comprime y avisa si no se puede subir. El backend acepta hasta 5 por tanda y 5 MB cada una
+  // (el peso se mira después de comprimir); "yaHay" cuenta las pendientes
   async function revisarArchivos(lista, yaHay = 0) {
     const archivos = Array.from(lista || []).filter((a) => a.type.startsWith('image/'));
     if (!archivos.length) {
@@ -259,13 +245,13 @@ export default function FormProducto() {
     setPendientes((prev) => prev.filter((x) => x !== p));
   }
 
-  // la portada es la primera de la lista: se pasa adelante
+  // la portada es la primera de la lista
   function pendienteDePortada(p) {
     setPendientes((prev) => [p, ...prev.filter((x) => x !== p)]);
   }
 
   async function subirImagenes(lista) {
-    // "subiendo" ya durante la compresion: con fotos grandes tarda un momento
+    // "subiendo" ya durante la compresión
     setSubiendo(true);
     const archivos = await revisarArchivos(lista);
     if (!archivos) {
@@ -304,8 +290,7 @@ export default function FormProducto() {
     }
   }
 
-  // la portada es la imagen de orden mas bajo: para cambiarla le damos un
-  // orden menor a todas las demas
+  // la portada es la imagen de orden más bajo: se le da un orden menor a las demás
   async function hacerPortada(img) {
     const minimo = Math.min(...imagenes.map((i) => i.orden));
     if (img.orden === minimo) return;
@@ -324,7 +309,7 @@ export default function FormProducto() {
 
   const ordenadas = [...imagenes].sort((a, b) => a.orden - b.orden);
   const categoria = categorias.find((c) => String(c.id) === form.categoriaId);
-  // producto armado con lo que hay en el formulario, para la vista previa
+  // producto armado con el formulario, para la vista previa
   const previa = {
     id: id || 0,
     nombre: unirNombre(form.titulo || 'Título del disco', form.artista),

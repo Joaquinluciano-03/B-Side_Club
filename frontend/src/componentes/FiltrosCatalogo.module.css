@@ -1,4 +1,4 @@
-/* ============ LA HOJA ============
+/* La hoja
    Un <dialog> modal. En escritorio es una hoja que entra desde la derecha;
    en el celular sube desde abajo. Entra con la curva de cajon y sale mas
    rapido (lo que se va no hace esperar). Sin soporte de @starting-style
@@ -138,7 +138,7 @@
   color: var(--tinta-dim);
 }
 
-/* ============ SECCIONES ============ */
+/* Secciones */
 .seccion {
   margin: 0;
   padding: var(--e-5) 0 0;
@@ -208,7 +208,7 @@
   color: var(--tinta-sobre-naranja);
 }
 
-/* ============ PRECIO ============ */
+/* Precio */
 .precios {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -245,7 +245,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ============ PIE ============ */
+/* Pie */
 .pie {
   flex: none;
   display: flex;

@@ -1,6 +1,4 @@
-// Promociones y novedades. Es lo que se muestra en la banda de la home.
-// Tienen vigencia opcional: si no se cargan fechas, la promo vale mientras
-// este activa.
+// promociones y novedades de la banda de la home. La vigencia es opcional: sin fechas, vale mientras esté activa
 
 import { useEffect, useState } from 'react';
 import { get, post, put, del } from '../../lib/api';
@@ -22,7 +20,7 @@ const VACIA = {
   activa: true,
 };
 
-// la base guarda DateTime y el <input type="date"> quiere "YYYY-MM-DD"
+// la base guarda DateTime y <input type="date"> quiere "YYYY-MM-DD"
 function aInputDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -57,7 +55,7 @@ export default function Promociones() {
 
   useEffect(() => {
     setError(null);
-    // sin ?soloActivas el panel las ve todas, incluidas las apagadas
+    // sin ?soloActivas el panel las ve todas
     get('/promociones')
       .then(setPromociones)
       .catch((err) => setError(mensajeDeError(err)));
@@ -94,7 +92,7 @@ export default function Promociones() {
 
     const e = {};
     if (!form.titulo.trim()) e.titulo = 'Requerido.';
-    // una promo que termina antes de empezar no se mostraria nunca
+    // una promo que termina antes de empezar no se mostraría nunca
     if (form.fechaInicio && form.fechaFin && form.fechaFin < form.fechaInicio) {
       e.fechaFin = 'La fecha de fin es anterior a la de inicio.';
     }
@@ -117,8 +115,7 @@ export default function Promociones() {
           ? await post('/promociones', cuerpo)
           : await put(`/promociones/${editando}`, cuerpo);
 
-      // la imagen va en un segundo pedido (multipart) una vez que la promo
-      // ya existe y tiene id. Si falla, los datos quedaron guardados igual.
+      // la imagen va en un segundo pedido (multipart) cuando la promo ya tiene id. Si falla, los datos quedan guardados
       if (archivo) {
         const fd = new FormData();
         fd.append('imagen', archivo);

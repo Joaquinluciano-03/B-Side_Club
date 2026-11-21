@@ -1,4 +1,3 @@
-// conexion a base de datos
 require("dotenv").config();
 
 const { PrismaPg } = require("@prisma/adapter-pg");

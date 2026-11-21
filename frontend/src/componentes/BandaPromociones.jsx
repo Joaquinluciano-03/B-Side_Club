@@ -1,6 +1,4 @@
-// Banda de novedades de la home. Solo aparece si hay alguna promo vigente:
-// una seccion vacia con el titulo "Novedades" se ve peor que no tenerla.
-// Cada promo es un volante: imagen (si tiene) y texto, con la fecha de fin.
+// novedades de la home: solo aparece si hay alguna promo vigente
 
 import { useState } from 'react';
 import { usePromocionesVigentes } from '../lib/usePromociones';
@@ -32,13 +30,13 @@ function Volante({ promo }) {
 }
 
 export default function BandaPromociones() {
-  // el mismo pedido que usa la tracklist del hero (lib/usePromociones)
+  // el mismo pedido que usa la tracklist del hero
   const promos = usePromocionesVigentes();
 
   if (!promos || promos.length === 0) return null;
 
   return (
-    // id: a esta seccion apunta la tracklist del hero
+    // la tracklist del hero apunta a este id
     <section id="novedades" tabIndex={-1} className={estilos.banda} aria-labelledby="novedades-titulo">
       <div className={estilos.interior}>
         <h2 id="novedades-titulo" className={estilos.encabezado}>

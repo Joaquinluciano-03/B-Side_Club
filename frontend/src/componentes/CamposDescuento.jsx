@@ -1,9 +1,4 @@
-// Campos para cargar el descuento de un producto en el panel: el tipo (sin
-// descuento, porcentaje o monto fijo), el valor y, abajo, como queda el
-// precio. Lo usan el formulario del producto y el atajo del listado.
-//
-// Es controlado: recibe tipo ('' | 'porcentaje' | 'monto') y valor (string)
-// y avisa los cambios con onCambiar({ tipo, valor }).
+// campos del descuento de un producto (tipo, valor y cómo queda el precio). Controlado: onCambiar({ tipo, valor })
 
 import Segmentos from './Segmentos';
 import { calcularDescuento, esAConsultar, formatearPrecio } from '../lib/formato';
@@ -15,8 +10,7 @@ const TIPOS = [
   { valor: 'monto', label: 'Monto fijo' },
 ];
 
-// mismas reglas que el backend (src/services/producto.service.js): asi el
-// error aparece al lado del campo en vez de volver como 400 al guardar
+// mismas reglas que el backend, para mostrar el error junto al campo
 export function errorDescuento(precio, tipo, valor) {
   if (!tipo) return null;
   if (esAConsultar(precio)) return 'Poné un precio para poder aplicar un descuento.';

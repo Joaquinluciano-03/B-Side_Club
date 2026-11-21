@@ -1,12 +1,4 @@
-// Galeria de fotos de la ficha de producto. La tapa (funda con el disco
-// asomando) muestra la foto activa y se puede recorrer de varias formas:
-//   - flechas sobre la foto (con el mouse encima; en pantallas tactiles
-//     estan siempre a la vista)
-//   - deslizando con el dedo
-//   - con las flechas del teclado, con el foco en la galeria
-//   - tocando una miniatura
-// Al tocar la foto se abre en grande (para ver el estado del ejemplar de
-// cerca), con la misma navegacion. Sin fotos se ve la tapa generica y nada mas.
+// galería de la ficha: flechas, deslizar, teclado y miniaturas. Al tocar la foto se abre en grande con la misma navegación
 
 import { useEffect, useRef, useState } from 'react';
 import { CaretLeft, CaretRight, X, MagnifyingGlassPlus } from '@phosphor-icons/react';
@@ -14,10 +6,7 @@ import ArteProducto, { ObjetoInterior } from './ArteProducto';
 import { urlImagen } from '../lib/api';
 import estilos from './GaleriaProducto.module.css';
 
-// Deslizar con el dedo (o arrastrar con el mouse): pasado cierto recorrido
-// horizontal cambia de foto. Devuelve los handlers para el elemento y una
-// funcion que dice si el ultimo gesto fue un deslizamiento (asi el click que
-// viene despues no abre la foto en grande).
+// deslizar con el dedo o el mouse cambia de foto. Devuelve los handlers y una función que dice si el último gesto fue un deslizamiento (para no abrir la foto)
 function useDeslizar(alDeslizar) {
   const inicio = useRef(null);
   const deslizo = useRef(false);
@@ -64,7 +53,7 @@ export default function GaleriaProducto({ producto, vendido = false, className =
   const imagenes = (producto.imagenes || []).filter((img) => urlImagen(img.url));
   const total = imagenes.length;
   const [activa, setActiva] = useState(0);
-  // hacia donde se movio (1 o -1): la foto nueva entra desde ese lado
+  // hacia dónde se movió (1 o -1): la foto nueva entra desde ese lado
   const [direccion, setDireccion] = useState(0);
   const [ampliada, setAmpliada] = useState(false);
   const dialogo = useRef(null);
@@ -83,7 +72,7 @@ export default function GaleriaProducto({ producto, vendido = false, className =
   const deslizar = useDeslizar(ir);
   const deslizarGrande = useDeslizar(ir);
 
-  // precarga la anterior y la siguiente: al pasar, la foto ya esta
+  // precarga la anterior y la siguiente
   useEffect(() => {
     if (total < 2) return;
     for (const i of [activa + 1, activa - 1]) {
@@ -92,7 +81,7 @@ export default function GaleriaProducto({ producto, vendido = false, className =
     }
   }, [activa, total]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // la miniatura activa siempre a la vista en la tira (sin mover la pagina)
+  // la miniatura activa siempre a la vista
   useEffect(() => {
     const el = tira.current?.children[activa];
     if (!el) return;
@@ -103,7 +92,7 @@ export default function GaleriaProducto({ producto, vendido = false, className =
     }
   }, [activa]);
 
-  // abrir y cerrar la vista grande (dialog nativo: foco, Escape y fondo)
+  // abrir y cerrar la vista grande (dialog)
   useEffect(() => {
     const d = dialogo.current;
     if (!d) return;
@@ -207,12 +196,11 @@ export default function GaleriaProducto({ producto, vendido = false, className =
           }}
           onClose={() => setAmpliada(false)}
           onClick={(e) => {
-            // un click en el fondo (fuera de la foto y de los botones) cierra
+            // click en el fondo cierra
             if (e.target === e.currentTarget || e.target.dataset.fondo !== undefined) setAmpliada(false);
           }}
           onKeyDown={(e) => {
-            // el dialog esta adentro de la galeria: sin esto la flecha llega
-            // tambien a la galeria y avanza dos fotos
+            // si no, la flecha también llega a la galería y avanza dos fotos
             e.stopPropagation();
             if (total > 1) alTeclear(e);
           }}

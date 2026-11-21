@@ -1,12 +1,7 @@
-// traduce http a logica de negocio
-
 const invitacionService = require('../services/invitacion.service');
 const v = require('../utils/validar');
 
-// roles que se pueden dar por invitacion. super_admin queda afuera a proposito:
-// es el dueño del local, hay uno solo y sale del registro inicial. Sin esta
-// lista un administrador podia invitar a alguien como super_admin, y un rol
-// inventado ("jefe") llegaba a Prisma y salia como error 500.
+// super_admin no se puede invitar: es el dueño y hay uno solo
 const ROLES_INVITABLES = ['administrador', 'vendedor'];
 
 async function crear(req, res, next) {
@@ -14,8 +9,7 @@ async function crear(req, res, next) {
     const email = v.email(req.body.email, 'email', { requerido: true });
     const rol = v.opcion(req.body.rol, 'rol', ROLES_INVITABLES, { requerido: true });
 
-    // solo el dueño suma administradores: si no, un administrador podia
-    // invitar a otros con su mismo poder (y ellos a mas)
+    // solo el dueño puede sumar administradores
     if (rol === 'administrador' && req.user.rol !== 'super_admin') {
       return res.status(403).json({ error: 'Solo el dueño del local puede invitar administradores.' });
     }
@@ -39,7 +33,7 @@ async function aceptar(req, res, next) {
       apellido: v.texto(req.body.apellido, 'apellido', { requerido: true, max: 60 }),
       telefono: v.telefono(req.body.telefono, 'telefono', { requerido: true }),
     };
-    // el mail de la invitacion lo revisa el service, que es quien lo conoce
+    // el service revisa el mail
     datos.password = v.password(req.body.password, { datos });
 
     const resultado = await invitacionService.aceptar(datos);

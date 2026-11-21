@@ -14,7 +14,7 @@
   gap: var(--e-7) var(--e-6);
 }
 
-/* ---- el local ---- */
+/* El local */
 .marca {
   font-family: var(--display);
   font-size: var(--t-lg);
@@ -69,7 +69,7 @@
   text-decoration-color: var(--naranja);
 }
 
-/* ---- columnas ---- */
+/* Columnas */
 .encabezado {
   margin: 0 0 var(--e-4);
   font-size: var(--t-sm);
@@ -128,7 +128,7 @@
   flex-shrink: 0;
 }
 
-/* ---- base ---- */
+/* Base */
 .base {
   max-width: var(--ancho);
   margin: 0 auto;

@@ -1,6 +1,4 @@
-// Contacto: canales rapidos (WhatsApp, Instagram, mail) y el formulario que
-// guarda la consulta -> POST /api/consultas (publico, 5 envios por hora).
-// Si llega con ?productoId=N la consulta queda asociada a ese disco.
+// contacto: canales rápidos y formulario que guarda la consulta (POST /api/consultas, 5 envíos por hora). Con ?productoId=N la consulta queda asociada al disco
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -57,7 +55,7 @@ export default function Contacto() {
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
-  // si viene por un producto, lo mostramos y precargamos el asunto
+  // si viene por un producto, se muestra y se precarga el asunto
   useEffect(() => {
     if (!productoId) {
       setProducto(null);
@@ -73,7 +71,7 @@ export default function Contacto() {
 
   function campo(nombre, valor) {
     setForm((f) => ({ ...f, [nombre]: valor }));
-    // el error se limpia al corregir, no al reenviar: es menos frustrante
+    // el error se limpia al corregir, no al reenviar
     if (errores[nombre]) setErrores((e) => ({ ...e, [nombre]: null }));
   }
 
@@ -85,8 +83,7 @@ export default function Contacto() {
     setParams(nuevos, { replace: true });
   }
 
-  // Validamos igual que el backend para avisar antes de gastar un pedido:
-  // el formulario publico tiene un limite de 5 envios por hora.
+  // se valida como el backend para no gastar uno de los 5 envíos por hora
   function validar() {
     const e = {};
     if (!form.nombre.trim()) e.nombre = 'Decinos cómo te llamás.';
@@ -95,7 +92,7 @@ export default function Contacto() {
     if (!form.asunto.trim()) e.asunto = 'Poné un asunto corto.';
     if (!form.mensaje.trim()) e.mensaje = 'Contanos qué buscás.';
     setErrores(e);
-    // el foco va al primer campo con error, para no tener que buscarlo
+    // el foco va al primer campo con error
     const primero = ['nombre', 'email', 'asunto', 'mensaje'].find((k) => e[k]);
     if (primero) document.getElementById(`c-${primero}`)?.focus();
     return !primero;

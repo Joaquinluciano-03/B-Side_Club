@@ -1,9 +1,4 @@
-// Avisos flotantes: una pastilla oscura abajo al centro, con un icono segun
-// el tipo. Entran desde abajo con @starting-style (toast.module.css).
-//
-// Sirven para confirmar algo que YA pasó ("Cambios guardados"). Para los
-// errores que la persona tiene que leer y corregir en el formulario seguimos
-// usando el .aviso inline: un toast se va solo y eso no se puede perder.
+// avisos flotantes para confirmar algo que ya pasó. Los errores que hay que corregir en el formulario siguen usando .aviso inline: un toast se va solo
 
 import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { CheckCircle, WarningCircle, Info } from '@phosphor-icons/react';
@@ -22,8 +17,7 @@ const ICONOS = {
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
-  // contador propio en vez de Date.now(): dos toasts en el mismo milisegundo
-  // compartirian key y React se queja
+  // contador propio en vez de Date.now(): dos toasts en el mismo milisegundo compartirían key
   const siguienteId = useRef(0);
 
   const cerrar = useCallback((id) => {

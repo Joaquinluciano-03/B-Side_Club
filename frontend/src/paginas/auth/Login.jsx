@@ -15,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  // si ya hay sesion, no tiene sentido mostrar el login
+  // con sesión no tiene sentido mostrar el login
   if (!cargando && esStaff) return <Navigate to={location.state?.volverA || '/panel'} replace />;
 
   async function enviar(e) {

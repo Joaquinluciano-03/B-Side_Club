@@ -1,7 +1,4 @@
-// El genero de un producto: se elige de la lista de generos (tabla Genero),
-// asi siempre se escribe igual y el filtro del catalogo no repite opciones.
-// Si falta uno, se agrega desde aca mismo sin salir del formulario; la lista
-// completa (con borrar) esta en Panel > Categorias.
+// género de un producto, elegido de la tabla Genero para que siempre se escriba igual. Se puede agregar uno acá mismo
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -71,7 +68,7 @@ export default function SelectorGenero({ id = 'p-genero', valor, onChange }) {
               setNuevo(e.target.value);
               setError(null);
             }}
-            // Enter agrega el genero; sin esto mandaria el formulario del producto
+            // Enter agrega el género (si no, mandaría el formulario del producto)
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

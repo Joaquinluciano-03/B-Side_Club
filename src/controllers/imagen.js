@@ -1,5 +1,3 @@
-// traduce http a logica de negocio
-
 const imagenService = require('../services/imagen.service');
 const v = require('../utils/validar');
 

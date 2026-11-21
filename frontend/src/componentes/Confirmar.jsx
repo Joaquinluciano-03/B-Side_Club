@@ -1,7 +1,4 @@
-// Dialogo de confirmacion para las acciones que borran.
-// Usa <dialog> nativo: trae el foco atrapado y el cierre con Escape sin que
-// tengamos que implementarlos a mano. El foco arranca en "Cancelar", que es
-// la opcion segura si alguien aprieta Enter sin leer.
+// diálogo de confirmación para acciones que borran. El foco arranca en "Cancelar" por seguridad
 
 import { useEffect, useRef } from 'react';
 import estilos from './Dialogo.module.css';
@@ -31,7 +28,7 @@ export default function Confirmar({ abierto, titulo, texto, textoBoton = 'Elimin
         onCancelar();
       }}
       onClick={(e) => {
-        // click en el backdrop (fuera de la tarjeta) = cancelar
+        // click fuera de la tarjeta = cancelar
         if (e.target === ref.current) onCancelar();
       }}
     >
