@@ -45,6 +45,16 @@ async function cambiarEstado(req, res, next) {
   }
 }
 
+async function guardarResultado(req, res, next) {
+  try {
+    const resultado = v.texto(req.body.resultado, 'resultado', { max: 500, multilinea: true });
+    const consulta = await consultaService.guardarResultado(v.id(req.params.id), resultado);
+    res.json(consulta);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function eliminar(req, res, next) {
   try {
     await consultaService.eliminar(v.id(req.params.id));
@@ -54,4 +64,4 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { crear, listar, cambiarEstado, eliminar };
+module.exports = { crear, listar, cambiarEstado, guardarResultado, eliminar };

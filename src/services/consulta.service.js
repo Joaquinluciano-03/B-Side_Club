@@ -78,9 +78,14 @@ async function cambiarEstado(id, estado) {
   });
 }
 
+async function guardarResultado(id, resultado) {
+  await obtenerPorId(id);
+  return prisma.consulta.update({ where: { id }, data: { resultado } });
+}
+
 async function eliminar(id) {
   await obtenerPorId(id);
   await prisma.consulta.delete({ where: { id } });
 }
 
-module.exports = { crear, listar, obtenerPorId, cambiarEstado, eliminar };
+module.exports = { crear, listar, obtenerPorId, cambiarEstado, guardarResultado, eliminar };

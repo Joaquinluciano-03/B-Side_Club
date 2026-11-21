@@ -233,9 +233,6 @@ function LadoB() {
           {PROMESAS.map((p, i) => (
             <div key={p.titulo} style={{ '--i': i }}>
               <dt>
-                <span className={estilos.promesaNumero} aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
                 {p.titulo}
               </dt>
               <dd>{p.texto}</dd>

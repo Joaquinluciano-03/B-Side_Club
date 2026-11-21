@@ -49,6 +49,11 @@ export default function Consultas() {
   const [abierta, setAbierta] = useState(null);
   const [aBorrar, setABorrar] = useState(null);
   const [recargar, setRecargar] = useState(0);
+  const [nota, setNota] = useState('');
+  // al abrir otra consulta, la casilla arranca con su resultado guardado
+  useEffect(() => {
+    setNota(abierta?.resultado ?? '');
+  }, [abierta?.id]);
 
   useEffect(() => {
     let vigente = true;
@@ -87,6 +92,18 @@ export default function Consultas() {
       );
       setAbierta((a) => (a && a.id === c.id ? { ...a, estado: nuevo } : a));
       toast.exito(`Marcada como ${etiquetaConsulta(nuevo).toLowerCase()}.`);
+    } catch (err) {
+      toast.error(mensajeDeError(err));
+    }
+  }
+
+  async function guardarResultado() {
+    const c = abierta;
+    try {
+      const act = await patch(`/consultas/${c.id}/resultado`, { resultado: nota });
+      setConsultas((prev) => prev.map((x) => (x.id === c.id ? { ...x, resultado: act.resultado } : x)));
+      setAbierta((a) => (a && a.id === c.id ? { ...a, resultado: act.resultado } : a));
+      toast.exito('Resultado guardado.');
     } catch (err) {
       toast.error(mensajeDeError(err));
     }
@@ -177,6 +194,26 @@ export default function Consultas() {
                   <Link to={`/producto/${abierta.producto.id}`}>{abierta.producto.nombre}</Link>
                 </p>
               )}
+
+              <div className="campo">
+                <label htmlFor="resultado-consulta">Resultado de la consulta</label>
+                <textarea
+                  id="resultado-consulta"
+                  className={estilos.resultado}
+                  rows={3}
+                  maxLength={500}
+                  value={nota}
+                  onChange={(e) => setNota(e.target.value)}
+                  placeholder="Ej: terminó en venta, el cliente no quiso, no contestó…"
+                />
+                <button
+                  className={`btn btn-secundario ${estilos.guardarResultado}`}
+                  onClick={guardarResultado}
+                  disabled={nota.trim() === (abierta.resultado ?? '')}
+                >
+                  Guardar resultado
+                </button>
+              </div>
 
               <div className={estilos.detalleAcciones}>
                 <a

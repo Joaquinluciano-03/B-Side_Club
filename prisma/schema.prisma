@@ -177,6 +177,7 @@ model Consulta {
   canal      Canal
   estado     Estado    @default(pendiente)
   fecha      DateTime  @default(now())
+  resultado  String? // nota interna del panel: si termino en venta, el cliente no quiso, etc
   productoId Int? // opcional: la consulta puede no referirse a ningun producto del catalogo
   producto   Producto? @relation(fields: [productoId], references: [id])
 

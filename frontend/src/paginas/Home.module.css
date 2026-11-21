@@ -604,15 +604,6 @@
   font-size: var(--t-md);
   color: var(--naranja);
 }
-.promesaNumero {
-  font-family: var(--mono);
-  font-stretch: 87.5%;
-  font-weight: 400;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: var(--crema-tenue);
-  font-variant-numeric: tabular-nums;
-}
 .promesas dd {
   margin: var(--e-2) 0 0;
   color: var(--crema-dim);

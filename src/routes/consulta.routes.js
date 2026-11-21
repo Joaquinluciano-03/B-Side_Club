@@ -13,6 +13,7 @@ const rolesGestion = ['super_admin', 'administrador', 'vendedor'];
 router.post('/', limiteFormulario, consultaController.crear);
 router.get('/', requireAuth, requireRol(...rolesGestion), consultaController.listar);
 router.patch('/:id/estado', requireAuth, requireRol(...rolesGestion), consultaController.cambiarEstado);
+router.patch('/:id/resultado', requireAuth, requireRol(...rolesGestion), consultaController.guardarResultado);
 router.delete('/:id', requireAuth, requireRol(...rolesGestion), consultaController.eliminar);
 
 module.exports = router;
